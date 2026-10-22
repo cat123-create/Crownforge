@@ -1,1 +1,177 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRATE CLASH</title>
+<style>
+:root{--bg:#081321;--panel:#12253a;--blue:#55c7ff;--gold:#ffc857;--text:#edf6ff;--muted:#9fb4c8;--green:#75e0a3}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top,#183752,#081321 65%);color:var(--text);font:15px/1.5 system-ui,sans-serif}
+button{cursor:pointer;font:inherit;font-weight:800;color:var(--text);background:#203b54;border:1px solid #45637e;border-radius:10px;padding:10px 13px;transition:.15s}
+button:hover{filter:brightness(1.2);transform:translateY(-1px)}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none}
+button:focus-visible{outline:3px solid var(--blue)}
+.wrap{max-width:1150px;margin:auto;padding:18px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.logo{font-size:clamp(28px,4vw,40px);font-weight:1000;letter-spacing:2px}
+.logo span{color:var(--blue)}
+.sub{font-size:13px;color:var(--muted)}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:#102338;border:1px solid #2b4a63;border-radius:30px;padding:8px 12px;font-weight:800}
+.gold{color:var(--gold)}
+.layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.85fr);gap:16px}
+.panel{background:linear-gradient(155deg,#14273b,#0d1a2a);border:1px solid #2a465f;border-radius:18px;padding:16px;box-shadow:0 16px 40px #0004;min-width:0}
+h2,h3{margin:0 0 8px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.primary{background:linear-gradient(135deg,#1687c7,#2452a0)}
+.section{margin-top:18px}
+.scene{height:465px;position:relative;overflow:hidden;border-radius:16px;border:1px solid #35516a;margin-top:14px;background:linear-gradient(#8ec8d6 0 28%,#6fa17b 28% 46%,#427950 46%)}
+.sun{position:absolute;right:9%;top:7%;width:54px;height:54px;border-radius:50%;background:#ffe8a0;box-shadow:0 0 35px #ffe8a0;animation:sun 3s infinite alternate}
+@keyframes sun{to{box-shadow:0 0 65px #ffe8a0}}
+.mountain{position:absolute;bottom:48%;width:0;height:0;border-left:110px solid transparent;border-right:110px solid transparent;border-bottom:160px solid #537d8c}
+.m1{left:-50px}.m2{right:-40px;border-bottom-color:#426b7d;border-left-width:145px;border-right-width:145px}
+.ground{position:absolute;bottom:-5%;left:-10%;width:120%;height:62%;background:linear-gradient(135deg,#4c8657,#2e6445);transform:rotate(-4deg);border-top:7px solid #a9bb7a}
+.path{position:absolute;left:35%;bottom:-5%;height:67%;width:30%;background:#b7a47c;clip-path:polygon(42% 0,58% 0,100% 100%,0 100%)}
+.wall{position:absolute;left:8%;right:8%;bottom:27%;height:82px;background:repeating-linear-gradient(90deg,#8298a5 0 42px,#667e8e 42px 46px);border:5px solid #425b6c;box-shadow:0 8px #294757}
+.wall:before{content:"";position:absolute;top:-27px;left:-4px;right:-4px;height:28px;background:repeating-linear-gradient(90deg,#aebbc0 0 28px,transparent 28px 45px);border-bottom:4px solid #425b6c}
+.gate{position:absolute;left:42%;bottom:23%;width:16%;height:93px;background:#5c4736;border:7px solid #344d5d;border-bottom:0;border-radius:40px 40px 0 0}
+.banner{position:absolute;top:12px;left:12px;padding:7px 10px;background:#0b1a2be8;border:1px solid #42667e;border-radius:8px;font-size:12px;font-weight:900}
+.building{position:absolute;z-index:3;border:0;background:transparent;padding:0;text-align:center}
+.building .emoji{display:grid;place-items:center;margin:auto;width:80px;height:72px;font-size:46px;background:linear-gradient(145deg,#c2d4dc,#6f8c9c);border:4px solid #405a6b;border-radius:12px 12px 6px 6px;box-shadow:inset 0 5px #ffffff70,0 8px #314c5a}
+.label{display:block;margin-top:8px;padding:5px;background:#0b1a2bf2;border:1px solid #52718a;border-radius:8px;font-size:11px;white-space:nowrap}
+.barracks{left:7%;bottom:43%}.armory{right:7%;bottom:43%}.mine{left:39%;bottom:57%}.command{left:39%;bottom:30%}
+.command .emoji{background:linear-gradient(145deg,#6ac5ff,#2772a8)}
+.soldiers{position:absolute;bottom:7%;left:8%;right:8%;display:flex;justify-content:center;gap:18px;font-size:35px}
+.inventory{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.item{background:#13273a;border:1px solid #2d4b64;border-radius:10px;padding:10px;font-size:13px;overflow-wrap:anywhere}
+.item b{display:block}.item button{margin-top:8px;padding:6px 9px;font-size:12px}
+.action{width:100%;text-align:left;display:flex;align-items:center;gap:10px;margin:9px 0;background:#172d42}
+.big{font-size:25px}.desc{display:block;color:var(--muted);font-size:12px;font-weight:500}
+.notice{margin-top:10px;min-height:25px;color:#b9e6ff}
+.progress{height:8px;background:#263a4e;border-radius:9px;overflow:hidden;margin:8px 0}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,#39b6ff,#71e0b0);transition:width .2s}
+.fightbox{background:linear-gradient(130deg,#351d2c,#1b2336);border:1px solid #713d50;border-radius:14px;padding:14px;margin-top:16px}
+.arena{min-height:95px;display:flex;align-items:center;justify-content:space-around;font-size:32px}
+.log{font-size:13px;color:#c4d6e5;min-height:40px}
+.footer{text-align:center;color:#7892a9;font-size:12px;margin:18px}
+@media(max-width:790px){.layout{grid-template-columns:1fr}.scene{height:410px}}
+@media(max-width:460px){.wrap{padding:9px}.panel{padding:12px}.scene{height:360px}.building .emoji{width:55px;height:50px;font-size:30px}.barracks{left:1%}.armory{right:1%}.mine{left:36%}.label{font-size:9px;white-space:normal;max-width:82px}.inventory{grid-template-columns:1fr 1fr}.soldiers{font-size:27px}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+ <div><div class="logo">CRATE <span>CLASH</span></div><div class="sub">Build your base. Gear your troops. Win the clash.</div></div>
+ <div class="stats"><div class="pill">🪙 <b id="coins">250</b></div><div class="pill">⚔️ Power <b id="power">30</b></div><div class="pill">🪖 Army <b id="army">3/6</b></div></div>
+</header>
+<div class="layout">
+<main class="panel">
+ <div class="row"><div><h2>Your Fortress</h2><div class="sub">Select any building to manage it.</div></div><button class="primary" id="collect">Collect Gold</button></div>
+ <div class="scene">
+  <div class="sun"></div><div class="mountain m1"></div><div class="mountain m2"></div><div class="ground"></div><div class="path"></div><div class="wall"></div><div class="gate"></div><div class="banner">🏰 YOUR KINGDOM</div>
+  <button class="building barracks" data-open="barracks" aria-label="Barracks"><span class="emoji">🏯</span><span class="label">BARRACKS · Lv <span id="blvl">1</span></span></button>
+  <button class="building armory" data-open="armory" aria-label="Armory"><span class="emoji">🛡️</span><span class="label">ARMORY</span></button>
+  <button class="building mine" data-open="mine" aria-label="Gold Mine"><span class="emoji">⛏️</span><span class="label">GOLD MINE · Lv <span id="mlvl">1</span></span></button>
+  <button class="building command" data-open="fight" aria-label="Command Post"><span class="emoji">🏰</span><span class="label">COMMAND POST</span></button>
+  <div class="soldiers" id="soldierArt">⚔️ 🏹 🛡️</div>
+ </div>
+ <div class="section"><h3>Base Overview</h3><div class="row"><span class="sub">Mine production</span><b class="gold" id="production">5 coins / min</b></div><div class="progress"><span id="minebar" style="width:20%"></span></div><div class="row"><span class="sub">Army capacity</span><b id="capacity">3 / 6 soldiers</b></div><div class="progress"><span id="armybar" style="width:50%"></span></div></div>
+ <div class="section"><h3>Quick Actions</h3><div class="inventory"><button class="action" data-open="barracks"><span class="big">🪖</span><span><b>Train army</b><span class="desc">Recruit more fighters</span></span></button><button class="action" data-open="armory"><span class="big">📦</span><span><b>Open a crate</b><span class="desc">Find powerful gear</span></span></button></div></div>
+</main>
+<aside class="panel">
+ <h2 id="sideTitle">Base Command</h2><div class="sub" id="sideDesc">Choose a building to see its options.</div>
+ <div id="sideContent"><div class="item" style="margin-top:14px"><b>Welcome, Commander!</b> Start with 250 coins, 3 soldiers, and a gold mine. Upgrade your base to become stronger.</div><button class="action primary" data-open="fight">⚔️ Enter battle</button></div>
+ <div class="notice" id="notice" role="status" aria-live="polite"></div>
+ <div class="section"><h3>Inventory</h3><div class="sub">Sell gear you no longer need.</div><div class="inventory" id="inventory"><div class="item">No gear yet</div></div></div>
+ <div class="section"><h3>Achievements</h3><div class="inventory" id="achievements"><div class="item">No achievements yet</div></div></div>
+ <div class="fightbox"><div class="row"><h3>Battle Readiness</h3><b id="ready" class="green">READY</b></div><div class="arena"><span id="friendly">⚔️🏹🛡️</span><b style="font-size:16px;color:#ffb5b5">VS</b><span id="enemy">👹👹</span></div><div class="log" id="fightlog">Your troops are ready for orders.</div><button class="primary" id="fightBtn" style="width:100%">⚔️ Fight!</button></div>
+ <div class="section"><button id="reset" style="width:100%;background:#3a202c">Reset Save</button><div class="sub">Clears your saved progress in this browser.</div></div>
+</aside>
+</div>
+<div class="footer">CRATE CLASH · Progress saves automatically in this browser.</div>
+</div>
+<script>
+(()=>{
+"use strict";
+const KEY="crateClashSave_v3", $=id=>document.getElementById(id);
+const fresh=()=>({coins:250,army:3,capacity:6,barracks:1,mine:1,power:30,wins:0,last:Date.now(),gear:[],achievements:{}});
+let s=fresh();
+try{const d=JSON.parse(localStorage.getItem(KEY)||"null");if(d&&typeof d==="object")s={...s,...d};}catch(e){}
+s.coins=Math.max(0,Number(s.coins)||0);s.army=Math.max(1,Math.floor(Number(s.army)||1));s.capacity=Math.max(s.army,Math.floor(Number(s.capacity)||6));s.barracks=Math.min(10,Math.max(1,Math.floor(Number(s.barracks)||1)));s.mine=Math.min(5,Math.max(1,Math.floor(Number(s.mine)||1)));s.power=Math.max(1,Number(s.power)||30);s.wins=Math.max(0,Number(s.wins)||0);if(!Array.isArray(s.gear))s.gear=[];if(!s.achievements||typeof s.achievements!=="object")s.achievements={};
+const away=Math.min(28800,Math.max(0,(Date.now()-(Number(s.last)||Date.now()))/1000));s.coins+=Math.floor(away*5*s.mine/60);s.last=Date.now();
+let pending=0,lastTick=Date.now();
+function save(){s.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(s));}catch(e){}}
+function message(t){$("notice").textContent=t;}
+function gp(){return s.gear.reduce((a,g)=>a+(Number(g.power)||0),0);}
+function esc(t){return String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function render(){
+ $("coins").textContent=Math.floor(s.coins);$("army").textContent=s.army+"/"+s.capacity;$("power").textContent=s.power+gp();
+ $("blvl").textContent=s.barracks;$("mlvl").textContent=s.mine;$("production").textContent=(5*s.mine)+" coins / min";
+ $("minebar").style.width=(s.mine/5*100)+"%";$("capacity").textContent=s.army+" / "+s.capacity+" soldiers";$("armybar").style.width=Math.min(100,s.army/s.capacity*100)+"%";
+ const icons=["⚔️","🏹","🛡️","🔱","🪄"];
+ $("soldierArt").textContent=Array.from({length:Math.min(s.army,8)},(_,i)=>icons[i%icons.length]).join(" ");
+ $("friendly").textContent=Array.from({length:Math.min(s.army,5)},(_,i)=>icons[i%icons.length]).join("");
+ $("inventory").innerHTML=s.gear.length?s.gear.map((g,i)=>`<div class="item"><b>${esc(g.icon)} ${esc(g.name)}</b><span class="sub">+${g.power} power</span><button data-sell="${i}">Sell +${g.power*4} 🪙</button></div>`).join(""):'<div class="item">No gear yet</div>';
+ const labels={crateOpened:"📦 First crate opened",firstWin:"🏆 First victory",bigBarracks:"🏯 Barracks expanded",maxMine:"⛏️ Mine fully upgraded",fiveWins:"⚔️ Five victories"};
+ const earned=Object.keys(labels).filter(k=>s.achievements[k]);
+ $("achievements").innerHTML=earned.length?earned.map(k=>`<div class="item">${labels[k]}</div>`).join(""):'<div class="item">No achievements yet</div>';
+ save();
+}
+function show(which){
+ let title="",desc="",html="";
+ if(which==="barracks"){
+  title="🪖 Barracks";desc="Expand your army and recruit soldiers.";
+  let cost=100*s.barracks;
+  html=`<div class="item"><b>Barracks level ${s.barracks}</b>Upgrade: ${cost} coins. Each upgrade adds 3 capacity and 3 soldiers.</div><button class="action primary" id="upB" ${s.coins<cost||s.barracks>=10?"disabled":""}>🏗️ Upgrade Barracks · ${cost} coins</button><button class="action" id="train" ${s.coins<45||s.army>=s.capacity?"disabled":""}>🪖 Train one soldier · 45 coins</button>`;
+  $("sideContent").innerHTML=html;
+  $("upB").onclick=()=>{if(s.barracks>=10||s.coins<cost)return;s.coins-=cost;s.barracks++;s.capacity+=3;s.army+=3;s.power+=15;s.achievements.bigBarracks=true;message("Barracks upgraded! +3 soldiers and capacity.");render();show("barracks");};
+  $("train").onclick=()=>{if(s.coins<45||s.army>=s.capacity){message("Need 45 coins and an open army slot.");return;}s.coins-=45;s.army++;s.power+=5;message("A new soldier joined your army!");render();show("barracks");};
+ }else if(which==="armory"){
+  title="📦 Armory";desc="Open crates to find gear that boosts battle power.";
+  html='<div class="item"><b>Supply crate</b>Contains random weapons, armor, shields, or magic gear.</div><button class="action primary" id="crate" '+(s.coins<80?"disabled":"")+'>📦 Buy and open crate · 80 coins</button>';
+  $("sideContent").innerHTML=html;
+  $("crate").onclick=()=>{if(s.coins<80){message("Not enough coins.");return;}s.coins-=80;const pool=[["Iron Sword","⚔️",8],["Scout Bow","🏹",7],["Guardian Shield","🛡️",6],["Battle Axe","🪓",9],["Heavy Armor","🥋",10],["Magic Staff","🪄",11],["Lucky Charm","🍀",5],["Crystal Blade","💎",14]];let p=pool[Math.floor(Math.random()*pool.length)];s.gear.push({name:p[0],icon:p[1],power:p[2]});s.achievements.crateOpened=true;message("Found "+p[0]+"! +"+p[2]+" power.");render();show("armory");};
+ }else if(which==="mine"){
+  title="⛏️ Gold Mine";desc="Earn gold automatically and upgrade production.";
+  let cost=100*s.mine;
+  html=`<div class="item"><b>Gold Mine · Level ${s.mine}/5</b>Production: ${5*s.mine} coins per minute. Upgrade cost: ${cost} coins.</div><button class="action primary" id="upM" ${s.mine>=5||s.coins<cost?"disabled":""}>⛏️ ${s.mine>=5?"Mine fully upgraded":"Upgrade mine · "+cost+" coins"}</button><div class="item">Your mine earns coins while you play and while you are away, up to 8 hours.</div>`;
+  $("sideContent").innerHTML=html;
+  $("upM").onclick=()=>{if(s.mine>=5||s.coins<cost)return;s.coins-=cost;s.mine++;if(s.mine===5)s.achievements.maxMine=true;message("Mine upgraded to level "+s.mine+"!");render();show("mine");};
+ }else{
+  title="⚔️ Command Post";desc="Lead your troops into battle.";
+  html=`<div class="item"><b>Battle briefing</b>Your strength: ${s.power+gp()+s.army*4}. Victories: ${s.wins}. Enemies grow stronger as you win.</div><button class="action primary" id="battleNow">⚔️ Start battle</button>`;
+  $("sideContent").innerHTML=html;$("battleNow").onclick=battle;
+ }
+ $("sideTitle").textContent=title;$("sideDesc").textContent=desc;
+}
+function battle(){
+ if(s.army<1){message("Recruit soldiers first.");return;}
+ let player=s.power+gp()+s.army*4, enemy=25+Math.floor(Math.random()*45)+s.wins*4;
+ $("enemy").textContent="👹".repeat(Math.max(1,Math.min(6,Math.ceil(enemy/18))));
+ if(player>=enemy){
+  let reward=70+Math.floor(Math.random()*65);s.coins+=reward;s.wins++;s.power+=2;s.achievements.firstWin=true;if(s.wins>=5)s.achievements.fiveWins=true;
+  $("fightlog").textContent=`Victory! Enemy strength ${enemy}. You earned ${reward} coins.`;$("ready").textContent="VICTORY";message("Battle won! +"+reward+" coins.");
+ }else{
+  let loss=s.army>1?Math.min(s.army-1,Math.floor(Math.random()*2)+1):0;s.army-=loss;s.coins+=20;
+  $("fightlog").textContent=`Retreat! Enemy strength ${enemy}. Lost ${loss} soldier(s), salvaged 20 coins.`;$("ready").textContent="RETREAT";message("Battle lost. Upgrade your troops or gear.");
+ }
+ render();if($("sideTitle").textContent.includes("Command Post"))show("fight");
+}
+$("collect").onclick=()=>{let n=Math.floor(pending);if(n<1){message("Your mine is working. Come back soon!");return;}pending-=n;s.coins+=n;message("Collected "+n+" coins.");render();};
+$("fightBtn").onclick=battle;
+document.addEventListener("click",e=>{
+ let open=e.target.closest("[data-open]");if(open){show(open.dataset.open);return;}
+ let sell=e.target.closest("[data-sell]");if(sell){let i=Number(sell.dataset.sell);if(s.gear[i]){let g=s.gear.splice(i,1)[0],v=g.power*4;s.coins+=v;message("Sold "+g.name+" for "+v+" coins.");render();}}
+});
+$("reset").onclick=()=>{if(!confirm("Erase all CRATE CLASH progress in this browser?"))return;s=fresh();pending=0;try{localStorage.removeItem(KEY);}catch(e){}$("fightlog").textContent="Your troops are ready for orders.";$("ready").textContent="READY";message("Save reset. A new kingdom begins!");render();show("barracks");};
+setInterval(()=>{let now=Date.now(),dt=Math.max(0,Math.min(10,(now-lastTick)/1000));lastTick=now;pending+=dt*5*s.mine/60;let n=Math.floor(pending);if(n>0){pending-=n;s.coins+=n;render();}else save();},1000);
+window.addEventListener("pagehide",save);
+document.querySelectorAll("[data-open]").forEach(b=>b.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();show(b.dataset.open);}}));
+render();
+})();
+</script>
+</body>
+</html>
