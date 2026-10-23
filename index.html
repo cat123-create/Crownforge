@@ -1,377 +1,206 @@
-
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0a1420">
-<title>CRATE CLASH — Goldbound Wars</title>
+<meta name="theme-color" content="#101b27">
+<title>CRATE CLASH — Kingdom Builder</title>
 <style>
-:root{--bg:#08121d;--panel:#132436;--line:#35536a;--text:#eef6ff;--muted:#a6bbcd;--gold:#ffd36d;--blue:#75d5ff;--mint:#7af0bd;--red:#ff7588}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 15% 0%,#24475b 0,transparent 38%),linear-gradient(145deg,#07101a,#0b1825 55%,#101822);color:var(--text);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-button,select{font:inherit}
-button{cursor:pointer;color:var(--text);font-weight:800;border:1px solid #4a6b82;border-radius:10px;padding:10px 13px;background:linear-gradient(#2b465c,#1a2e40);transition:filter .15s,transform .15s}
-button:hover{filter:brightness(1.12);transform:translateY(-1px)}
-button:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.primary{background:linear-gradient(#ffe6a0,#e7ac47);color:#2a200e;border:0}
-.good{background:linear-gradient(#99f5d4,#49c995);color:#09291f;border:0}
-.danger{background:linear-gradient(#ff9aa8,#e9516b);color:#2b0910;border:0}
-.wrap{max-width:1220px;margin:auto;padding:17px}
-.top{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;padding:15px 17px;border:1px solid #3c596f;border-radius:18px;background:linear-gradient(120deg,#172c3d,#0d1824);box-shadow:0 12px 35px #0004;margin-bottom:14px}
-.brand{display:flex;align-items:center;gap:12px}
-.crest{width:53px;height:53px;border-radius:15px;display:grid;place-items:center;color:#30230a;font-size:28px;background:radial-gradient(circle at 30% 20%,#fff0b9,#e6b651 50%,#845226);box-shadow:inset 0 2px #fff9,0 8px 20px #0004}
-.brand h1{font-size:clamp(23px,4vw,33px);margin:0;letter-spacing:2px;line-height:1.1}
-.brand small{font-size:10px;letter-spacing:2px;color:var(--muted)}
-.resources{display:flex;gap:7px;flex-wrap:wrap}
-.res{padding:9px 11px;border:1px solid #3b566b;background:#0c1926;border-radius:11px;font-weight:850;white-space:nowrap}
-.res b{color:var(--gold)}
-.res .xp{color:var(--mint);font-size:12px}
-.panel{border:1px solid var(--line);background:linear-gradient(155deg,#16293bf5,#0d1925f7);border-radius:17px;overflow:hidden;box-shadow:0 12px 34px #0003}
-.tabs{display:flex;gap:6px;padding:9px;border-bottom:1px solid var(--line);background:#0b1722;overflow-x:auto}
-.tab{flex:1;min-width:max-content;background:transparent;border-color:transparent;color:var(--muted);padding:10px 12px}
-.tab.active{background:linear-gradient(#314d63,#1a3043);border-color:#55748a;color:#fff}
-.view{padding:16px}
-.hide{display:none!important}
-.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.title{margin:0 0 4px;font-size:17px}
-.sub{font-size:12px;color:var(--muted)}
-.gold{color:var(--gold)}
-.mint{color:var(--mint)}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
-.card{min-width:0;background:linear-gradient(145deg,#20384a,#122130);border:1px solid #3a566b;border-radius:13px;padding:13px}
-.card h3,.card h4{margin:0 0 6px}
-.card p{margin:5px 0;color:var(--muted);font-size:13px}
-.card button{margin-top:9px;width:100%}
-.icon{font-size:29px;margin-right:8px}
-.itemhead{display:flex;align-items:center;gap:8px}
-.bar{height:8px;border-radius:99px;background:#07111b;overflow:hidden;margin:8px 0}
-.bar span{display:block;height:100%;background:linear-gradient(90deg,#51c7ff,#6ce2b2,#ffe083)}
-.baseScene{height:clamp(310px,38vw,440px);border-radius:15px;overflow:hidden;position:relative;isolation:isolate;border:1px solid #5a7b83;background:linear-gradient(#24495f 0%,#719ba8 40%,#55754b 41%,#1f392c 100%);margin:12px 0 16px}
-.sun{position:absolute;right:10%;top:9%;height:48px;width:48px;border-radius:50%;background:#ffe6a1;box-shadow:0 0 36px #ffdf8d}
-.mountains{position:absolute;left:-3%;right:-3%;top:17%;height:37%;background:#456b73;clip-path:polygon(0 82%,14% 22%,26% 72%,39% 7%,54% 70%,69% 19%,82% 65%,100% 12%,100% 100%,0 100%);opacity:.8}
-.hills{position:absolute;inset:40% -10% -5%;background:linear-gradient(160deg,#59804f,#20392a);clip-path:polygon(0 28%,17% 9%,29% 26%,46% 2%,64% 24%,81% 8%,100% 29%,100% 100%,0 100%)}
-.road{position:absolute;left:36%;bottom:-8%;width:30%;height:64%;background:#b9a37a;clip-path:polygon(42% 0,58% 0,100% 100%,0 100%);opacity:.9}
-.wall{position:absolute;left:7%;right:7%;bottom:24%;height:23%;background:repeating-linear-gradient(90deg,#81949a 0 42px,#5d727d 42px 47px);border:5px solid #394f5b;box-shadow:0 9px #172a32}
-.wall:before{content:"";position:absolute;left:0;right:0;top:-25px;height:24px;background:repeating-linear-gradient(90deg,#adbdc0 0 25px,transparent 25px 43px);border-bottom:4px solid #445a66}
-.keep{position:absolute;left:50%;bottom:24%;transform:translateX(-50%);font-size:clamp(75px,12vw,125px);filter:drop-shadow(0 8px 8px #0008);z-index:2;line-height:1}
-.turret{position:absolute;bottom:38%;font-size:clamp(28px,4vw,42px);z-index:2;filter:drop-shadow(0 4px 4px #0008)}
-.turret.left{left:13%}.turret.right{right:13%}
-.sceneTitle{position:absolute;left:50%;top:12px;transform:translateX(-50%);white-space:nowrap;background:#081722df;border:1px solid #e3c57b;border-radius:999px;padding:7px 13px;font-size:11px;letter-spacing:1.5px;font-weight:1000;z-index:4}
-.spot{position:absolute;z-index:5;transform:translate(-50%,-50%);width:clamp(94px,15%,140px);min-height:82px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;text-align:center;background:linear-gradient(#173547f5,#091720f5);border:1px solid #ffe3a3;border-radius:12px;box-shadow:0 7px 17px #0009,0 0 0 2px #ffdc8530;padding:7px}
-.spot span{font-size:32px;line-height:1.05}
-.spot b{font-size:11px;letter-spacing:.6px}
-.spot small{font-size:9px;color:#ffdf8b}
-.spot.mine{left:23%;top:31%}.spot.armory{left:77%;top:33%}.spot.barracks{left:50%;top:58%}.spot.castle{left:50%;top:22%;width:100px;min-height:60px}
-.sceneHint{position:absolute;left:10px;bottom:9px;background:#07141edb;padding:5px 8px;border-radius:6px;font-size:10px;z-index:6;color:#f4f7fb}
-.trooplist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-.troop{padding:12px;border:1px solid #3a566b;border-radius:12px;background:linear-gradient(#21394b,#111f2c);min-width:0}
-.troop .troopEmoji{font-size:35px}
-.troop select{width:100%;margin-top:8px;background:#0b1722;color:#fff;border:1px solid #3b566b;border-radius:8px;padding:8px}
-.troop small{display:block;color:var(--muted);margin:3px 0 7px}
-.split{display:grid;grid-template-columns:1.1fr .9fr;gap:12px}
-.inventoryrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px solid #2d4254}
-.inventoryrow:last-child{border:0}
-.inventoryrow button{padding:7px 9px;font-size:12px}
-.tag{display:inline-block;padding:3px 6px;border:1px solid #4a667b;border-radius:6px;font-size:10px;color:#c6d9e8}
-.legendary{color:#ffd36d}.epic{color:#d0a7ff}.rare{color:#78d5ff}.common{color:#c1cfdd}
-.notice{padding:11px;border-radius:10px;background:#0d1a26;border:1px solid #2e465a;color:#c1d1df;font-size:13px;margin-bottom:12px}
-.arena{position:relative;background:#09131c;border-bottom:1px solid #30475a}
-.arena canvas{display:block;width:100%;height:auto;aspect-ratio:760/390}
-.arenaStatus{position:absolute;top:12px;left:12px;padding:6px 10px;border-radius:999px;background:#07111ddd;border:1px solid #4b657b;font-size:11px;font-weight:900}
-.arenaInfo{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 14px;background:#10202d}
-.controls{padding:12px 14px;background:#0b1722;color:var(--muted);font-size:12px;display:flex;flex-wrap:wrap;align-items:center;gap:9px}
-.touch{display:none;gap:8px;margin-left:auto;align-items:center}
-.touch button{touch-action:none;user-select:none;padding:7px 10px}
-.battleLog{display:grid;gap:5px;max-height:105px;overflow:auto;font-size:12px;color:var(--muted);background:#0b1722;border-radius:9px;padding:9px}
-.footer{font-size:11px;color:#869eb1;text-align:center;padding:15px}
-.toast{position:fixed;z-index:99;bottom:18px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#ffe8a3;color:#231a0b;border-radius:10px;padding:11px 15px;font-weight:900;box-shadow:0 10px 25px #0007;transition:.2s;max-width:90vw;text-align:center}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-@media(max-width:780px){.wrap{padding:9px}.top{padding:12px}.view{padding:12px}.trooplist{grid-template-columns:repeat(2,minmax(0,1fr))}.split{grid-template-columns:1fr}.baseScene{height:340px}.spot{width:100px;min-height:70px}.spot span{font-size:28px}.spot b{font-size:10px}.spot.castle{top:21%}.spot.mine{left:22%;top:32%}.spot.armory{left:78%;top:34%}.spot.barracks{top:60%}.touch{display:flex;width:100%;justify-content:space-between}.controls{gap:7px}}
-@media(max-width:430px){.resources{width:100%}.res{flex:1;text-align:center;padding:8px 5px;font-size:13px}.grid{grid-template-columns:1fr}.trooplist{grid-template-columns:1fr 1fr}.baseScene{height:305px}.sceneTitle{font-size:9px}.spot{width:88px;padding:6px;min-height:66px}.spot span{font-size:25px}.spot small{font-size:8px}.keep{font-size:75px}.wall{bottom:23%;height:21%}.spot.castle{width:85px;min-height:56px}}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+:root{--bg:#09131e;--panel:#142536;--panel2:#1c3345;--line:#38566c;--text:#f1f7fc;--muted:#a7bdce;--gold:#ffd36b;--elixir:#d6a0ff;--mint:#83efbd;--blue:#80d6ff;--red:#ff8194}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 16% -10%,#28556b 0,transparent 38%),radial-gradient(ellipse at 96% 25%,#4d3425 0,transparent 28%),linear-gradient(145deg,#08111a,#0e1b29 60%,#101923);color:var(--text);font:15px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,select{font:inherit}button{color:var(--text);font-weight:800;background:linear-gradient(#2b485e,#1a2d3e);border:1px solid #4c6d83;border-radius:10px;padding:10px 12px;cursor:pointer;transition:filter .15s,transform .15s}button:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-1px)}button:disabled{opacity:.4;cursor:not-allowed}.primary{background:linear-gradient(#ffe49b,#dfa342);color:#30220c;border:0}.mintbtn{background:linear-gradient(#a2f6d3,#4cc999);color:#08281d;border:0}.danger{background:linear-gradient(#ff9cac,#e85570);color:#300b12;border:0}.wrap{max-width:1300px;margin:auto;padding:16px}.top{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,#1b3244f5,#0c1925f5);border:1px solid #405e72;border-radius:19px;padding:15px 18px;margin-bottom:14px;box-shadow:0 14px 35px #0004}.brand{display:flex;align-items:center;gap:12px}.crest{width:55px;height:55px;border-radius:16px;display:grid;place-items:center;font-size:30px;color:#39250b;background:radial-gradient(circle at 28% 20%,#fff4bd,#e1ad4f 55%,#89551f);box-shadow:inset 0 2px #fff9,0 8px 20px #0005}.brand h1{font-size:clamp(22px,3.8vw,33px);letter-spacing:2px;margin:0;line-height:1.1}.brand small{color:var(--muted);letter-spacing:2px;font-size:10px}.resources{display:flex;flex-wrap:wrap;gap:7px}.resource{background:#0a1824;border:1px solid #38546a;padding:9px 11px;border-radius:11px;font-weight:900;white-space:nowrap}.resource b{color:var(--gold)}.resource .pink{color:var(--elixir)}.resource .gem{color:var(--blue)}.panel{border:1px solid var(--line);background:linear-gradient(155deg,#172a3bf7,#0e1925fa);border-radius:17px;overflow:hidden;box-shadow:0 12px 34px #0003}.tabs{display:flex;gap:6px;padding:9px;background:#0b1722;border-bottom:1px solid var(--line);overflow-x:auto}.tab{flex:1;min-width:max-content;background:transparent;border-color:transparent;color:var(--muted);padding:10px 13px}.tab.active{background:linear-gradient(#314e63,#1d3345);border-color:#58778d;color:#fff}.view{padding:16px}.hide{display:none!important}.row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.title{font-size:18px;margin:0 0 4px}.sub{font-size:12px;color:var(--muted)}.gold{color:var(--gold)}.elixir{color:var(--elixir)}.mint{color:var(--mint)}.blue{color:var(--blue)}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.card{min-width:0;background:linear-gradient(145deg,#203849,#122230 75%);border:1px solid #3b586d;border-radius:13px;padding:13px;box-shadow:inset 0 1px #ffffff08}.card h3,.card h4{margin:0 0 7px}.card p{margin:5px 0;color:var(--muted);font-size:13px}.card button{margin-top:10px;width:100%}.tag{display:inline-block;padding:4px 7px;border:1px solid #48657a;border-radius:7px;font-size:10px;font-weight:900;letter-spacing:.6px;color:#c9dce8}.base-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap}.map-shell{margin:13px 0 14px;padding:11px;border:1px solid #436579;border-radius:16px;background:linear-gradient(155deg,#213d42,#172e2a 50%,#11231f);box-shadow:inset 0 0 45px #0003}.map-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:9px}.map-head strong{font-size:12px;letter-spacing:1px}.map-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:#c1d3cf}.land-map{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:3px;max-width:820px;margin:auto;aspect-ratio:1/1}.tile{min-width:0;min-height:0;padding:0;border:1px solid #719463;border-radius:5px;background:linear-gradient(145deg,#6e9b5b,#416c42);position:relative;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden;box-shadow:inset 0 1px #ffffff28}.tile:before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,#ffffff06 0 4px,transparent 4px 9px);pointer-events:none}.tile.empty:hover{border-color:#ffe59b;box-shadow:inset 0 0 0 2px #ffe59b66}.tile.selected{outline:3px solid var(--gold);outline-offset:-3px;z-index:2}.tile .building-icon{font-size:clamp(15px,2.8vw,31px);line-height:1.03;filter:drop-shadow(0 3px 2px #0006);z-index:1}.tile .building-name{font-size:clamp(6px,.8vw,9px);font-weight:900;color:#fff;text-shadow:0 1px 3px #000,0 0 5px #000;z-index:1;max-width:100%;overflow:hidden;white-space:nowrap}.tile .level{position:absolute;top:2px;right:2px;background:#08131bdc;border:1px solid #ffffff30;border-radius:4px;padding:1px 3px;color:#ffe4a0;font-size:8px;font-weight:900;z-index:1}.tile.occupied{background:linear-gradient(145deg,#5e8c54,#2f5637);border-color:#b3cf7d}.tile.townhall{background:linear-gradient(145deg,#9e8656,#655331);border-color:#ffdf91}.tile.defense{background:linear-gradient(145deg,#788b99,#455966);border-color:#b7d5e4}.tile.production{background:linear-gradient(145deg,#76a663,#3b7149)}.tile.storage{background:linear-gradient(145deg,#879b9d,#4e6665)}.tile.fog{background:repeating-linear-gradient(135deg,#1c302f,#1c302f 7px,#263b37 7px,#263b37 14px);border-color:#314b44;color:#94aaa1;cursor:not-allowed}.tile.fog span{font-size:clamp(10px,2vw,22px);opacity:.75}.tile:disabled{opacity:1}.tile .plus{font-size:clamp(12px,2.2vw,23px);font-weight:900;color:#deefd2;z-index:1}.map-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:9px}.smallnote{font-size:11px;color:var(--muted)}.selection-panel{background:#0c1925;border:1px solid #334e61;border-radius:12px;padding:13px;margin:12px 0}.selection-panel h3{margin:0 0 4px}.action-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.action-row button{width:auto;margin:0}.build-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}.build-option{cursor:pointer;text-align:left}.build-option .bigicon{font-size:29px;display:block;margin-bottom:5px}.build-option .cost{font-weight:900;font-size:12px;color:var(--gold);margin-top:7px}.build-option.selected{border-color:var(--gold);box-shadow:inset 0 0 0 1px #ffd36b55}.build-option.locked{opacity:.55}.mini-bar{height:8px;border-radius:99px;background:#08131d;overflow:hidden;margin:8px 0}.mini-bar span{display:block;height:100%;background:linear-gradient(90deg,#50caff,#7aebb2,#ffdf83)}.list{display:grid;gap:9px}.listitem{background:linear-gradient(120deg,#1e3546,#122130);border:1px solid #3b566a;border-radius:12px;padding:12px;display:flex;align-items:center;gap:11px;min-width:0}.listitem .ico{font-size:30px;width:42px;text-align:center;flex:none}.listitem .info{flex:1;min-width:0}.listitem .info b{display:block}.listitem .info small{color:var(--muted);font-size:12px;display:block}.listitem button{padding:8px 10px;font-size:12px}.worldmap{height:205px;position:relative;overflow:hidden;border:1px solid #466b61;border-radius:14px;background:linear-gradient(160deg,#3f7754,#315d42 60%,#234b39);margin:12px 0}.worldmap:before{content:"";position:absolute;inset:-20%;background:repeating-linear-gradient(25deg,transparent 0 36px,#d6e2aa15 36px 40px,transparent 40px 80px),repeating-linear-gradient(110deg,transparent 0 54px,#d6e2aa10 54px 58px,transparent 58px 100px);transform:rotate(-5deg)}.worldmap:after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 20% 75%,#1c4a38 0 12%,transparent 13%),radial-gradient(ellipse at 70% 25%,#1b4a37 0 15%,transparent 16%),radial-gradient(ellipse at 90% 80%,#789451 0 10%,transparent 11%);pointer-events:none}.world-pin{position:absolute;z-index:2;border-radius:10px;border:1px solid #ffe5a1;background:#101e2be8;padding:6px 9px;text-align:center;font-size:10px;box-shadow:0 4px 10px #0005}.world-pin b{display:block;font-size:19px}.world-pin.active{outline:3px solid #ffe08a}.world-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.world-card{background:linear-gradient(145deg,#20394b,#101e2b);border:1px solid #3d5a70;border-radius:13px;padding:13px}.world-card.selected{border-color:var(--gold);box-shadow:inset 0 0 0 1px #ffd36b55}.world-card p{font-size:12px;color:var(--muted);margin:5px 0}.lootline{display:flex;gap:12px;flex-wrap:wrap;font-weight:900;margin:8px 0}.lootline .g{color:var(--gold)}.lootline .e{color:var(--elixir)}.report{display:grid;gap:7px;background:#0b1722;border:1px solid #2f475a;border-radius:11px;padding:11px;color:#c6d6e2;font-size:12px;margin-top:12px}.toast{position:fixed;z-index:20;left:50%;bottom:18px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#ffe8aa;color:#281e0b;padding:11px 16px;border-radius:11px;font-weight:900;box-shadow:0 10px 35px #0007;transition:.2s;max-width:92vw;text-align:center}.toast.show{opacity:1;transform:translate(-50%,0)}.footer{text-align:center;color:#829bae;font-size:11px;padding:15px}.hint{background:#0c1a26;border:1px solid #30495c;border-radius:10px;padding:10px 12px;font-size:12px;color:#c3d4e1;margin:10px 0}.pill{font-size:10px;font-weight:900;letter-spacing:.5px;border:1px solid #49667a;border-radius:999px;padding:5px 8px;color:#d9e7f1}
+@media(max-width:780px){.wrap{padding:8px}.top{padding:12px}.view{padding:11px}.land-map{gap:2px}.tile{border-radius:3px}.build-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.world-list{grid-template-columns:1fr}.worldmap{height:175px}.map-shell{padding:6px}.tile .building-name{font-size:6px}.tile .level{font-size:7px;padding:0 2px}}
+@media(max-width:430px){.resources{width:100%}.resource{flex:1;text-align:center;padding:7px 5px;font-size:12px}.brand small{letter-spacing:1px}.land-map{gap:1px}.tile .building-icon{font-size:clamp(12px,4vw,19px)}.tile .building-name{display:none}.tile .level{font-size:6px}.build-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* ISOMETRIC KINGDOM ART PASS — procedural, no external image files */
+.map-shell{padding:12px;background:linear-gradient(160deg,#1b3737,#112720 62%,#0c1d1a);border-color:#496b65;box-shadow:inset 0 0 55px #0005,0 10px 26px #0002}
+.map-head{padding:2px 2px 8px}.map-head strong{letter-spacing:1.35px;color:#e4eee0}
+.map-legend{color:#bfd0c4;gap:12px}
+.land-map{position:relative;display:block;width:100%;max-width:920px;margin:0 auto;aspect-ratio:920/600;overflow:hidden;border-radius:13px;background:radial-gradient(ellipse at 50% 48%,#526c45,#253f32 65%,#172b26);box-shadow:inset 0 0 0 1px #d4e4b025,inset 0 0 55px #07130d6b}
+.realm-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.land-map .tile{position:absolute;display:block;transform:translate(-50%,-50%);grid-column:auto!important;grid-row:auto!important;min-width:0;min-height:0;margin:0;padding:0;background:transparent!important;border:1px solid transparent!important;border-radius:0!important;box-shadow:none!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);z-index:3;outline:none;opacity:1}
+.land-map .tile:before{content:none}
+.land-map .tile:hover:not(:disabled){background:#ffe69c26!important;border-color:#ffe7a5!important;box-shadow:inset 0 0 0 2px #ffe7a566!important;filter:brightness(1.15)}
+.land-map .tile.selected{outline:2px solid #ffe6a0!important;outline-offset:-3px;background:#ffe6a02b!important;z-index:5}
+.land-map .tile:disabled{opacity:1;pointer-events:none}
+.land-map .tile .building-icon,.land-map .tile .building-name,.land-map .tile .level,.land-map .tile .plus,.land-map .tile span{display:none!important}
+.land-map .tile:focus-visible{outline:3px solid #fff!important;outline-offset:-4px;z-index:7}
+.map-foot{padding:3px 2px 0}.map-foot .smallnote{font-size:12px;color:#bed0c4}
+#expandLand{box-shadow:0 5px 15px #0004}
+#selectedPanel{background:linear-gradient(140deg,#152b38,#0d1b24);border-color:#486475;box-shadow:inset 0 1px #fff1}
+.build-option{transition:transform .16s,border-color .16s,box-shadow .16s}.build-option:hover:not(:disabled){transform:translateY(-2px)}
+.tile .building-icon{display:none!important}
+@media(max-width:780px){.map-shell{padding:7px}.land-map{border-radius:9px}.map-legend{font-size:9px;gap:6px}.map-head strong{font-size:10px}.map-foot .smallnote{font-size:10px}}
+@media(max-width:430px){.land-map{aspect-ratio:1.06/1}.map-legend span:last-child{display:none}}
+
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="top">
-<div class="brand"><div class="crest">♜</div><div><h1>CRATE CLASH</h1><small>GOLDBOUND WARS · BUILD YOUR CREW</small></div></div>
-<div class="resources"><div class="res">🪙 <b id="coins">250</b></div><div class="res">💎 <b id="gems">0</b></div><div class="res">⭐ Lv. <b id="level">1</b> <span class="xp" id="xp">0/100 XP</span></div></div>
-</header>
+<header class="top"><div class="brand"><div class="crest">♜</div><div><h1>CRATE CLASH</h1><small>KINGDOM BUILDER · CLAIM YOUR LAND</small></div></div><div class="resources"><div class="resource">🪙 Gold <b id="gold">650</b></div><div class="resource">💧 Elixir <b class="pink" id="elixir">400</b></div><div class="resource">⭐ Hall <b id="hallLevel">1</b></div></div></header>
 <div class="panel">
-<nav class="tabs" aria-label="Game sections">
-<button class="tab active" data-tab="base">🏰 Base</button>
-<button class="tab" data-tab="crates">📦 Crates</button>
-<button class="tab" data-tab="army">🛡️ Army</button>
-<button class="tab" data-tab="mine">⛏️ Gold Mine</button>
-<button class="tab" data-tab="battle">⚔️ Battle</button>
-<button class="tab" data-tab="unlock">🔓 Upgrades</button>
-</nav>
-<section class="view" id="view-base">
-<div class="row"><div><h2 class="title">Your Fortress</h2><div class="sub">Tap a building to manage it. Every building here is interactive.</div></div><span class="tag mint" id="baseLevel">BASE LEVEL 1</span></div>
-<div class="baseScene" aria-label="Illustrated kingdom with interactive buildings">
-<div class="sun"></div><div class="mountains"></div><div class="hills"></div><div class="road"></div><div class="wall"></div><div class="turret left">🏯</div><div class="turret right">🏯</div><div class="keep">🏰</div><div class="sceneTitle">YOUR KINGDOM</div>
-<button class="spot castle" data-open="unlock"><span>🏰</span><b>CASTLE</b><small>UPGRADES</small></button>
-<button class="spot mine" data-open="mine"><span>⛏️</span><b>GOLD MINE</b><small id="sceneMine">LV. 1</small></button>
-<button class="spot armory" data-open="crates"><span>🛡️</span><b>ARMORY</b><small id="sceneArmory">LV. 1</small></button>
-<button class="spot barracks" data-open="army"><span>🪖</span><b>BARRACKS</b><small id="sceneBarracks">LV. 1</small></button>
-<span class="sceneHint">SELECT A BUILDING TO PLAY</span>
-</div>
-<div class="grid">
-<div class="card"><div class="row"><h3>🪙 Mine production</h3><b class="gold" id="production">5/min</b></div><div class="bar"><span id="mineBar" style="width:20%"></span></div><p>Workers keep earning coins while this page is open and while you’re away.</p><button data-open="mine">Manage Gold Mine</button></div>
-<div class="card"><div class="row"><h3>🛡️ Army strength</h3><b class="mint" id="power">12</b></div><div class="bar"><span id="armyBar" style="width:30%"></span></div><p><span id="armyCount">3</span> fighters in your squad. Better weapons and more training increase battle readiness.</p><button data-open="army">Manage Army</button></div>
-</div>
+<nav class="tabs" aria-label="Game sections"><button class="tab active" data-tab="base">🏰 Base Map</button><button class="tab" data-tab="build">🏗️ Build</button><button class="tab" data-tab="army">🪖 Army</button><button class="tab" data-tab="world">🗺️ World Map</button><button class="tab" data-tab="economy">🪙 Economy</button></nav>
+<section class="view" id="view-base"><div class="base-top"><div><h2 class="title">Your Kingdom</h2><div class="sub">A handcrafted isometric kingdom. Select a building, place new structures, or expand into the surrounding forest.</div></div><span class="pill" id="landLabel">LAND 5 × 5</span></div>
+<div class="map-shell"><div class="map-head"><strong>🌲 HOME KINGDOM · ISOMETRIC MAP</strong><div class="map-legend"><span>Meadow = buildable land</span><span>Forest = unclaimed land</span><span>Gold glow = territory edge</span></div></div><div id="landMap" class="land-map" aria-label="Clickable tile map of your base"></div><div class="map-foot"><span class="smallnote" id="mapStatus">Choose a tile or building.</span><button class="primary" id="expandLand">🌲 Expand Territory · 250 🪙</button></div></div>
+<div id="selectedPanel" class="selection-panel"><h3>🏰 Town Hall</h3><div class="sub">Your kingdom starts here. Upgrade it to unlock better buildings and more territory.</div><div class="action-row"><button class="primary" id="upgradeHall">Upgrade Town Hall · 200 🪙 + 120 💧</button><button data-go="build">Browse Buildings</button></div></div>
+<div class="grid"><div class="card"><div class="row"><h3>🪙 Gold production</h3><b class="gold" id="goldRate">8/min</b></div><div class="mini-bar"><span id="goldBar" style="width:15%"></span></div><p>Gold mines build your economy. Collect stored gold before the storage fills up.</p><button data-go="economy">Manage economy</button></div><div class="card"><div class="row"><h3>💧 Elixir production</h3><b class="elixir" id="elixirRate">7/min</b></div><div class="mini-bar"><span id="elixirBar" style="width:15%"></span></div><p>Elixir is used to train troops. Pumps keep filling your storage while you play.</p><button data-go="army">Train troops</button></div></div>
 </section>
-<section class="view hide" id="view-crates">
-<div class="row"><div><h2 class="title">Armory & Crates</h2><div class="sub">Find weapons and armor; equip items to improve your battle chances.</div></div><span class="tag" id="armoryLevel">ARMORY LV. 1</span></div>
-<div class="grid" style="margin-top:12px">
-<div class="card"><div class="itemhead"><span class="icon">📦</span><div><h3>Supply Crate</h3><div class="sub">Random weapon, armor, or mining tool</div></div></div><p>Costs 80 coins. Duplicate items are converted to coins.</p><button class="primary" id="openCrate">Open Supply Crate · 80 🪙</button></div>
-<div class="card"><div class="itemhead"><span class="icon">🔧</span><div><h3>Armory upgrade</h3><div class="sub">Current level: <b id="armoryLevel2">1</b>/5</div></div></div><p>Better armories improve the quality of loot you find.</p><button id="upgradeArmory">Upgrade Armory · 120 🪙</button></div>
+<section class="view hide" id="view-build"><div class="row"><div><h2 class="title">Build & Upgrade</h2><div class="sub">Select a building, then tap an empty tile on Base Map to place it.</div></div><span class="pill" id="buildHall">TOWN HALL LEVEL 1</span></div><div class="hint" id="buildHint">Selecting a building does not spend resources. Cost is charged only when you place it.</div><div class="build-grid" id="buildOptions"></div><div class="selection-panel"><div class="row"><div><h3 id="buildSelectedTitle">No building selected</h3><div class="sub" id="buildSelectedDesc">Choose something to build above.</div></div><button id="cancelBuild">Cancel placement</button></div></div><h3 style="margin:18px 0 10px">Buildings in your kingdom</h3><div class="list" id="buildingList"></div></section>
+<section class="view hide" id="view-army"><div class="row"><div><h2 class="title">Army Camp</h2><div class="sub">Train troops to improve your odds when you raid rival bases.</div></div><span class="pill" id="armyCapacity">0 / 15 troop space</span></div><div class="grid" style="margin:12px 0"><div class="card"><h3>🪖 Army strength</h3><div style="font-size:24px;font-weight:950" class="mint" id="armyStrength">0</div><p>Your troop strength is compared with a rival base's defenses during a quick strategic raid. There is no live battle screen.</p></div><div class="card"><h3>🏕️ Barracks</h3><p>Build or upgrade barracks to get more troop capacity. Stronger troops take more space.</p><button data-go="build">Build more Barracks</button></div></div><h3>Train troops</h3><div class="grid" id="troopOptions" style="margin-top:10px"></div><h3 style="margin:18px 0 9px">Your troops</h3><div class="list" id="troopList"></div></section>
+<section class="view hide" id="view-world"><div class="row"><div><h2 class="title">World Map</h2><div class="sub">Scout rival kingdoms, inspect their stored resources, and decide which target is worth a raid.</div></div><button class="primary" id="findBases">🔎 Find New Bases</button></div><div class="hint">This single-file version uses generated rival bases to simulate the world map. It cannot connect to real players without a multiplayer server. Raids resolve instantly—no battle arena or fighting minigame.</div><div class="worldmap" id="worldMap"></div><div class="row"><h3 style="margin:8px 0">Nearby rival bases</h3><span class="sub">Choose a base to scout it</span></div><div class="world-list" id="rivalList"></div><div class="report" id="raidReport"><b>🧭 Scout report</b><span>Choose a rival base to review its loot and defenses.</span></div></section>
+<section class="view hide" id="view-economy"><div class="row"><div><h2 class="title">Resource Economy</h2><div class="sub">Collect gold and elixir that your buildings have produced.</div></div><span class="pill" id="storageLabel">STORAGE</span></div><div class="grid" style="margin:12px 0"><div class="card"><h3 class="gold">🪙 Gold storage</h3><div style="font-size:25px;font-weight:950" id="storedGold">0</div><div class="sub" id="goldCapacity">Storage capacity 500</div><p>Stored gold cannot grow beyond your storage capacity.</p><button class="primary" id="collectGold">Collect Gold</button></div><div class="card"><h3 class="elixir">💧 Elixir storage</h3><div style="font-size:25px;font-weight:950" id="storedElixir">0</div><div class="sub" id="elixirCapacity">Storage capacity 400</div><p>Use elixir to train Barbarians, Archers, and Giants.</p><button class="primary" id="collectElixir">Collect Elixir</button></div><div class="card"><h3>⛏️ Gold Mine</h3><p id="mineDesc">Your gold mines produce stored gold.</p><button data-go="build">Build/upgrade Gold Mine</button></div><div class="card"><h3>💧 Elixir Pump</h3><p id="pumpDesc">Your pumps create stored elixir.</p><button data-go="build">Build/upgrade Elixir Pump</button></div></div><div class="card"><h3>📈 Production overview</h3><div class="row"><span>Gold per minute</span><b class="gold" id="economyGoldRate">8</b></div><div class="row"><span>Elixir per minute</span><b class="elixir" id="economyElixirRate">7</b></div><div class="row"><span>Total buildings placed</span><b id="buildingCount">5</b></div><div class="row"><span>Rival bases raided</span><b id="raidCount">0</b></div></div></section>
 </div>
-<div class="row" style="margin:19px 0 10px"><h3 style="margin:0">Your Equipment</h3><span class="sub" id="itemCount">0 items</span></div>
-<div id="inventory" class="card"><p>No equipment yet. Open a crate to find gear.</p></div>
-</section>
-<section class="view hide" id="view-army">
-<div class="row"><div><h2 class="title">Barracks & Army</h2><div class="sub">Recruit specialists and choose your active fighter.</div></div><span class="tag" id="barracksLevel">BARRACKS LV. 1</span></div>
-<div class="grid" style="margin-top:12px">
-<div class="card"><h3>🏗️ Expand Barracks</h3><p>Upgrade the barracks to raise your squad capacity and recruit another fighter.</p><button id="upgradeBarracks">Upgrade · 100 🪙</button></div>
-<div class="card"><h3>🪖 Recruit Fighter</h3><p>Choose a class below. Recruit costs increase as your squad grows.</p><div class="sub">Squad: <b id="capacityText">3 / 6</b></div></div>
-</div>
-<div class="trooplist" id="troopList" style="margin-top:12px"></div>
-</section>
-<section class="view hide" id="view-mine">
-<div class="row"><div><h2 class="title">Gold Mine</h2><div class="sub">Hire workers, upgrade the mine, and build a reliable income.</div></div><span class="tag gold" id="mineLevel">MINE LV. 1/5</span></div>
-<div class="grid" style="margin-top:12px">
-<div class="card"><h3>⛏️ Mine output</h3><div class="gold" style="font-size:22px;font-weight:900" id="mineOutput">5 coins/min</div><div class="bar"><span id="mineBar2" style="width:20%"></span></div><p>Output grows with mine levels, workers, and equipped mining tools.</p><button class="primary" id="collectGold">Collect stored gold · <span id="storedGold">0</span></button></div>
-<div class="card"><h3>👷 Mine workers</h3><div style="font-size:22px;font-weight:900" id="workerCount">0 workers</div><p>Each worker adds extra production. Workers also help you collect while away.</p><button id="hireWorker">Hire worker · 60 🪙</button></div>
-<div class="card"><h3>🪨 Upgrade the mine</h3><p>Raise the mine level. Maximum level is 5.</p><button id="upgradeMine">Upgrade mine · 100 🪙</button></div>
-<div class="card"><h3>📜 Foreman's report</h3><p id="mineReport">Your mine is ready. Hire a worker to increase income.</p><button data-open="crates">Find a mining tool</button></div>
-</div>
-</section>
-<section class="view hide" id="view-battle">
-<div class="row" style="margin-bottom:10px"><div><h2 class="title">Battle Gate</h2><div class="sub">Win through movement and timing. Enemies get stronger as your win count rises.</div></div><span class="tag" id="rank">BRONZE III</span></div>
-<div class="panel">
-<div class="arena"><canvas id="arena" width="760" height="390" aria-label="Interactive battle arena"></canvas><span class="arenaStatus" id="arenaStatus">READY TO DEPLOY</span></div>
-<div class="arenaInfo"><div class="row" style="gap:20px"><div><div class="sub">YOUR FIGHTER</div><b id="activeFighter">Rookie Swordsman</b></div><div><div class="sub">WEAPON</div><b id="activeWeapon">Training Blade</b></div><div><div class="sub">VICTORIES</div><b id="wins">0</b></div></div><button class="primary" id="deploy">⚔️ Deploy Army</button></div>
-<div class="controls"><span>Move <b>W A S D</b> / arrows</span><span>Attack <b>SPACE</b> or <b>J</b></span><span>Dodge the red circle, then attack during recovery.</span>
-<div class="touch"><button data-move="up">▲</button><div><button data-move="left">◀</button><button data-move="down">▼</button><button data-move="right">▶</button></div><button class="primary" id="touchAttack">ATTACK</button></div>
-</div>
-<div style="padding:12px"><div class="row" style="margin-bottom:8px"><h3 style="margin:0">Battle report</h3><span class="sub">Your last actions</span></div><div class="battleLog" id="battleLog"><div>Tip: stay mobile. A successful dodge opens a short counterattack window.</div></div></div>
-</div>
-</section>
-<section class="view hide" id="view-unlock">
-<div class="row"><div><h2 class="title">Castle Upgrades</h2><div class="sub">Strengthen the base to survive tougher battles.</div></div><span class="tag" id="castleLevel">CASTLE LV. 1</span></div>
-<div class="grid" style="margin-top:12px">
-<div class="card"><h3>🧱 Reinforce the Wall</h3><p>Each wall upgrade reduces enemy damage by 8% (up to level 5).</p><div class="sub">Wall level: <b id="wallLevel">1/5</b></div><button id="upgradeWall">Reinforce Wall · 140 🪙</button></div>
-<div class="card"><h3>⭐ Commander training</h3><p>Spend coins to gain experience and raise your fighter's level.</p><div class="sub">Current level: <b id="commanderLevel">1</b> · XP <b id="commanderXP">0/100</b></div><button id="trainCommander">Train commander · 90 🪙</button></div>
-<div class="card"><h3>🏆 Achievements</h3><div id="achievements"><p>Win battles and upgrade the kingdom to earn achievements.</p></div></div>
-<div class="card"><h3>💾 Save & reset</h3><p>Progress is saved automatically in this browser on this device.</p><button id="saveNow">Save now</button><button class="danger" id="resetSave">Reset all progress</button></div>
-</div>
-</section>
-</div>
-<div class="footer">CRATE CLASH · Your progress saves automatically in this browser.</div>
-</div>
-<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="footer">CRATE CLASH · Isometric kingdom builder · Progress saves automatically · All artwork is drawn inside this HTML.</div>
+</div><div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 (()=>{'use strict';
-const $=id=>document.getElementById(id), SAVE_KEY='crateClashGoldboundClean_v1';
-const roles=[
-{name:'Swordsman',emoji:'⚔️',cost:0,desc:'Balanced melee fighter.'},
-{name:'Archer',emoji:'🏹',cost:90,desc:'Ranged attacks; safer from a distance.'},
-{name:'Spearman',emoji:'🔱',cost:110,desc:'Long reach with reliable damage.'},
-{name:'Mage',emoji:'🪄',cost:150,desc:'Powerful magic bolts.'},
-{name:'Heavy',emoji:'🛡️',cost:130,desc:'Tough fighter; helps reduce damage.'}
-];
-const loot=[
-{name:'Iron Sword',type:'weapon',emoji:'⚔️',damage:13,range:82,rarity:'common',cost:35},
-{name:'Scout Bow',type:'weapon',emoji:'🏹',damage:10,range:340,rarity:'rare',cost:42},
-{name:'Long Spear',type:'weapon',emoji:'🔱',damage:15,range:118,rarity:'rare',cost:45},
-{name:'Ember Staff',type:'weapon',emoji:'🪄',damage:18,range:300,rarity:'epic',cost:55},
-{name:'Guardian Plate',type:'armor',emoji:'🦺',armor:3,rarity:'rare',cost:38},
-{name:'Royal Cuirass',type:'armor',emoji:'🛡️',armor:6,rarity:'epic',cost:60},
-{name:'Miner Pickaxe',type:'tool',emoji:'⛏️',bonus:2,rarity:'common',cost:28},
-{name:'Golden Pickaxe',type:'tool',emoji:'✨',bonus:5,rarity:'legendary',cost:70}
-];
-const fresh=()=>({coins:250,gems:0,level:1,xp:0,wins:0,streak:0,last:Date.now(),stored:0,base:{barracks:1,armory:1,mine:1,wall:1,castle:1},workers:0,soldiers:[{id:1,role:'Swordsman',name:'Rookie',level:1,weapon:'Training Blade'}],nextId:2,inventory:[],equipped:{weapon:'Training Blade',armor:'',tool:''},activeRole:'Swordsman',claimed:{}});
-let state=fresh(),tab='base',battle=null,held=new Set(),attackQueued=false,lastFrame=0,toastTimer=null,logs=[];
-function clamp(n,a,b){return Math.max(a,Math.min(b,n))}
-function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a}
-function save(){state.last=Date.now();try{localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}}
-function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2300)}
-function log(t){logs.unshift(t);logs=logs.slice(0,7);$('battleLog').innerHTML=logs.map(x=>'<div>'+escapeHTML(x)+'</div>').join('')}
-function escapeHTML(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function owned(itemName){return state.inventory.some(x=>x.name===itemName)}
-function equipItem(item){if(!item)return;if(item.type==='weapon')state.equipped.weapon=item.name;if(item.type==='armor')state.equipped.armor=item.name;if(item.type==='tool')state.equipped.tool=item.name;render();save();toast(item.name+' equipped!')}
-function weaponData(name){if(name==='Training Blade')return{name,emoji:'⚔️',damage:8,range:78,rarity:'common'};return loot.find(x=>x.name===name&&x.type==='weapon')||{name:'Training Blade',emoji:'⚔️',damage:8,range:78,rarity:'common'}}
-function armorData(){return loot.find(x=>x.name===state.equipped.armor&&x.type==='armor')||{armor:0}}
-function toolBonus(){const t=loot.find(x=>x.name===state.equipped.tool&&x.type==='tool');return t?t.bonus:0}
-function production(){return 5*state.base.mine+state.workers*2+toolBonus()}
-function armyCapacity(){return 3+(state.base.barracks-1)*2}
-function squadPower(){return state.soldiers.reduce((n,s)=>n+8+(s.level||1)*2+(weaponData(s.weapon||'Training Blade').damage-8),0)+state.level*2+armorData().armor*2}
-function active(){return state.soldiers.find(s=>s.role===state.activeRole)||state.soldiers[0]||{name:'Rookie',role:'Swordsman',level:1,weapon:'Training Blade'}}
-function getWeapon(){return weaponData(active().weapon||state.equipped.weapon||'Training Blade')}
-function xpNeeded(){return 100+(state.level-1)*35}
-function renderHeader(){
-$('coins').textContent=Math.floor(state.coins);$('gems').textContent=state.gems;$('level').textContent=state.level;$('xp').textContent=state.xp+'/'+xpNeeded();
-$('power').textContent=squadPower();$('armyCount').textContent=state.soldiers.length;$('armyBar').style.width=clamp(state.soldiers.length/armyCapacity()*100,0,100)+'%';
-$('capacityText').textContent=state.soldiers.length+' / '+armyCapacity();$('baseLevel').textContent='BASE LEVEL '+state.base.castle;$('production').textContent=production()+'/min';$('mineBar').style.width=(state.base.mine/5*100)+'%';$('mineBar2').style.width=(state.base.mine/5*100)+'%';
-$('sceneMine').textContent='LV. '+state.base.mine;$('sceneArmory').textContent='LV. '+state.base.armory;$('sceneBarracks').textContent='LV. '+state.base.barracks;$('armoryLevel').textContent='ARMORY LV. '+state.base.armory;$('armoryLevel2').textContent=state.base.armory;$('barracksLevel').textContent='BARRACKS LV. '+state.base.barracks;
-$('mineLevel').textContent='MINE LV. '+state.base.mine+'/5';$('mineOutput').textContent=production()+' coins/min';$('workerCount').textContent=state.workers+' worker'+(state.workers===1?'':'s');$('storedGold').textContent=Math.floor(state.stored);$('mineReport').textContent='Production is '+production()+' coins/min. Stored gold is collected separately.';
-$('castleLevel').textContent='CASTLE LV. '+state.base.castle;$('wallLevel').textContent=state.base.wall+'/5';$('commanderLevel').textContent=state.level;$('commanderXP').textContent=state.xp+'/'+xpNeeded();$('wins').textContent=state.wins;
-$('rank').textContent=state.wins>=20?'GOLD I':state.wins>=10?'SILVER I':state.wins>=5?'SILVER III':state.wins>=2?'BRONZE I':'BRONZE III';$('activeFighter').textContent=active().name+' '+active().role;$('activeWeapon').textContent=getWeapon().name;
+const $=id=>document.getElementById(id),KEY='crateClashKingdomBuilder_v1',SIZE=11,CENTER=5;
+const TYPES={
+ townhall:{name:'Town Hall',icon:'🏰',gold:0,elixir:0,desc:'The heart of the kingdom. Upgrade it to unlock higher-level buildings.',hall:1,category:'townhall',baseDefense:12},
+ goldmine:{name:'Gold Mine',icon:'⛏️',gold:100,elixir:0,desc:'Produces gold for your kingdom.',hall:1,category:'production',goldRate:8},
+ pump:{name:'Elixir Pump',icon:'💧',gold:110,elixir:0,desc:'Produces elixir to train troops.',hall:1,category:'production',elixirRate:7},
+ goldstorage:{name:'Gold Storage',icon:'🪙',gold:130,elixir:30,desc:'Increases how much gold your kingdom can store.',hall:1,category:'storage'},
+ elixirstorage:{name:'Elixir Storage',icon:'🫙',gold:120,elixir:40,desc:'Increases how much elixir your kingdom can store.',hall:1,category:'storage'},
+ barracks:{name:'Barracks',icon:'🪖',gold:150,elixir:60,desc:'Trains troops and increases troop capacity.',hall:1,category:'army',baseDefense:4},
+ cannon:{name:'Cannon',icon:'💣',gold:180,elixir:70,desc:'Defends your kingdom from rival raids.',hall:2,category:'defense',baseDefense:18},
+ archerTower:{name:'Archer Tower',icon:'🏹',gold:230,elixir:110,desc:'A tall defensive tower that deters raiders.',hall:3,category:'defense',baseDefense:25},
+ wall:{name:'Wall',icon:'🧱',gold:35,elixir:0,desc:'A simple wall segment that makes your base harder to raid.',hall:1,category:'defense',baseDefense:3}
+};
+const TROOPS={Barbarian:{icon:'🗡️',cost:25,space:1,power:10,desc:'Cheap, balanced raiding troop.'},Archer:{icon:'🏹',cost:35,space:1,power:13,desc:'Quick and accurate.'},Giant:{icon:'🛡️',cost:90,space:3,power:31,desc:'Strong troop that takes three spaces.'}};
+const RIVAL_NAMES=['Pinewatch','Ironvale','Frostmoor','Sunspire','Oakheart','Redcliff','Moonkeep','Stormridge','Goldhaven','Ravenrock','Brightwater','Ashenfield','Westguard','Blue Hollow','Kingsfall','Thornwall'];
+const fresh=()=>({gold:650,elixir:400,storedGold:0,storedElixir:0,hall:1,land:0,last:Date.now(),nextId:6,buildings:[{id:1,type:'townhall',x:5,y:5,level:1},{id:2,type:'goldmine',x:4,y:5,level:1},{id:3,type:'pump',x:6,y:5,level:1},{id:4,type:'goldstorage',x:5,y:4,level:1},{id:5,type:'barracks',x:5,y:6,level:1}],troops:{Barbarian:5,Archer:0,Giant:0},rivals:[],selectedRival:null,raids:0,claimed:{}});
+let s=fresh(),tab='base',buildChoice=null,selectedBuilding=1,toastTimer=null,lastRivalSeed=0;
+function clamp(n,a,b){return Math.max(a,Math.min(b,n))}function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function esc(v){return String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2400)}
+function baseRadius(){return 2+s.land}function canUse(x,y){return Math.max(Math.abs(x-CENTER),Math.abs(y-CENTER))<=baseRadius()}
+function buildingAt(x,y){return s.buildings.find(b=>b.x===x&&b.y===y)}function buildingById(id){return s.buildings.find(b=>b.id===id)}
+function levels(type){return s.buildings.filter(b=>b.type===type).reduce((n,b)=>n+b.level,0)}
+function count(type){return s.buildings.filter(b=>b.type===type).length}
+function goldRate(){return s.buildings.filter(b=>b.type==='goldmine').reduce((n,b)=>n+TYPES.goldmine.goldRate*b.level,0)}
+function elixirRate(){return s.buildings.filter(b=>b.type==='pump').reduce((n,b)=>n+TYPES.pump.elixirRate*b.level,0)}
+function goldCap(){return 500+s.hall*250+levels('goldstorage')*500}function elixirCap(){return 400+s.hall*180+levels('elixirstorage')*450}
+function troopSpace(){return Object.entries(s.troops).reduce((sum,[name,n])=>sum+(TROOPS[name]?.space||1)*n,0)}function troopCapacity(){return 10+levels('barracks')*5}
+function troopPower(){return Object.entries(s.troops).reduce((sum,[name,n])=>sum+(TROOPS[name]?.power||0)*n,0)+s.hall*5}
+function defensePower(){return s.hall*9+s.buildings.reduce((n,b)=>n+(TYPES[b.type]?.baseDefense||0)*b.level,0)+count('wall')*2}
+function addResources(g,e){s.storedGold=clamp(s.storedGold+g,0,goldCap());s.storedElixir=clamp(s.storedElixir+e,0,elixirCap())}
+function save(){s.last=Date.now();try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}}
+function load(){try{const raw=JSON.parse(localStorage.getItem(KEY)||'null');if(raw&&typeof raw==='object'){s={...fresh(),...raw};s.buildings=Array.isArray(raw.buildings)?raw.buildings:fresh().buildings;s.troops={...fresh().troops,...(raw.troops||{})};s.claimed=raw.claimed&&typeof raw.claimed==='object'?raw.claimed:{};s.rivals=Array.isArray(raw.rivals)?raw.rivals:[];s.hall=Math.max(1,Number(s.hall)||1);s.land=clamp(Number(s.land)||0,0,3);s.gold=Math.max(0,Number(s.gold)||0);s.elixir=Math.max(0,Number(s.elixir)||0);s.storedGold=Math.max(0,Number(s.storedGold)||0);s.storedElixir=Math.max(0,Number(s.storedElixir)||0);s.nextId=Math.max(6,Number(s.nextId)||6)}}catch(e){s=fresh()}const away=clamp((Date.now()-(Number(s.last)||Date.now()))/1000,0,28800);addResources(away*goldRate()/60,away*elixirRate()/60);s.last=Date.now();if(!s.rivals.length)refreshRivals(false)}
+function openTab(name){tab=name;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.toggle('hide',v.id!=='view-'+name));render();window.scrollTo({top:0,behavior:'smooth'})}
+function renderHeader(){ $('gold').textContent=Math.floor(s.gold);$('elixir').textContent=Math.floor(s.elixir);$('hallLevel').textContent=s.hall;$('landLabel').textContent='LAND '+(baseRadius()*2+1)+' × '+(baseRadius()*2+1);$('goldRate').textContent=goldRate()+'/min';$('elixirRate').textContent=elixirRate()+'/min';$('goldBar').style.width=clamp(goldRate()/120*100,0,100)+'%';$('elixirBar').style.width=clamp(elixirRate()/120*100,0,100)+'%';$('buildHall').textContent='TOWN HALL LEVEL '+s.hall}
+let realmCanvas=null;
+const REALM_W=920,REALM_H=600;
+function realmGeometry(){const r=baseRadius(),tw=Math.min(132,620/(2*r)),th=tw*.49;return{r,tw,th,ox:REALM_W/2,oy:300-CENTER*th,scale:tw/132}}
+function realmPoint(x,y,g){return{x:g.ox+(x-y)*g.tw/2,y:g.oy+(x+y)*g.th/2}}
+function seeded(x,y,k=0){const n=Math.sin((x+17.3)*(127.1+k*3.7)+(y+7.1)*(311.7-k*1.9))*43758.5453;return n-Math.floor(n)}
+function realmPoly(ctx,pts,fill,stroke=null,lineWidth=1){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=lineWidth;ctx.stroke()}}
+function realmLine(ctx,pts,color,width=2){ctx.beginPath();ctx.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)ctx.lineTo(pts[i][0],pts[i][1]);ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke()}
+function realmEllipse(ctx,x,y,rx,ry,fill,stroke=null){ctx.beginPath();ctx.ellipse(x,y,rx,ry,0,0,Math.PI*2);ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.stroke()}}
+function drawTree(ctx,x,y,sc,variant=0){ctx.save();ctx.translate(x,y);ctx.scale(sc,sc);realmEllipse(ctx,0,0,20,7,'#08191255');realmPoly(ctx,[[-4,-2],[-1,-30],[5,-30],[7,-2]],'#684c31','#382b20',1);const shades=variant%3===0?['#315b36','#3d743e','#5d9650']:variant%3===1?['#294f38','#356c43','#4a8351']:['#3d6040','#50794a','#739052'];realmPoly(ctx,[[-25,-20],[0,-63],[25,-20],[15,-15],[-17,-15]],shades[0],'#203e2b',1.5);realmPoly(ctx,[[-20,-28],[0,-67],[20,-28],[9,-22],[-15,-22]],shades[1]);realmPoly(ctx,[[-13,-39],[0,-72],[13,-39],[4,-34],[-8,-34]],shades[2]);realmEllipse(ctx,-6,-47,4,8,'#8aa86a66');ctx.restore()}
+function drawGrassDetail(ctx,x,y,sc,seed){const col=['#b6c98255','#d6dca24b','#7ab36a55','#e5d49a55'][seed%4];realmLine(ctx,[[x-3*sc,y],[x-5*sc,y-5*sc]],col,1.2*sc);realmLine(ctx,[[x,y],[x+3*sc,y-6*sc]],col,1.2*sc);if(seed%7===0){realmEllipse(ctx,x+4*sc,y-3*sc,1.4*sc,1.4*sc,'#e8e2a5')}
 }
-function gainXP(n){state.xp+=n;while(state.xp>=xpNeeded()){state.xp-=xpNeeded();state.level++;state.gems+=2;toast('Level up! Commander level '+state.level+' · +2 gems')}}
-function openTab(name){tab=name;document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));document.querySelectorAll('[id^="view-"]').forEach(v=>v.classList.toggle('hide',v.id!=='view-'+name));if(name==='battle'&&!battle)$('arenaStatus').textContent='READY TO DEPLOY';render()}
-function renderInventory(){
-const inv=$('inventory');$('itemCount').textContent=state.inventory.length+' item'+(state.inventory.length===1?'':'s');
-if(!state.inventory.length){inv.innerHTML='<p>No equipment yet. Open a crate to find gear.</p>';return}
-inv.innerHTML=state.inventory.map((it,i)=>{const isEq=state.equipped[it.type]===it.name;const bonus=it.type==='weapon'?'Damage +'+it.damage:it.type==='armor'?'Reduce damage by '+it.armor:'+'+it.bonus+' coins/min';
-return '<div class="inventoryrow"><div><b>'+escapeHTML(it.emoji)+' '+escapeHTML(it.name)+'</b><div class="sub"><span class="'+it.rarity+'">'+it.rarity.toUpperCase()+'</span> · '+bonus+(isEq?' · <span class="mint">EQUIPPED</span>':'')+'</div></div><div style="display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end"><button data-equip="'+i+'" '+(isEq?'disabled':'')+'>Equip</button><button data-sell="'+i+'">Sell '+Math.max(5,it.cost||15)+' 🪙</button></div></div>'
-}).join('')
+function drawRealmTile(ctx,x,y,g,owned){const {tw,th}=g,p=realmPoint(x,y,g),cx=p.x,cy=p.y;const top=[[cx,cy-th/2],[cx+tw/2,cy],[cx,cy+th/2],[cx-tw/2,cy]];ctx.save();ctx.globalAlpha=owned?1:.9;
+// raised soil edge creates a tiny bevel under every diamond
+realmPoly(ctx,top.map(([a,b])=>[a,b+5*g.scale]),owned?'#233e2a':'#172b25',null);
+let fill;if(owned){const v=seeded(x,y,4);fill=v>.78?'#6e9b57':v>.4?'#5d8b4e':'#517f47'}else{const v=seeded(x,y,8);fill=v>.72?'#304c36':v>.38?'#284532':'#223c30'}
+const grad=ctx.createLinearGradient(cx-tw/2,cy-th/2,cx+tw/2,cy+th/2);grad.addColorStop(0,owned?'#7ca760':'#3b5940');grad.addColorStop(.48,fill);grad.addColorStop(1,owned?'#416d3c':'#1b342b');realmPoly(ctx,top,grad,owned?'#9fc47a':'#405b45',owned?1.3:1);
+if(owned){for(let k=0;k<4;k++){const rx=cx+(seeded(x,y,k)-.5)*tw*.65,ry=cy+(seeded(y,x,k+2)-.5)*th*.42;drawGrassDetail(ctx,rx,ry,g.scale,Math.floor(seeded(x+k,y+k,5)*12))}
+// gentle worn soil patches and scattered pale stones
+if(seeded(x,y,11)>.7){ctx.globalAlpha=.24;realmPoly(ctx,[[cx-14*g.scale,cy-4*g.scale],[cx-2*g.scale,cy-10*g.scale],[cx+17*g.scale,cy-1*g.scale],[cx+4*g.scale,cy+5*g.scale]],'#b9ad78');ctx.globalAlpha=1}
+if(seeded(x,y,12)>.84){realmEllipse(ctx,cx+13*g.scale,cy-4*g.scale,2.1*g.scale,1.3*g.scale,'#bbb9a0')}
+}else{
+// forest floor uses moss, leaves, and dark earth rather than a flat locked square
+ctx.globalAlpha=.24;realmPoly(ctx,[[cx,cy-th*.25],[cx+tw*.24,cy],[cx,cy+th*.25],[cx-tw*.24,cy]],'#0d201a');ctx.globalAlpha=1;
+if(seeded(x,y,2)>.26)drawTree(ctx,cx+(seeded(x,y,31)-.5)*tw*.19,cy+th*.03,g.scale*(.72+seeded(x,y,21)*.36),Math.floor(seeded(x,y,7)*3));
+if(seeded(x,y,22)>.73){realmEllipse(ctx,cx-tw*.15,cy,5*g.scale,2.6*g.scale,'#7b8774');realmEllipse(ctx,cx-tw*.15-2*g.scale,cy-1*g.scale,2.5*g.scale,1.7*g.scale,'#a0a58a')}
 }
-function renderTroops(){
-const list=$('troopList');
-list.innerHTML=roles.map(r=>{const count=state.soldiers.filter(s=>s.role===r.name).length;const price=r.cost+Math.max(0,state.soldiers.length-3)*15;
-return '<div class="troop"><div class="troopEmoji">'+r.emoji+'</div><b>'+r.name+'</b><small>'+r.desc+'</small><div class="sub">Owned: '+count+'</div><button data-recruit="'+r.name+'" '+(r.cost===0||state.coins<price||state.soldiers.length>=armyCapacity()?'disabled':'')+'>'+(r.cost===0?'Starting class':('Recruit · '+price+' 🪙'))+'</button></div>'
-}).join('')+'<div class="troop"><div class="troopEmoji">🎖️</div><b>Active fighter</b><small>Choose who you directly control during battle.</small><select id="activeSelect">'+state.soldiers.map(s=>'<option value="'+s.role+'" '+(s.role===state.activeRole?'selected':'')+'>'+escapeHTML(s.name)+' · '+s.role+'</option>').join('')+'</select><button data-train="active">Train active fighter · 55 🪙</button></div>';
+// shared edges are carefully outlined like separate grassy plots
+ctx.strokeStyle=owned?'#b5d18488':'#0d211b66';ctx.lineWidth=owned?1.1:.8;ctx.beginPath();ctx.moveTo(...top[0]);for(let i=1;i<top.length;i++)ctx.lineTo(...top[i]);ctx.closePath();ctx.stroke();
+// gold-lit frontier line marks the purchased land perimeter
+if(owned&&(!canUse(x+1,y)||!canUse(x-1,y)||!canUse(x,y+1)||!canUse(x,y-1))){ctx.strokeStyle='#f5dc8c';ctx.globalAlpha=.33;ctx.lineWidth=2.2*g.scale;ctx.beginPath();ctx.moveTo(...top[0]);for(let i=1;i<top.length;i++)ctx.lineTo(...top[i]);ctx.closePath();ctx.stroke();ctx.globalAlpha=1}
+ctx.restore()}
+function drawRoads(ctx,g){const hall=buildingAt(CENTER,CENTER);if(!hall)return;const buildings=s.buildings.filter(b=>b.type!=='wall');ctx.save();ctx.lineCap='round';for(const b of buildings){if(b.id===hall.id)continue;let x=CENTER,y=CENTER,pts=[realmPoint(x,y,g)];while(x!==b.x){x+=Math.sign(b.x-x);pts.push(realmPoint(x,y,g))}while(y!==b.y){y+=Math.sign(b.y-y);pts.push(realmPoint(x,y,g))}if(pts.some(p=>!Number.isFinite(p.x)))continue;realmLine(ctx,pts.map(p=>[p.x,p.y+2*g.scale]),'#17251f99',13*g.scale);realmLine(ctx,pts.map(p=>[p.x,p.y]),'#6d5940',9*g.scale);realmLine(ctx,pts.map(p=>[p.x,p.y-1*g.scale]),'#b99b6c',5*g.scale);realmLine(ctx,pts.map(p=>[p.x,p.y-2*g.scale]),'#d6c18b55',1.2*g.scale)}ctx.restore()}
+function drawBuildingArt(ctx,b,g){const p=realmPoint(b.x,b.y,g),sc=g.scale,level=b.level||1,sel=b.id===selectedBuilding;ctx.save();ctx.translate(p.x,p.y);ctx.scale(sc,sc);
+// each structure gets its own stone foundation and soft contact shadow
+realmEllipse(ctx,0,1,37,13,'#07171065');if(sel){ctx.shadowColor='#ffe5a1';ctx.shadowBlur=15;realmPoly(ctx,[[0,-7],[42,8],[0,25],[-42,8]],'#ffe4a015','#ffe2a1',2.2);ctx.shadowBlur=0}
+const stone='#c2c5b2',stoneDark='#7f918d',stoneFront='#9eaa9f',wood='#795236',woodLight='#b48a54',roof='#934a36',roofLight='#c16a47';
+function box(w,d,h,front,side,top){const z=-h;realmPoly(ctx,[[-w/2,z],[0,z-d/2],[0,-d/2],[ -w/2,0]],front);realmPoly(ctx,[[0,z-d/2],[w/2,z],[w/2,0],[0,-d/2]],side);realmPoly(ctx,[[-w/2,z],[0,z-d/2],[w/2,z],[0,z+d/2]],top, '#ffffff30',1)}
+function roofGable(w,baseY,peakY,front,side){realmPoly(ctx,[[-w/2,baseY],[0,peakY],[0,baseY+16]],front);realmPoly(ctx,[[0,peakY],[w/2,baseY],[0,baseY+16]],side);realmPoly(ctx,[[-w/2,baseY],[0,peakY],[w/2,baseY],[0,baseY+16]],null,'#573527',1.5)}
+if(b.type==='townhall'){
+box(58,39,48,'#d0c6a6','#8c9d98','#e0d8bd');realmPoly(ctx,[[-34,-47],[0,-70],[34,-47],[0,-29]],roof,'#63372c',1.2);realmPoly(ctx,[[-34,-47],[0,-29],[0,-21],[-34,-39]],'#783b2f');realmPoly(ctx,[[0,-29],[34,-47],[34,-39],[0,-21]],'#572e29');
+box(25,23,77,'#d6d0b9','#9ba79b','#e6dfc8');roofGable(32,-77,-99,'#c36643','#834232');realmPoly(ctx,[[-6,-79],[1,-79],[1,-49],[-6,-49]],'#4b3028');realmPoly(ctx,[[-16,-61],[-9,-61],[-9,-50],[-16,-50]],'#5b94a0');realmPoly(ctx,[[10,-61],[17,-61],[17,-50],[10,-50]],'#5b94a0');realmPoly(ctx,[[-27,-19],[-17,-19],[-17,-3],[-27,-3]],'#7f5434');realmPoly(ctx,[[-27,-19],[-22,-24],[-17,-19],[-17,-3],[-27,-3]],'#a17546');realmLine(ctx,[[0,-99],[0,-119]],'#67472b',2);realmPoly(ctx,[[0,-117],[16,-112],[0,-107]],'#e9bb5b');
+}else if(b.type==='goldmine'){
+realmPoly(ctx,[[-31,-1],[-18,-17],[0,-10],[18,-18],[32,-1],[0,14]],'#574a35','#2c2a20',1);realmPoly(ctx,[[-22,-4],[-12,-18],[1,-12],[9,-2],[-3,4]],'#382f27');realmPoly(ctx,[[-19,-15],[-13,-31],[-8,-25],[-5,-16]],'#897456');realmPoly(ctx,[[4,-12],[13,-29],[19,-24],[18,-9]],'#a99a70');realmLine(ctx,[[-26,-35],[0,-65],[25,-35]],woodLight,5);realmLine(ctx,[[-24,-35],[0,-8],[22,-35]],wood,4);realmLine(ctx,[[-18,-36],[19,-36]],woodLight,3);realmLine(ctx,[[0,-61],[0,-34]],'#c6a876',3);realmLine(ctx,[[0,-35],[12,-27]],'#e4cf99',2);realmEllipse(ctx,19,-6,3,2,'#ffe07a');realmEllipse(ctx,11,-11,2.3,1.8,'#f4c64d');realmEllipse(ctx,-9,-6,2,2,'#f6df86');
+}else if(b.type==='pump'){
+realmPoly(ctx,[[-25,-2],[-18,-13],[10,-12],[23,-1],[0,13]],'#574e6f','#332b43',1);box(34,28,35,'#8263a0','#513f74','#bb8bdd');realmEllipse(ctx,0,-35,17,7,'#ddb6fc','#f1d4ff');realmEllipse(ctx,0,-35,10,4,'#7fe0ff','#d1f7ff');realmLine(ctx,[[22,-15],[28,-27],[22,-37]],'#8dabb4',4);realmEllipse(ctx,22,-39,4,3,'#79dcff');realmEllipse(ctx,-5,-41,3,3,'#f4d4ff');
+}else if(b.type==='goldstorage'){
+box(38,35,29,'#778a85','#4e6662','#a9b9ad');realmEllipse(ctx,0,-29,19,8,'#b6c3a9','#536963');realmEllipse(ctx,0,-28,13,4,'#655b39');realmPoly(ctx,[[-19,-31],[-19,-8],[-14,-4],[-14,-27]],'#d3b96b');realmPoly(ctx,[[14,-31],[14,-8],[19,-5],[19,-31]],'#7f8a7e');realmLine(ctx,[[-16,-20],[16,-20]],'#e3c66b',3);realmEllipse(ctx,0,-29,5,2,'#ffe69e');
+}else if(b.type==='elixirstorage'){
+box(35,34,34,'#6d6197','#44385f','#aa90db');realmEllipse(ctx,0,-34,17,7,'#d9c2ff','#a991d7');realmEllipse(ctx,0,-34,12,4,'#a86de0','#e3ccff');realmLine(ctx,[[-17,-29],[-17,-9]],'#d5b6ff',3);realmLine(ctx,[[17,-29],[17,-9]],'#65568a',3);realmEllipse(ctx,0,-22,12,4,'#be8afa55');
+}else if(b.type==='barracks'){
+box(48,36,33,'#c6ad7f','#92744f','#dcc99c');realmPoly(ctx,[[-30,-33],[0,-57],[30,-33],[0,-15]],'#794a31','#4d3025',1.2);realmPoly(ctx,[[-30,-33],[0,-15],[0,-7],[-30,-25]],'#613a29');realmPoly(ctx,[[0,-15],[30,-33],[30,-25],[0,-7]],'#4c3025');realmPoly(ctx,[[-8,-24],[5,-24],[5,-1],[-8,-1]],'#533528');realmEllipse(ctx,-16,-29,5,5,'#b8d6cf','#594d37');realmPoly(ctx,[[-21,-30],[-11,-30],[-16,-22]],'#547e82');
+}else if(b.type==='cannon'){
+box(43,37,18,'#8b9899','#566a73','#b7c1b9');realmEllipse(ctx,-4,-20,17,12,'#465d65','#a8b9bb');realmEllipse(ctx,-4,-23,12,7,'#7f9499');realmLine(ctx,[[-4,-23],[23,-42]],'#394b55',10);realmLine(ctx,[[0,-24],[25,-43]],'#9caeae',5);realmEllipse(ctx,25,-44,5,4,'#17232a');realmEllipse(ctx,-22,-4,5,5,'#3d4e55','#acb8b4');realmEllipse(ctx,18,-4,5,5,'#3d4e55','#acb8b4');
+}else if(b.type==='archerTower'){
+realmPoly(ctx,[[-26,-2],[-18,-11],[17,-11],[25,-2],[0,10]],'#6d563d');realmLine(ctx,[[-18,-7],[-13,-64]],'#76533a',6);realmLine(ctx,[[18,-7],[13,-64]],'#76533a',6);realmLine(ctx,[[-9,-7],[-7,-61]],'#bd8c52',4);realmLine(ctx,[[9,-7],[7,-61]],'#bd8c52',4);realmPoly(ctx,[[-26,-61],[0,-78],[26,-61],[0,-45]],'#4d4335','#3a3025',1);realmPoly(ctx,[[-24,-62],[0,-78],[0,-67],[-24,-55]],'#91683f');realmPoly(ctx,[[0,-78],[26,-61],[24,-54],[0,-67]],'#66472f');realmLine(ctx,[[0,-78],[0,-98]],'#d5bd86',2);realmPoly(ctx,[[0,-97],[15,-93],[0,-88]],'#e6c45f');
+}else if(b.type==='wall'){
+box(34,23,20,'#a4ada4','#707f7c','#c6cbb9');realmLine(ctx,[[-10,-19],[-10,-7]],'#e0dfc8',1.5);realmLine(ctx,[[5,-13],[5,-2]],'#536a67',1.5);realmLine(ctx,[[-17,-7],[0,-15],[17,-7]],'#d6d7c5',1.4);
 }
-function renderAchievements(){
-const arr=[];if(state.wins>=1)arr.push('🏆 First victory');if(state.wins>=5)arr.push('⚔️ Five victories');if(state.base.mine>=5)arr.push('⛏️ Master miner');if(state.base.barracks>=4)arr.push('🪖 Army commander');if(state.inventory.length>=5)arr.push('📦 Crate collector');if(state.base.wall>=5)arr.push('🧱 Fortress wall');
-$('achievements').innerHTML=arr.length?arr.map(a=>'<div class="inventoryrow">'+a+'</div>').join(''):'<p>No achievements unlocked yet. Your first one is waiting!</p>';
+// Every upgrade visibly improves the structure with brass trim, a banner, or a level seal.
+if(level>1){ctx.globalAlpha=.9;realmLine(ctx,[[-27,-Math.max(23,35+level*2)],[0,-Math.max(32,46+level*2)],[27,-Math.max(23,35+level*2)]],'#e7ca71',1.5);realmEllipse(ctx,25,-55,5,5,'#f8dc83','#73552d');ctx.globalAlpha=1}
+// A small selection/name plate anchors the structure to the land without cluttering the entire map.
+ctx.shadowBlur=0;const name=TYPES[b.type].name,plateW=Math.min(90,Math.max(43,name.length*5.3));ctx.fillStyle=sel?'#1a2d2beF':'#10201edb';ctx.strokeStyle=sel?'#f2d991':'#a6c18a65';ctx.lineWidth=sel?1.4:.6;ctx.beginPath();ctx.roundRect(-plateW/2,10,plateW,13,4);ctx.fill();ctx.stroke();ctx.fillStyle=sel?'#fff1b4':'#e0ead2';ctx.font='bold 8px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(name,0,16.5);ctx.fillStyle='#fff2c3';ctx.font='bold 7px system-ui';ctx.textAlign='right';ctx.fillText('L'+level,plateW/2-2,-1);
+// Tiny smoke/steam and resource glints make production buildings feel alive.
+const tick=Date.now()/650;if(b.type==='goldmine'){for(let i=0;i<3;i++){ctx.globalAlpha=.45+.35*Math.sin(tick+i*2+b.id);realmEllipse(ctx,-6+i*7,-31-((tick+i*9)%11),1.5,1.5,'#ffdc79')}ctx.globalAlpha=1}else if(b.type==='pump'){ctx.globalAlpha=.45+.35*Math.sin(tick+b.id);realmEllipse(ctx,23,-43,3,3,'#a9f1ff');ctx.globalAlpha=1}else if(b.type==='townhall'){ctx.globalAlpha=.23+.12*Math.sin(tick+b.id);realmEllipse(ctx,5,-111-(tick%6),2,4,'#e0e8de');ctx.globalAlpha=1}
+ctx.restore()}
+function drawIsoRealm(canvas){if(!canvas)return;const ctx=canvas.getContext('2d');if(!ctx)return;const g=realmGeometry();ctx.clearRect(0,0,REALM_W,REALM_H);
+const bg=ctx.createLinearGradient(0,0,REALM_W,REALM_H);bg.addColorStop(0,'#213f34');bg.addColorStop(.45,'#294b37');bg.addColorStop(1,'#142c25');ctx.fillStyle=bg;ctx.fillRect(0,0,REALM_W,REALM_H);
+// Backdrop layers: forested ridgelines and tiny treetop canopy silhouettes.
+ctx.fillStyle='#182e27';ctx.beginPath();ctx.moveTo(0,35);for(let x=0;x<=REALM_W;x+=65)ctx.lineTo(x,45+seeded(x,3,2)*65);ctx.lineTo(REALM_W,0);ctx.lineTo(0,0);ctx.closePath();ctx.fill();
+for(let i=0;i<43;i++){const x=seeded(i,2,1)*REALM_W,y=seeded(i,7,2)*REALM_H*.85;ctx.globalAlpha=.2+.23*seeded(i,9,6);realmEllipse(ctx,x,y,10+seeded(i,4,3)*15,5+seeded(i,8,4)*8,i%3===0?'#8bab5c':'#0c241d')}ctx.globalAlpha=1;
+// Terrain is painted far-to-near so the tile edges and wooded fringe have depth.
+const cells=[];for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++)cells.push({x,y,z:x+y});cells.sort((a,b)=>a.z-b.z||a.x-b.x);for(const c of cells)drawRealmTile(ctx,c.x,c.y,g,canUse(c.x,c.y));
+// A short worn-earth road network connects useful buildings to the Town Hall.
+drawRoads(ctx,g);
+// Trees around newly claimed land are layered behind structures.
+for(const c of cells){if(canUse(c.x,c.y))continue;const p=realmPoint(c.x,c.y,g),r=seeded(c.x,c.y,44);if(r>.79)drawTree(ctx,p.x+(seeded(c.x,c.y,45)-.5)*g.tw*.1,p.y-g.th*.03,g.scale*(.65+seeded(c.x,c.y,46)*.42),Math.floor(r*10))}
+// Place buildings back-to-front for natural overlap.
+const buildings=[...s.buildings].sort((a,b)=>(a.x+a.y)-(b.x+b.y));for(const b of buildings)drawBuildingArt(ctx,b,g);
+// Dashed growth markers identify the frontier tiles available through the next land purchase.
+ctx.save();ctx.strokeStyle='#ffe3a4';ctx.globalAlpha=.58;ctx.lineWidth=1.8;ctx.setLineDash([4,5]);for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++){if(canUse(x,y))continue;if(Math.max(Math.abs(x-CENTER),Math.abs(y-CENTER))===baseRadius()+1){const p=realmPoint(x,y,g);ctx.beginPath();ctx.moveTo(p.x,p.y-g.th/2);ctx.lineTo(p.x+g.tw/2,p.y);ctx.lineTo(p.x,p.y+g.th/2);ctx.lineTo(p.x-g.tw/2,p.y);ctx.closePath();ctx.stroke()}}ctx.restore();
+// Selected building receives a restrained spotlight and locator ring.
+const sel=buildingById(selectedBuilding);if(sel){const p=realmPoint(sel.x,sel.y,g);ctx.save();ctx.strokeStyle='#ffe7a3';ctx.globalAlpha=.85;ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.beginPath();ctx.ellipse(p.x,p.y+4*g.scale,g.tw*.33,g.th*.30,0,0,Math.PI*2);ctx.stroke();ctx.restore()}
 }
-function render(){
-renderHeader();renderInventory();renderTroops();renderAchievements();
-$('upgradeArmory').disabled=state.base.armory>=5||state.coins<120*state.base.armory;$('upgradeArmory').textContent=state.base.armory>=5?'Armory fully upgraded':'Upgrade Armory · '+(120*state.base.armory)+' 🪙';
-$('upgradeBarracks').disabled=state.base.barracks>=8||state.coins<100*state.base.barracks;$('upgradeBarracks').textContent=state.base.barracks>=8?'Barracks fully upgraded':'Upgrade · '+(100*state.base.barracks)+' 🪙';
-$('upgradeMine').disabled=state.base.mine>=5||state.coins<100*state.base.mine;$('upgradeMine').textContent=state.base.mine>=5?'Mine fully upgraded':'Upgrade mine · '+(100*state.base.mine)+' 🪙';
-$('hireWorker').disabled=state.coins<60+state.workers*30;$('hireWorker').textContent='Hire worker · '+(60+state.workers*30)+' 🪙';
-$('upgradeWall').disabled=state.base.wall>=5||state.coins<140*state.base.wall;$('upgradeWall').textContent=state.base.wall>=5?'Wall fully reinforced':'Reinforce Wall · '+(140*state.base.wall)+' 🪙';$('trainCommander').disabled=state.coins<90;
-}
-function openCrate(){
-if(state.coins<80){toast('You need 80 coins for a crate.');return}state.coins-=80;
-const weights=loot.map(it=>({it,w:it.rarity==='legendary'?1+state.base.armory:it.rarity==='epic'?4+state.base.armory*2:it.rarity==='rare'?12+state.base.armory*3:25}));
-let total=weights.reduce((n,x)=>n+x.w,0),r=Math.random()*total,p=weights[0].it;for(const x of weights){r-=x.w;if(r<=0){p=x.it;break}}
-if(owned(p.name)||state.equipped[p.type]===p.name){const refund=Math.max(15,Math.round((p.cost||25)*.7));state.coins+=refund;toast('Duplicate '+p.name+' converted to '+refund+' coins.')}
-else{state.inventory.push({...p});toast('Crate opened: '+p.name+'!')}
-gainXP(12);render();save()
-}
-function recruit(role){
-const r=roles.find(x=>x.name===role);if(!r||r.cost===0)return;const price=r.cost+Math.max(0,state.soldiers.length-3)*15;
-if(state.soldiers.length>=armyCapacity()){toast('Upgrade your Barracks to increase capacity.');return}if(state.coins<price){toast('Not enough coins.');return}
-state.coins-=price;const id=state.nextId++;state.soldiers.push({id,role:r.name,name:r.name+' '+id,level:1,weapon:'Training Blade'});toast(r.name+' recruited!');gainXP(10);render();save()
-}
-function sellItem(i){
-const it=state.inventory[i];if(!it)return;const val=Math.max(5,it.cost||15);
-if(state.equipped[it.type]===it.name)state.equipped[it.type]=it.type==='weapon'?'Training Blade':'';
-state.inventory.splice(i,1);state.coins+=val;toast('Sold '+it.name+' for '+val+' coins.');render();save()
-}
-function load(){
-try{const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');if(d&&typeof d==='object'){
-state={...fresh(),...d};state.base={...fresh().base,...(d.base||{})};
-if(!Array.isArray(state.soldiers)||!state.soldiers.length)state.soldiers=fresh().soldiers;
-if(!Array.isArray(state.inventory))state.inventory=[];
-state.equipped={weapon:'Training Blade',armor:'',tool:'',...(d.equipped||{})};
-state.soldiers=state.soldiers.slice(0,armyCapacity());state.coins=Math.max(0,Number(state.coins)||0);state.last=Number(state.last)||Date.now();
-}}catch(e){state=fresh()}
-const away=clamp((Date.now()-state.last)/1000,0,28800);state.stored+=away*production()/60;state.last=Date.now()
-}
-// ----- Skill-based live combat -----
-const canvas=$('arena'),ctx=canvas.getContext('2d');let anim=0,projectiles=[];
-function startBattle(){
-if(battle&&!battle.finished){toast('You are already in a battle!');return}
-const a=active(),w=weaponData(a.weapon||state.equipped.weapon),hp=105+(state.level-1)*7+armorData().armor*5,enemyHp=66+state.wins*13+state.level*4;
-battle={px:210,py:255,ex:545,ey:248,playerHP:hp,playerMax:hp,enemyHP:enemyHp,enemyMax:enemyHp,enemyDamage:12+Math.floor(state.wins/2)+Math.max(0,state.level-1),enemyPhase:'approach',enemyWindup:0,enemyCd:1,enemyRecovery:0,attackCd:0,invuln:0,counter:0,finished:false,weapon:w,role:a.role,enemyName:['Raider','Iron Guard','Ash Knight','War Captain'][Math.min(3,Math.floor(state.wins/4))],hits:0,dodges:0,squadSize:state.soldiers.length,projectiles:[]};
-projectiles=[];openTab('battle');$('arenaStatus').textContent='FIGHT!';log('Battle started against '+battle.enemyName+'. Dodge the red warning marker.');toast('Battle started. Move constantly and time your attacks!')
-}
-function finishBattle(win){
-if(!battle||battle.finished)return;battle.finished=true;
-if(win){state.wins++;state.streak++;const reward=70+state.wins*6+rnd(0,20);state.coins+=reward;state.gems+=1+(state.wins%5===0?2:0);gainXP(35+state.wins*2);log('VICTORY! +'+reward+' coins and gems earned. Dodges: '+battle.dodges+'.');$('arenaStatus').textContent='VICTORY!';toast('Victory! +'+reward+' coins')}
-else{state.streak=0;const salvage=20+rnd(0,12);state.coins+=salvage;gainXP(8);log('Defeat. You salvaged '+salvage+' coins. Upgrade gear and try again.');$('arenaStatus').textContent='DEFEATED';toast('Defeated! Upgrade your gear and try again.')}
-save();render()
-}
-function attack(){
-if(!battle||battle.finished)return;if(battle.attackCd>0)return;battle.attackCd=battle.weapon.range>150?.48:.62;
-const d=Math.hypot(battle.ex-battle.px,battle.ey-battle.py),weap=battle.weapon,counter=battle.enemyPhase==='recovery'&&battle.counter>0;
-const damage=Math.round((weap.damage+(state.level-1)*1.4)*(counter?1.8:1)*(battle.role==='Mage'?1.08:1));
-if(weap.range>150){const dist=d||1;battle.projectiles.push({x:battle.px+10,y:battle.py-25,vx:(battle.ex-battle.px)/dist*7.4,vy:(battle.ey-battle.py)/dist*7.4,life:65,damage,color:weap.emoji==='🪄'?'#b88aff':'#7bdfff'});log(counter?'Counter shot! Projectile launched.':'Projectile launched.')}
-else if(d<weap.range+(battle.role==='Spearman'?22:0)){battle.enemyHP-=damage;battle.hits++;log((counter?'PERFECT COUNTER! ':'Hit! ')+damage+' damage.');if(counter){battle.counter=0;toast('Great counterattack!')}if(battle.enemyHP<=0)finishBattle(true)}
-else{log('Missed — move closer before attacking.')}
-if(battle&&battle.enemyHP<=0)finishBattle(true)
-}
-function updateBattle(dt){
-if(!battle||battle.finished||tab!=='battle')return;const b=battle;let dx=0,dy=0;
-if(held.has('w')||held.has('arrowup')||held.has('up'))dy--;if(held.has('s')||held.has('arrowdown')||held.has('down'))dy++;if(held.has('a')||held.has('arrowleft')||held.has('left'))dx--;if(held.has('d')||held.has('arrowright')||held.has('right'))dx++;
-const m=Math.hypot(dx,dy)||1;if(dx||dy){b.px=clamp(b.px+dx/m*205*dt,44,716);b.py=clamp(b.py+dy/m*160*dt,155,333)}
-b.attackCd=Math.max(0,b.attackCd-dt);b.enemyCd-=dt;b.invuln=Math.max(0,b.invuln-dt);b.counter=Math.max(0,b.counter-dt);
-const d=Math.hypot(b.px-b.ex,b.py-b.ey);
-if(b.enemyPhase==='approach'){
-if(d>74){b.ex-=((b.ex-b.px)/(d||1))*100*dt;b.ey-=((b.ey-b.py)/(d||1))*68*dt}
-if(d<135&&b.enemyCd<=0){b.enemyPhase='windup';b.enemyWindup=.76;b.targetX=b.px;b.targetY=b.py;b.enemyCd=1.65;$('arenaStatus').textContent='DODGE NOW!'}
-}else if(b.enemyPhase==='windup'){
-b.enemyWindup-=dt;
-if(b.enemyWindup<=0){
-const escaped=Math.hypot(b.px-b.targetX,b.py-b.targetY)>66;
-if(escaped){b.dodges++;b.enemyPhase='recovery';b.enemyRecovery=.92;b.counter=1;
-const assist=Math.max(0,b.squadSize-1)*2;if(assist){b.enemyHP-=assist;b.hits++;log('Clean dodge! Squad assisted for '+assist+' damage.')}else log('Perfect dodge! Counterattack window open.');
-toast('Dodged! Attack while the enemy recovers!')}
-else{const armor=armorData().armor,wallReduction=(state.base.wall-1)*.08,heavy=state.soldiers.some(s=>s.role==='Heavy')?.88:1,damage=Math.max(3,Math.round(b.enemyDamage*(1-wallReduction)*heavy)-armor);
-b.playerHP-=damage;b.invuln=.7;b.enemyPhase='recovery';b.enemyRecovery=.62;b.px=clamp(b.px-Math.sign(b.ex-b.px)*20,44,716);log('Hit for '+damage+' damage. You failed to leave the danger zone.');$('arenaStatus').textContent='HIT! MOVE!';if(b.playerHP<=0)finishBattle(false)}
-if(b.enemyHP<=0)finishBattle(true)
-}
-}else if(b.enemyPhase==='recovery'){b.enemyRecovery-=dt;if(b.enemyRecovery<=0){b.enemyPhase='approach';$('arenaStatus').textContent='MOVE + ATTACK'}}
-for(let i=b.projectiles.length-1;i>=0;i--){const q=b.projectiles[i];q.x+=q.vx;q.y+=q.vy;q.life--;if(Math.hypot(q.x-b.ex,q.y-(b.ey-20))<25){b.enemyHP-=q.damage;b.hits++;b.projectiles.splice(i,1);if(b.enemyHP<=0)finishBattle(true)}else if(q.life<=0||q.x<0||q.x>760||q.y<0||q.y>390)b.projectiles.splice(i,1)}
-if(attackQueued){attack();attackQueued=false}
-if(battle&&!battle.finished)$('arenaStatus').textContent=b.enemyPhase==='windup'?'DODGE NOW!':b.enemyPhase==='recovery'&&b.counter>0?'COUNTER WINDOW':b.enemyPhase==='recovery'?'ENEMY RECOVERING':'MOVE + ATTACK'
-}
-function fighter(x,y,color,emoji,scale=1,flash=false){
-ctx.save();ctx.translate(x,y);ctx.scale(scale,scale);ctx.strokeStyle=color;ctx.lineWidth=6;ctx.lineCap='round';ctx.shadowColor=color;ctx.shadowBlur=8;
-ctx.beginPath();ctx.arc(0,-37,10,0,Math.PI*2);ctx.fillStyle='#f2d1a9';ctx.fill();ctx.stroke();
-ctx.beginPath();ctx.moveTo(0,-26);ctx.lineTo(0,1);ctx.moveTo(0,-18);ctx.lineTo(-15,-5);ctx.moveTo(0,-18);ctx.lineTo(15,-6);ctx.moveTo(0,1);ctx.lineTo(-11,19);ctx.moveTo(0,1);ctx.lineTo(11,19);ctx.stroke();
-ctx.shadowBlur=0;ctx.font='20px system-ui';ctx.textAlign='center';ctx.fillText(emoji,0,-25);
-if(flash){ctx.strokeStyle='#ffe7a0';ctx.lineWidth=3;ctx.beginPath();ctx.arc(15,-6,14,-1,1.2);ctx.stroke()}ctx.restore()
-}
-function barCanvas(x,y,w,pct,color){ctx.fillStyle='#071019';ctx.fillRect(x,y,w,7);ctx.fillStyle=color;ctx.fillRect(x,y,w*clamp(pct,0,1),7)}
-function drawArena(ts){
-const W=760,H=390;ctx.clearRect(0,0,W,H);const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#284c61');sky.addColorStop(.48,'#172f3c');sky.addColorStop(.49,'#283e38');sky.addColorStop(1,'#0a151e');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
-ctx.fillStyle='#ffdaa0';ctx.globalAlpha=.5;ctx.beginPath();ctx.arc(606,65,27,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
-for(let i=0;i<7;i++){const x=i*125-15;ctx.fillStyle=i%2?'#122633':'#0d202c';ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x+12,0);ctx.lineTo(x+12,88);ctx.lineTo(x+29,100);ctx.lineTo(x-7,100);ctx.lineTo(x-7,12);ctx.closePath();ctx.fill()}
-ctx.fillStyle='#192b32';ctx.beginPath();ctx.moveTo(0,140);ctx.lineTo(760,140);ctx.lineTo(760,390);ctx.lineTo(0,390);ctx.closePath();ctx.fill();
-for(let y=150;y<390;y+=27){ctx.strokeStyle='#aac8cb17';ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
-ctx.strokeStyle='#f4d17c';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(380,255,245,105,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([7,10]);ctx.strokeStyle='#74e5d577';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(380,255,224,91,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);
-for(let i=0;i<20;i++){const a=i*Math.PI/10+anim*.006;ctx.fillStyle=i%3?'#78e7d5':'#ffd980';ctx.globalAlpha=.45+.25*Math.sin(anim/15+i);ctx.beginPath();ctx.arc(380+232*Math.cos(a),255+98*Math.sin(a),2,0,Math.PI*2);ctx.fill()}ctx.globalAlpha=1;
-const b=battle;let px=b?b.px:218,py=b?b.py:255,ex=b?b.ex:548,ey=b?b.ey:252;
-if(b&&!b.finished&&b.enemyPhase==='windup'){ctx.fillStyle='#ff475522';ctx.strokeStyle='#ff657c';ctx.lineWidth=3;ctx.setLineDash([8,6]);ctx.beginPath();ctx.ellipse(b.targetX,b.targetY+5,65,34,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.setLineDash([]);ctx.fillStyle='#fff';ctx.font='900 17px system-ui';ctx.textAlign='center';ctx.fillText('DODGE!',b.targetX,b.targetY-40)}
-if(b){
-for(const q of b.projectiles){ctx.fillStyle=q.color;ctx.shadowColor=q.color;ctx.shadowBlur=15;ctx.beginPath();ctx.arc(q.x,q.y,6,0,Math.PI*2);ctx.fill()}ctx.shadowBlur=0;
-for(let i=Math.min(3,state.soldiers.length-1);i>=1;i--){const ax=px-i*24-12,ay=py+(i%2?20:-17);fighter(ax,ay,'#54bac9',roles.find(r=>r.name===state.soldiers[i].role)?.emoji||'⚔️',.8)}
-fighter(px,py,'#60d8c2',active().role==='Archer'?'🏹':active().role==='Mage'?'🪄':active().role==='Spearman'?'🔱':'⚔️',1.15,b.attackCd>.34);fighter(ex,ey,'#fa687b',b.enemyName==='Ash Knight'?'👹':'🪓',1.15,b.enemyPhase==='windup');
-ctx.textAlign='center';ctx.font='900 13px system-ui';ctx.fillStyle='#fff';ctx.fillText('YOU · '+Math.ceil(b.playerHP)+' HP',px,py-68);ctx.fillText(b.enemyName+' · '+Math.max(0,Math.ceil(b.enemyHP))+' HP',ex,ey-68);
-barCanvas(px-48,py-56,96,b.playerHP/b.playerMax,'#65e0b6');barCanvas(ex-48,ey-56,96,b.enemyHP/b.enemyMax,'#ff6d83')
-}else{fighter(px,py,'#60d8c2','⚔️',1.2);fighter(ex,ey,'#fa687b','👹',1.15);ctx.textAlign='center';ctx.font='900 20px system-ui';ctx.fillStyle='#fff';ctx.fillText('READY FOR THE NEXT CLASH?',380,122);ctx.font='13px system-ui';ctx.fillStyle='#bbcedd';ctx.fillText('Deploy to start a live, skill-based fight',380,145)}
-anim++;if(tab==='battle')updateBattle(Math.min(.04,(ts-lastFrame)/1000||.016));lastFrame=ts;requestAnimationFrame(drawArena)
-}
-// Tabs, interaction, keyboard, and mobile controls
+function renderMap(){const map=$('landMap');map.innerHTML='';const g=realmGeometry();const canvas=document.createElement('canvas');canvas.className='realm-canvas';canvas.width=REALM_W;canvas.height=REALM_H;canvas.setAttribute('aria-hidden','true');map.appendChild(canvas);realmCanvas=canvas;
+// Transparent diamond hit targets preserve all existing build/select/move mechanics.
+const cells=[];for(let y=0;y<SIZE;y++)for(let x=0;x<SIZE;x++)cells.push({x,y,z:x+y});cells.sort((a,b)=>a.z-b.z||a.x-b.x);
+for(const c of cells){const {x,y}=c,b=buildingAt(x,y),p=realmPoint(x,y,g),tile=document.createElement('button');tile.className='tile '+(!canUse(x,y)?'fog':b?'occupied '+(TYPES[b.type].category||''):'empty')+(b&&b.id===selectedBuilding?' selected':'');tile.style.left=(p.x/REALM_W*100)+'%';tile.style.top=(p.y/REALM_H*100)+'%';tile.style.width=(g.tw/REALM_W*100)+'%';tile.style.height=(g.th/REALM_H*100)+'%';tile.setAttribute('aria-label',!canUse(x,y)?'Unclaimed forest':b?TYPES[b.type].name+' level '+b.level:'Empty buildable meadow');tile.title=!canUse(x,y)?'Expand territory to claim this forest':b?TYPES[b.type].name+' · Level '+b.level:'Empty land';if(!canUse(x,y)){tile.disabled=true;tile.innerHTML='<span>🔒</span>'}else if(b){tile.dataset.building=b.id;tile.innerHTML='<span class="building-icon">'+TYPES[b.type].icon+'</span>'}else{tile.dataset.x=x;tile.dataset.y=y;tile.dataset.empty='1';tile.innerHTML=buildChoice?'<span class="plus">＋</span>':'<span class="plus">·</span>'}map.appendChild(tile)}
+drawIsoRealm(canvas);$('mapStatus').textContent=buildChoice?(buildChoice.startsWith('__move:')?'Moving building — choose an empty meadow tile.':'Placing: '+TYPES[buildChoice].name+' — choose an empty meadow tile.'):'Select a structure to inspect it, or choose Build to place something new.';$('expandLand').disabled=s.land>=3||s.gold<250+s.land*300;$('expandLand').textContent=s.land>=3?'Territory fully claimed':'🌲 Expand Territory · '+(250+s.land*300)+' 🪙';}
+function renderSelected(){const p=$('selectedPanel');const b=buildingById(selectedBuilding);if(!b){p.innerHTML='<h3>Choose a building</h3><div class="sub">Select an existing building or start placing a new one.</div><div class="action-row"><button data-go="build">Browse Buildings</button></div>';return}const d=TYPES[b.type],costG=Math.ceil((d.gold||100)*(.75+b.level*.65)),costE=Math.ceil((d.elixir||0)*(.75+b.level*.6));let action='';if(b.type==='townhall'){action='<div class="action-row"><button class="primary" data-upgrade="'+b.id+'" '+(s.hall>=5||s.gold<200*s.hall||s.elixir<120*s.hall?'disabled':'')+'>Upgrade Town Hall · '+(200*s.hall)+' 🪙 + '+(120*s.hall)+' 💧</button></div>'}else{action='<div class="action-row"><button class="primary" data-upgrade="'+b.id+'" '+(b.level>=5||s.gold<costG||s.elixir<costE?'disabled':'')+'>Upgrade · '+costG+' 🪙'+(costE?' + '+costE+' 💧':'')+'</button>'+(b.type==='goldmine'||b.type==='pump'?'<button data-go="economy">Collect resources</button>':'')+'</div>'}const production=b.type==='goldmine'?'<p>Production: <b class="gold">'+(d.goldRate*b.level)+' gold/min</b></p>':b.type==='pump'?'<p>Production: <b class="elixir">'+(d.elixirRate*b.level)+' elixir/min</b></p>':b.category==='defense'?'<p>Defense strength: <b>'+((d.baseDefense||0)*b.level)+'</b></p>':'';p.innerHTML='<div class="row"><div><h3>'+d.icon+' '+d.name+' · Lv. '+b.level+'</h3><div class="sub">Coordinates '+(b.x+1)+', '+(b.y+1)+' · '+d.desc+'</div></div><span class="tag">SELECTED</span></div>'+production+action+(b.type!=='townhall'?'<div class="action-row"><button data-move-building="'+b.id+'">Move building</button></div>':'')}
+function renderBuild(){const opts=$('buildOptions');opts.innerHTML=Object.entries(TYPES).filter(([key,d])=>key!=='townhall').map(([key,d])=>{const locked=s.hall<d.hall;const selected=buildChoice===key;return '<button class="card build-option '+(selected?'selected ':'')+(locked?'locked':'')+'" data-choose="'+key+'" '+(locked?'disabled':'')+'><span class="bigicon">'+d.icon+'</span><b>'+d.name+'</b><p>'+d.desc+'</p><div class="cost">'+d.gold+' 🪙'+(d.elixir?' + '+d.elixir+' 💧':'')+'</div><div class="sub">'+(locked?'Unlock at Town Hall '+d.hall:selected?'SELECTED · tap a map tile':'Tap to select')+'</div></button>'}).join('');const moving=Boolean(buildChoice&&buildChoice.startsWith('__move:'));const movingBuilding=moving?buildingById(Number(buildChoice.split(':')[1])):null;$('buildSelectedTitle').textContent=moving?'Moving: '+(movingBuilding?TYPES[movingBuilding.type].name:'building'):buildChoice?'Selected: '+TYPES[buildChoice].name:'No building selected';$('buildSelectedDesc').textContent=moving?'Switch to Base Map, then tap an empty green tile to relocate it.':buildChoice?'Now switch to Base Map and tap an empty green tile. Placement costs '+TYPES[buildChoice].gold+' gold and '+TYPES[buildChoice].elixir+' elixir.':'Choose something to build above.';const list=$('buildingList');list.innerHTML=s.buildings.map(b=>'<div class="listitem"><span class="ico">'+TYPES[b.type].icon+'</span><div class="info"><b>'+TYPES[b.type].name+' · Level '+b.level+'</b><small>'+TYPES[b.type].desc+'</small></div><button data-inspect="'+b.id+'">Inspect</button></div>').join('')}
+function renderArmy(){const used=troopSpace(),cap=troopCapacity();$('armyCapacity').textContent=used+' / '+cap+' troop space';$('armyStrength').textContent=troopPower();$('troopOptions').innerHTML=Object.entries(TROOPS).map(([name,t])=>'<div class="card"><div class="row"><h3>'+t.icon+' '+name+'</h3><span class="tag">'+t.space+' space</span></div><p>'+t.desc+'<br><b class="elixir">'+t.power+' strength</b></p><button data-train="'+name+'" '+(s.elixir<t.cost||used+t.space>cap?'disabled':'')+'>Train · '+t.cost+' 💧</button></div>').join('');$('troopList').innerHTML=Object.entries(s.troops).filter(([n,c])=>c>0).map(([name,n])=>'<div class="listitem"><span class="ico">'+TROOPS[name].icon+'</span><div class="info"><b>'+name+' × '+n+'</b><small>'+TROOPS[name].power+' strength each · '+(TROOPS[name].space*n)+' space used</small></div></div>').join('')||'<div class="sub">No troops trained yet.</div>'}
+function refreshRivals(showToast=true){lastRivalSeed++;const names=[...RIVAL_NAMES];const rivals=[];for(let i=0;i<4;i++){const idx=rand(0,names.length-1),name=names.splice(idx,1)[0];const hall=clamp(s.hall+rand(-1,2),1,5);rivals.push({id:'r'+Date.now().toString(36)+i+'-'+rand(100,999),name,level:hall,defense:rand(22,40)+hall*17,gold:rand(160,520)+hall*90,elixir:rand(100,390)+hall*65,raided:false,cooldown:0,position:[{x:15,y:22},{x:55,y:32},{x:80,y:67},{x:31,y:72}][i]})}s.rivals=rivals;s.selectedRival=rivals[0].id;renderWorld();save();if(showToast)toast('Found four rival kingdoms nearby.')}
+function renderWorld(){const wrap=$('rivalList');wrap.innerHTML='';const map=$('worldMap');map.innerHTML='';s.rivals.forEach((r,i)=>{const pin=document.createElement('button');pin.className='world-pin '+(s.selectedRival===r.id?'active':'');pin.style.left=r.position.x+'%';pin.style.top=r.position.y+'%';pin.style.transform='translate(-50%,-50%)';pin.innerHTML='<b>🏰</b>'+esc(r.name);pin.dataset.rival=r.id;map.appendChild(pin);const card=document.createElement('div');card.className='world-card '+(s.selectedRival===r.id?'selected':'');const spent=r.raided?' · recently raided':'';card.innerHTML='<div class="row"><h3 style="margin:0">🏰 '+esc(r.name)+'</h3><span class="tag">HALL '+r.level+'</span></div><p>Defense rating: <b>'+r.defense+'</b>'+spent+'</p><div class="lootline"><span class="g">🪙 '+Math.floor(r.gold)+' gold</span><span class="e">💧 '+Math.floor(r.elixir)+' elixir</span></div><button data-scout="'+r.id+'">Scout base</button>';card.dataset.rivalCard=r.id;wrap.appendChild(card)});renderScoutReport()}
+function selectedRival(){return s.rivals.find(r=>r.id===s.selectedRival)}
+function renderScoutReport(){const r=selectedRival(),box=$('raidReport');if(!r){box.innerHTML='<b>🧭 Scout report</b><span>Search for rival bases to begin.</span>';return}const power=troopPower(),ratio=power/Math.max(1,r.defense),estimated=Math.round(clamp(ratio,0.2,0.9)*r.gold),estimateE=Math.round(clamp(ratio,0.2,0.9)*r.elixir);box.innerHTML='<b>🧭 Scouting report: '+esc(r.name)+'</b><span>Town Hall '+r.level+' · Defensive strength '+r.defense+' · Your army strength '+power+'</span><span>Estimated haul: <b class="gold">'+estimated+' gold</b> and <b class="elixir">'+estimateE+' elixir</b>, depending on your army.</span><span class="sub">This is a quick strategy calculation, not a real-time fight. Train more troops or pick a weaker target for a better haul.</span><div class="action-row"><button class="primary" id="raidSelected" '+(r.raided||troopSpace()===0?'disabled':'')+'>'+(r.raided?'Already raided — find another base':'Raid for resources')+'</button><button data-go="army">Train troops</button></div>'}
+function inspect(id){selectedBuilding=Number(id);buildChoice=null;openTab('base')}
+function chooseBuilding(type){buildChoice=type;openTab('build');renderBuild();toast('Selected '+TYPES[type].name+'. Tap an empty tile on Base Map.')}
+function placeBuilding(type,x,y){const d=TYPES[type];if(buildingAt(x,y)){toast('That tile is occupied.');return}if(!canUse(x,y)){toast('Expand your territory first.');return}if(s.hall<d.hall){toast('Upgrade your Town Hall to unlock that building.');return}if(s.gold<d.gold||s.elixir<d.elixir){toast('Not enough resources to build '+d.name+'.');return}s.gold-=d.gold;s.elixir-=d.elixir;s.buildings.push({id:s.nextId++,type,x,y,level:1});selectedBuilding=s.buildings[s.buildings.length-1].id;buildChoice=null;render();save();toast(d.name+' built!')}
+function upgrade(id){const b=buildingById(Number(id));if(!b)return;if(b.type==='townhall'){const cg=200*s.hall,ce=120*s.hall;if(s.hall>=5)return toast('Town Hall is fully upgraded.');if(s.gold<cg||s.elixir<ce)return toast('Not enough gold or elixir.');s.gold-=cg;s.elixir-=ce;s.hall++;b.level=s.hall;render();save();toast('Town Hall upgraded to level '+s.hall+'!');return}if(b.level>=5)return toast('This building is max level.');const d=TYPES[b.type],cg=Math.ceil((d.gold||100)*(.75+b.level*.65)),ce=Math.ceil((d.elixir||0)*(.75+b.level*.6));if(s.gold<cg||s.elixir<ce)return toast('Not enough resources.');s.gold-=cg;s.elixir-=ce;b.level++;render();save();toast(d.name+' upgraded to level '+b.level+'.')}
+function expand(){const cost=250+s.land*300;if(s.land>=3)return toast('Your territory is fully expanded.');if(s.gold<cost)return toast('You need '+cost+' gold to expand.');s.gold-=cost;s.land++;render();save();toast('Territory expanded! New land is ready to build on.')}
+function moveBuilding(id){const b=buildingById(Number(id));if(!b||b.type==='townhall')return toast('The Town Hall cannot be moved.');buildChoice='__move:'+b.id;toast('Choose an empty tile on your Base Map to move '+TYPES[b.type].name+'.');openTab('base')}
+function handleTile(tile){if(tile.dataset.empty){const x=Number(tile.dataset.x),y=Number(tile.dataset.y);if(buildChoice?.startsWith('__move:')){const id=Number(buildChoice.split(':')[1]),b=buildingById(id);if(!b)return;const old={x:b.x,y:b.y};b.x=x;b.y=y;buildChoice=null;selectedBuilding=b.id;render();save();toast(TYPES[b.type].name+' moved.');return}if(buildChoice){placeBuilding(buildChoice,x,y);return}selectedBuilding=null;$('selectedPanel').innerHTML='<h3>Empty land</h3><div class="sub">This plot is ready for a building.</div><div class="action-row"><button class="primary" data-go="build">Choose a building</button></div>';renderMap();return}if(tile.dataset.building){selectedBuilding=Number(tile.dataset.building);renderMap();renderSelected()}}
+function trainTroop(name){const t=TROOPS[name];if(!t)return;if(troopSpace()+t.space>troopCapacity())return toast('Not enough troop space. Build/upgrade Barracks.');if(s.elixir<t.cost)return toast('Not enough elixir.');s.elixir-=t.cost;s.troops[name]=(s.troops[name]||0)+1;render();save();toast(name+' trained!')}
+function raid(id){const r=s.rivals.find(v=>v.id===id);if(!r||r.raided)return toast('Find a new rival base.');if(troopSpace()===0)return toast('Train some troops first.');const power=troopPower(),ratio=power/r.defense;let share=ratio>=1.25?.82:ratio>=.9?.64:ratio>=.6?.42:.22;share*=0.85+Math.random()*.15;const gold=Math.min(r.gold,Math.floor(r.gold*share)),elixir=Math.min(r.elixir,Math.floor(r.elixir*share));r.gold-=gold;r.elixir-=elixir;r.raided=true;s.gold+=gold;s.elixir+=elixir;s.raids=(s.raids||0)+1;const result=ratio>=1.25?'Great raid':ratio>=.9?'Successful raid':ratio>=.6?'Risky raid':'Small raid';$('raidReport').innerHTML='<b>📦 '+result+' on '+esc(r.name)+'</b><span>You brought home <b class="gold">'+gold+' gold</b> and <b class="elixir">'+elixir+' elixir</b>.</span><span>Your strength: '+power+' · Rival defense: '+r.defense+'. '+(ratio<.6?'Your army was weaker, so much of the loot stayed behind.':'Your strategy paid off.')+'</span><div class="action-row"><button class="primary" id="findMoreAfterRaid">Find another base</button><button data-go="army">Train more troops</button></div>';renderHeader();renderWorldMapOnly();save();toast(result+'! Resources added.')}
+function renderWorldMapOnly(){const map=$('worldMap');map.innerHTML='';s.rivals.forEach(r=>{const pin=document.createElement('button');pin.className='world-pin '+(s.selectedRival===r.id?'active':'');pin.style.left=r.position.x+'%';pin.style.top=r.position.y+'%';pin.style.transform='translate(-50%,-50%)';pin.innerHTML='<b>🏰</b>'+esc(r.name);pin.dataset.rival=r.id;map.appendChild(pin)});$('rivalList').querySelectorAll('[data-rival-card]').forEach(card=>{const r=s.rivals.find(x=>x.id===card.dataset.rivalCard);if(r){card.classList.toggle('selected',r.id===s.selectedRival);card.querySelector('p').innerHTML='Defense rating: <b>'+r.defense+'</b>'+(r.raided?' · recently raided':'');card.querySelector('.lootline').innerHTML='<span class="g">🪙 '+Math.floor(r.gold)+' gold</span><span class="e">💧 '+Math.floor(r.elixir)+' elixir</span>';card.querySelector('button').textContent='Scout base';}})}
+function renderEconomy(){$('storedGold').textContent=Math.floor(s.storedGold);$('storedElixir').textContent=Math.floor(s.storedElixir);$('goldCapacity').textContent='Storage capacity '+goldCap();$('elixirCapacity').textContent='Storage capacity '+elixirCap();$('storageLabel').textContent='STORAGE '+Math.floor(s.storedGold)+' / '+goldCap()+' GOLD';$('economyGoldRate').textContent=goldRate();$('economyElixirRate').textContent=elixirRate();$('buildingCount').textContent=s.buildings.length;$('raidCount').textContent=s.raids||0;$('mineDesc').textContent=count('goldmine')+' Gold Mine(s) producing '+goldRate()+' gold per minute.';$('pumpDesc').textContent=count('pump')+' Elixir Pump(s) producing '+elixirRate()+' elixir per minute.'}
+function render(){renderHeader();renderMap();renderSelected();renderBuild();renderArmy();renderWorld();renderEconomy()}
+
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>openTab(b.dataset.tab)));
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.open)openTab(b.dataset.open);if(b.dataset.recruit)recruit(b.dataset.recruit);if(b.dataset.equip!=null)equipItem(state.inventory[Number(b.dataset.equip)]);if(b.dataset.sell!=null)sellItem(Number(b.dataset.sell));if(b.dataset.move)held.add(b.dataset.move)});
-document.addEventListener('change',e=>{if(e.target.id==='activeSelect'){state.activeRole=e.target.value;render();save()}});
-$('openCrate').onclick=openCrate;
-$('upgradeArmory').onclick=()=>{if(state.base.armory<5&&state.coins>=120*state.base.armory){state.coins-=120*state.base.armory;state.base.armory++;gainXP(12);render();save();toast('Armory upgraded! Better crate odds.')}else toast('Not enough coins or armory is maxed.')};
-$('upgradeBarracks').onclick=()=>{if(state.base.barracks<8&&state.coins>=100*state.base.barracks){state.coins-=100*state.base.barracks;state.base.barracks++;state.base.castle=Math.max(state.base.castle,state.base.barracks);gainXP(12);render();save();toast('Barracks expanded. Squad capacity increased.')}else toast('Not enough coins or barracks is maxed.')};
-$('hireWorker').onclick=()=>{const c=60+state.workers*30;if(state.coins<c)return toast('Not enough coins.');state.coins-=c;state.workers++;gainXP(5);render();save();toast('Worker hired! Mine income increased.')};
-$('upgradeMine').onclick=()=>{const c=100*state.base.mine;if(state.base.mine>=5||state.coins<c)return toast('Not enough coins or mine is maxed.');state.coins-=c;state.base.mine++;state.base.castle=Math.max(state.base.castle,state.base.mine);gainXP(10);render();save();toast('Mine production increased!')};
-$('collectGold').onclick=()=>{const n=Math.floor(state.stored);if(n<1)return toast('Not enough stored gold yet.');state.stored-=n;state.coins+=n;render();save();toast('Collected '+n+' gold!')};
-$('upgradeWall').onclick=()=>{const c=140*state.base.wall;if(state.base.wall>=5||state.coins<c)return toast('Not enough coins or wall is maxed.');state.coins-=c;state.base.wall++;state.base.castle=Math.max(state.base.castle,state.base.wall);gainXP(10);render();save();toast('Wall fortified. Enemy attacks do less damage.')};
-$('trainCommander').onclick=()=>{if(state.coins<90)return toast('Not enough coins.');state.coins-=90;gainXP(40);render();save();toast('Commander training complete.')};
-$('saveNow').onclick=()=>{save();toast('Game saved in this browser.')};
-$('resetSave').onclick=()=>{if(!confirm('Reset all CRATE CLASH progress? This cannot be undone.'))return;state=fresh();battle=null;held.clear();logs=[];save();render();openTab('base');toast('Progress reset.')};
-$('deploy').onclick=startBattle;$('touchAttack').onclick=()=>{attackQueued=true};
-window.addEventListener('keydown',e=>{const k=e.key.toLowerCase();if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(k))e.preventDefault();if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(k))held.add(k);if(k===' '||k==='j'){if(tab!=='battle')openTab('battle');attackQueued=true}});
-window.addEventListener('keyup',e=>held.delete(e.key.toLowerCase()));window.addEventListener('blur',()=>held.clear());document.addEventListener('pointerup',()=>held.clear());document.addEventListener('pointercancel',()=>held.clear());
-document.querySelectorAll('[data-move]').forEach(btn=>{btn.addEventListener('pointerdown',e=>{e.preventDefault();held.add(btn.dataset.move);btn.setPointerCapture?.(e.pointerId)});btn.addEventListener('pointerup',e=>{e.preventDefault();held.delete(btn.dataset.move)});btn.addEventListener('pointerleave',()=>held.delete(btn.dataset.move))});
-setInterval(()=>{if(document.hidden)return;const now=Date.now(),dt=clamp((now-state.last)/1000,0,15);state.last=now;state.stored+=dt*production()/60;renderHeader();save()},1000);
-window.addEventListener('pagehide',save);
-load();render();drawArena(0);
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.go){openTab(b.dataset.go);return}if(b.dataset.open){openTab(b.dataset.open);return}if(b.closest('#landMap')&&(b.dataset.empty||b.dataset.building)){handleTile(b);return}if(b.dataset.choose){chooseBuilding(b.dataset.choose);return}if(b.dataset.upgrade){upgrade(b.dataset.upgrade);return}if(b.dataset.inspect){inspect(b.dataset.inspect);return}if(b.dataset.moveBuilding){moveBuilding(b.dataset.moveBuilding);return}if(b.dataset.train){trainTroop(b.dataset.train);return}if(b.dataset.rival){s.selectedRival=b.dataset.rival;renderWorld();save();return}if(b.dataset.scout){s.selectedRival=b.dataset.scout;renderWorld();toast('Scouting report updated.');save();return}if(b.id==='raidSelected'){raid(s.selectedRival);return}if(b.id==='findMoreAfterRaid'){refreshRivals();return}});
+$('expandLand').addEventListener('click',expand);$('cancelBuild').addEventListener('click',()=>{buildChoice=null;render();toast('Placement cancelled.')});$('findBases').addEventListener('click',()=>refreshRivals());$('collectGold').addEventListener('click',()=>{const n=Math.floor(s.storedGold);if(!n)return toast('No stored gold to collect yet.');s.storedGold-=n;s.gold+=n;render();save();toast('Collected '+n+' gold.')});$('collectElixir').addEventListener('click',()=>{const n=Math.floor(s.storedElixir);if(!n)return toast('No stored elixir to collect yet.');s.storedElixir-=n;s.elixir+=n;render();save();toast('Collected '+n+' elixir.')});
+setInterval(()=>{if(!document.hidden){const now=Date.now(),dt=clamp((now-(Number(s.last)||now))/1000,0,15);s.last=now;addResources(dt*goldRate()/60,dt*elixirRate()/60);renderHeader();renderEconomy();if(tab==='base'&&realmCanvas)drawIsoRealm(realmCanvas);save()}},1000);window.addEventListener('pagehide',save);window.addEventListener('resize',()=>{if(tab==='base')renderMap()});
+load();render();
 })();
 </script>
 </body>
