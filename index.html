@@ -46,6 +46,7 @@ h1{font-family:var(--display);font-weight:400;font-size:3rem;line-height:1;margi
 .ico.build{background:radial-gradient(circle at 35% 30%,#ffe9b8,#f08a2a 45%,#8a3c00)}
 .ico.land{background:radial-gradient(circle at 35% 30%,#d8ffb0,#6cc043 45%,#2f6a16)}
 .main{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:14px;align-items:start}
+.leftcol{display:flex;flex-direction:column;gap:14px;min-width:0}
 @media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
 .mapbox{position:relative;border:4px solid var(--woodd);border-radius:18px;overflow:hidden;background:#3a96d8;box-shadow:0 6px 0 rgba(0,0,0,.3);min-width:0}
 canvas{display:block;width:100%;cursor:grab;touch-action:none}
@@ -232,6 +233,10 @@ textarea{min-height:110px;font-size:.75rem;word-break:break-all}
 .ach.done{opacity:1;border-color:#ffd13b;background:linear-gradient(180deg,#fff6cf,#ffe9a0)}.ach .aic{font-size:1.8rem;filter:grayscale(1)}.ach.done .aic{filter:none}
 .ach div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.ach small{font-size:.75rem;opacity:.85}.ach .bar{height:6px}
 .dchips{display:flex;gap:6px;flex-wrap:wrap}.dchips button{margin:0;font-size:.85rem;padding:5px 10px 6px}
+.rk{font-size:.72rem;font-weight:900;border-radius:999px;padding:1px 7px;background:rgba(122,74,36,.15);white-space:nowrap}
+.rk-leader{background:#ffe27a}.rk-co{background:#d6ecff}.rk-elder{background:#d8f5c8}.rk-member{display:none}
+.cdesc{margin:0;font-style:italic}.cinfo{grid-column:1/-1;margin:-2px 0 4px 24px;font-size:.8rem}
+.csets summary{cursor:pointer;font-weight:900;color:var(--ink)}.csets .mkform{margin-top:6px}.csets label{display:flex;flex-direction:column;font-size:.8rem;font-weight:800;gap:2px;flex:1}
 </style>
 </head>
 <body>
@@ -254,6 +259,7 @@ textarea{min-height:110px;font-size:.75rem;word-break:break-all}
   </header>
   <p class="help" data-t="more">Everyone who opens this page plays in the same world. Drag the map, pinch or scroll to zoom, and tap the minimap to jump anywhere. <b>Buy land</b> touching your borders, give your <b>builders</b> jobs, and <b>tap your mines</b> to collect. Train an army, open <b>crates</b> in the Shop for gear, build <b>walls</b> and hide <b>traps</b>, brew <b>spells</b>, and team up in a <b>clan</b>. Then <b>raid</b> barbarian camps and rival kingdoms for loot and trophies. Take a rival's <b>Town Hall</b> and you take everything they own.</p>
   <div class="main">
+    <div class="leftcol">
     <div class="mapbox" data-t="map">
       <div class="tut" id="tut" hidden></div>
       <canvas id="map" aria-label="World map"></canvas>
@@ -262,28 +268,29 @@ textarea{min-height:110px;font-size:.75rem;word-break:break-all}
       <button id="bCollect" class="prime" hidden>Collect all</button>
       <div class="zoom"><button id="zIn" aria-label="Zoom in">+</button><button id="zOut" aria-label="Zoom out">−</button><button id="zHome" class="home soft" aria-label="Go to my Town Hall">Home</button><button id="zWorld" class="home soft" aria-label="Open the world map">Map</button></div>
     </div>
+  <div class="lower">
+      <div class="card clan" data-t="clan"><div class="label">Clan</div><div id="clanBody"></div>
+        <form id="clanCreate" class="row" hidden><input id="cName" maxlength="20" placeholder="Clan name"><input id="cTag" maxlength="5" placeholder="Tag, e.g. IRON" style="max-width:9rem"><button class="prime" type="submit">Found clan<span class="c">500 gold</span></button></form>
+        <ul class="log chat" id="chatLog" hidden></ul>
+        <form id="chatForm" class="row" hidden><input id="chatIn" maxlength="200" placeholder="Message your clan" autocomplete="off" style="flex:1;min-width:0"><button class="prime" type="submit">Send</button></form></div>
+      <div class="card" data-t="more"><div class="label">Leaderboards</div><div class="row tabs" id="boardTabs"><button data-bt="kingdoms" class="prime">Kingdoms</button><button data-bt="clans" class="soft">Clans</button><button data-bt="raiders" class="soft">Raiders this week</button></div><p class="desc" id="season"></p><div class="board" id="board"></div></div>
+      <div class="card" data-t="more"><div class="label">War report</div><ul class="log" id="log"></ul></div>
+      <div class="card" data-t="more"><div class="label">Settings</div>
+        <div class="row">
+          <button id="bSound" class="soft">Sound: on</button><button id="bMusic" class="soft">Music: off</button><button class="soft" data-act="tut:again">Replay tutorial</button>
+          <button id="bNewAcct" class="soft">New account</button><button id="bChg" class="soft">Change account</button>
+          <button id="bAbandon" class="war">Abandon kingdom</button>
+        </div>
+        <p class="desc"><b id="ver"></b></p>
+        <p class="desc">You stay signed in and everything saves automatically, so the game opens straight into your kingdom. Use <b>New account</b> to start another kingdom, and <b>Change account</b> to switch between them.</p>
+        <p class="desc">Your kingdom only makes gold and stone while you are online with the game open. While you are away it rests, but other players can still attack you, so build up your archers, walls, towers and traps before you log off.</p>
+      </div>
+    </div>
+      </div>
     <div class="side">
       <div class="card quest" id="quest" data-t="map"></div>
       <div class="card" id="panel" data-t="map"></div>
       <div class="card" id="army" data-t="army"></div>
-    </div>
-  </div>
-  <div class="lower">
-    <div class="card clan" data-t="clan"><div class="label">Clan</div><div id="clanBody"></div>
-      <form id="clanCreate" class="row" hidden><input id="cName" maxlength="20" placeholder="Clan name"><input id="cTag" maxlength="5" placeholder="Tag, e.g. IRON" style="max-width:9rem"><button class="prime" type="submit">Found clan<span class="c">500 gold</span></button></form>
-      <ul class="log chat" id="chatLog" hidden></ul>
-      <form id="chatForm" class="row" hidden><input id="chatIn" maxlength="200" placeholder="Message your clan" autocomplete="off" style="flex:1;min-width:0"><button class="prime" type="submit">Send</button></form></div>
-    <div class="card" data-t="more"><div class="label">Leaderboards</div><div class="row tabs" id="boardTabs"><button data-bt="kingdoms" class="prime">Kingdoms</button><button data-bt="clans" class="soft">Clans</button><button data-bt="raiders" class="soft">Raiders this week</button></div><p class="desc" id="season"></p><div class="board" id="board"></div></div>
-    <div class="card" data-t="more"><div class="label">War report</div><ul class="log" id="log"></ul></div>
-    <div class="card" data-t="more"><div class="label">Settings</div>
-      <div class="row">
-        <button id="bSound" class="soft">Sound: on</button><button id="bMusic" class="soft">Music: off</button><button class="soft" data-act="tut:again">Replay tutorial</button>
-        <button id="bNewAcct" class="soft">New account</button><button id="bChg" class="soft">Change account</button>
-        <button id="bAbandon" class="war">Abandon kingdom</button>
-      </div>
-      <p class="desc"><b id="ver"></b></p>
-      <p class="desc">You stay signed in and everything saves automatically, so the game opens straight into your kingdom. Use <b>New account</b> to start another kingdom, and <b>Change account</b> to switch between them.</p>
-      <p class="desc">Your kingdom keeps running while you are away. Mines keep filling and other players can attack you, so build up your archers, walls, towers and traps before you log off.</p>
     </div>
   </div>
 </div>
@@ -337,7 +344,7 @@ const FIREBASE_CONFIG = {
   appId: ""
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 24;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
+const GAME_VERSION = 28;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
 const NEW_SHIELD_MIN = 120;     // peace shield for brand new kingdoms
 const DEFEND_SHIELD_MIN = 30;   // peace shield after being attacked
 const CAMP_MAX = 25;            // highest barbarian camp level
@@ -427,12 +434,12 @@ try{ G.muted=localStorage.getItem('iron-acre-muted')==='1'; }catch(e){}
 const now=()=>Date.now();
 const $=id=>document.getElementById(id);
 /* ----- word filter for names and chat ----- */
-const BAD_SUB=['fuck','shit','bitch','cunt','pussy','asshole','bastard','slut','whore','fagg','nigg','retard','porn','penis','vagina','nazi','hitler','killyourself','wank','twat','bollock','motherf','jizz','dildo','boob','dickhead'];
-const BAD_WORD=['ass','arse','tit','tits','cum','hoe','hoes','sex','fag','fags','kys','piss','fck','fk','fuk','stfu','cock','cocks','rape','raped','rapist','dck','sht','btch','nude','nudes','dick','dicks'];
-const normTxt=s=>String(s||'').toLowerCase().replace(/[0@4]/g,m=>m==='0'?'o':'a').replace(/[1!|]/g,'i').replace(/3/g,'e').replace(/[5$]/g,'s').replace(/7/g,'t').replace(/(.)\1{2,}/g,'$1$1');
-function rudeWord(w){ const n=normTxt(w).replace(/[^a-z]/g,''); if(!n) return false; const n1=n.replace(/(.)\1+/g,'$1'); return BAD_WORD.includes(n)||BAD_WORD.includes(n1)||BAD_SUB.some(b=>n.includes(b)||n1.includes(b.replace(/(.)\1+/g,'$1'))); }
-function isRude(text){ const t=String(text||''); if(t.split(/\s+/).some(rudeWord)) return true; const squash=normTxt(t).replace(/[^a-z]/g,''); return BAD_SUB.some(b=>squash.includes(b)); }
-function cleanText(text){ const t=String(text||''); if(!isRude(t)) return t; const out=t.split(/(\s+)/).map(w=>/\s/.test(w)?w:rudeWord(w)?'*'.repeat(Math.max(3,w.length)):w).join(''); return isRude(out)?out.replace(/[^\s]/g,'*'):out; }
+const BAD_START=['fuck','shit','bitch','cunt','nigg','fagg','motherf','asshole','dickhead','bullshit','whore','slut','retard','jackass','dumbass','wanker'];
+const BAD_WORD=['ass','asses','arse','dick','dicks','cock','cocks','pussy','pussies','twat','wank','piss','pissed','bastard','bastards','tits','titties','boobs','porn','cum','kys','fck','fuk','fk','fkn','sht','btch','rape','rapist','nazi','hitler','fag','fags','hoe','hoes','stfu','wtf','dildo','penis','vagina'];
+const normWord=w=>String(w||'').toLowerCase().replace(/0/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e').replace(/[4@]/g,'a').replace(/[5$]/g,'s').replace(/7/g,'t').replace(/[^a-z]/g,'');
+function rudeWord(w){ const n=normWord(w); if(!n) return false; return BAD_WORD.includes(n)||BAD_START.some(b=>n.startsWith(b)); }
+function isRude(text){ return String(text||'').split(/[\s_\-.,]+/).some(rudeWord); }
+function cleanText(text){ return String(text||'').split(/(\s+)/).map(w=>/^\s+$/.test(w)||!rudeWord(w)?w:'*'.repeat(Math.max(3,w.length))).join(''); }
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const f=n=>Math.floor(n).toLocaleString();
 const cid=(x,y)=>x+'_'+y;
@@ -495,11 +502,14 @@ function stats(id){
   s.cap=500+400*s.hallLvl+120*s.count+(s.hallLvl>5?(s.hallLvl-5)*(s.hallLvl-5)*500:0); s.troopCap=10+15*s.barracks; s.maxLvl=Math.min(BLD_MAX,s.hallLvl+1); s.builders=2+s.hut;
   return s;
 }
-function cur(p){ if(!p) return {gold:0,stone:0}; const s=stats(p.id), el=Math.max(0,(now()-(p.t||now()))/60000);
+/* Resources only grow while you are online. 'Online' means the game is open in a visible tab and you used it in the last few minutes. */
+const ONLINE_GRACE=4*60000;
+const activeEnd=p=>!p?now():Math.min(now(),Math.max(p.t||0,p.lastSeen||p.t||now())+ONLINE_GRACE);
+function cur(p){ if(!p) return {gold:0,stone:0}; const s=stats(p.id), el=Math.max(0,(activeEnd(p)-(p.t||now()))/60000);
   const acc=(v,r)=>v>=s.cap?v:Math.min(s.cap,v+r*el); return {gold:acc(p.gold||0,s.gBase), stone:acc(p.stone||0,s.sBase)}; }
 function settle(p){ const c=cur(p); p.gold=c.gold; p.stone=c.stone; p.t=now(); if(p.research&&p.research.done<=now()){ p.lab=p.lab||{}; p.lab[p.research.u]=p.research.lvl; delete p.research; } return p; }
 const rateOf=p=>PROD[p.b].rate*p.lvl*(1+gearBonus(P(p.o),'mine'));
-function stored(p){ if(!p||!PROD[p.b]||!p.lvl) return 0; return Math.min(collCap(p),rateOf(p)*Math.max(0,now()-(p.ct||now()))/60000); }
+function stored(p){ if(!p||!PROD[p.b]||!p.lvl) return 0; const end=p.o?activeEnd(P(p.o)):now(); return Math.min(collCap(p),rateOf(p)*Math.max(0,end-(p.ct||now()))/60000); }
 const myBT=(t,l)=>Math.max(1,Math.round(buildTime(t,l)*(1-gearBonus(P(ME),'build'))));
 const army=p=>ALLU.reduce((a,u)=>a+(p[u]||0),0);
 const armySp=p=>ALLU.reduce((a,u)=>a+(p[u]||0)*UNITS[u].sp,0);
@@ -2621,7 +2631,15 @@ document.querySelectorAll('#boardTabs button').forEach(b=>b.onclick=()=>{ boardT
 
 /* ================= clans ================= */
 let clanKey='', chatFor=null, chatUnsub=null, chatMsgs=[], lastChat=0;
-function myClan(){ const m=P(ME); return m&&!m.dead&&m.clan&&G.clans[m.clan]?G.clans[m.clan]:null; }
+function myClan(){ const m=P(ME); const c=m&&!m.dead&&m.clan?G.clans[m.clan]:null; return c&&(c.members||[]).includes(ME)?c:null; }
+/* ----- clan ranks: Leader > Co-leader > Elder > Member ----- */
+const RANKS={leader:{name:'Leader',ic:'👑',n:3},co:{name:'Co-leader',ic:'⭐',n:2},elder:{name:'Elder',ic:'🔰',n:1},member:{name:'Member',ic:'',n:0}};
+const CLAN_TYPES={open:'Anyone can join',request:'Ask to join',closed:'Closed'};
+const rankOf=(c,uid)=>!c?'member':c.leader===uid?'leader':((c.ranks||{})[uid]||'member');
+const rankN=(c,uid)=>RANKS[rankOf(c,uid)].n;
+const canManage=c=>rankN(c,ME)>=2, canAccept=c=>rankN(c,ME)>=1;
+const canKick=(c,uid)=>uid!==ME&&uid!==c.leader&&(rankN(c,ME)===3||(rankN(c,ME)===2&&rankN(c,uid)<=1)||(rankN(c,ME)===1&&rankN(c,uid)===0));
+function clanCanJoin(c,m){ const tr=m?.tr||0, n=(c.members||[]).length; if(n>=CLAN_MAX) return 'Full'; if(c.type==='closed') return 'Closed'; if(tr<(c.minTr||0)) return `Needs ${f(c.minTr)} trophies`; return ''; }
 function clanTr(c){ return (c.members||[]).reduce((a,id)=>a+(P(id)&&!P(id).dead?(P(id).tr||0):0),0); }
 function topClans(){ return Object.values(G.clans).map(c=>({...c,tr:clanTr(c)})).sort((a,b)=>b.tr-a.tr).slice(0,15); }
 const tagOf=id=>{ const p=P(id), c=p&&p.clan&&G.clans[p.clan]; return c&&(c.members||[]).includes(id)?`[${esc(c.tag)}] `:''; };
@@ -2634,18 +2652,27 @@ function renderChat(){ const el=$('chatLog'); if(!el) return; const atBottom=el.
 function renderClan(){
   const m=P(ME), c=myClan(), alive=m&&!m.dead;
   $('clanCreate').hidden=!alive||!!c; $('chatForm').hidden=!c; $('chatLog').hidden=!c;
-  const key=JSON.stringify([weekId(),alive,c,c&&(c.members||[]).map(id=>[P(id)?.tr,online(P(id)),P(id)?.cc,P(id)?.dead]),!c&&topClans().map(x=>[x.id,x.tr,(x.members||[]).length]),m&&[m.arc,m.sol,m.giant,m.cc]]);
+  const key=JSON.stringify([weekId(),alive,c,m&&m.tr,!c&&Object.values(G.clans).map(x=>[x.requests,x.accepted,x.type,x.minTr,x.desc]),c&&(c.members||[]).map(id=>[P(id)?.tr,online(P(id)),P(id)?.cc,P(id)?.dead]),!c&&topClans().map(x=>[x.id,x.tr,(x.members||[]).length]),m&&[m.arc,m.sol,m.giant,m.cc]]);
   if(key===clanKey) return; clanKey=key; syncChat();
   const el=$('clanBody');
   if(!alive){ el.innerHTML='<p class="desc">Found a kingdom to join a clan.</p>'; return; }
   if(c){ const mem=(c.members||[]).map(id=>P(id)).filter(Boolean).sort((a,b)=>(b.tr||0)-(a.tr||0));
-    el.innerHTML=`<h2>[${esc(c.tag)}] ${esc(c.name)}</h2><p class="desc">${mem.length} of ${CLAN_MAX} members · ${f(clanTr(c))} trophies. Clanmates cannot attack each other, and everyone in the clan is under a peace treaty while offline (unless inactive for over a week). Send troops to help defend a clanmate's kingdom.</p>
-      <div class="board">${mem.map(p=>`<div class="${p.id===ME?'me':''}"><span class="sw" style="background:${p.color}"></span><span>${esc(p.name)}${p.id===c.leader?' (leader)':''}${online(p)?' <span class="on">●</span>':''}</span><span>${f(p.tr||0)} trophies</span><span>${ccSp(p.cc)}/${CC_CAP}</span></div>
-        ${p.id!==ME&&!p.dead?`<div class="row donate">${btn('Send 5 archers',null,'don:'+p.id+':arc:5','soft')}${btn('Send 5 soldiers',null,'don:'+p.id+':sol:5','soft')}${m.giant?btn('Send a giant',null,'don:'+p.id+':giant:1','soft'):''}</div>`:''}`).join('')}</div>
+    const reqs=Object.entries(c.requests||{}), myR=rankOf(c,ME);
+    el.innerHTML=`<h2>[${esc(c.tag)}] ${esc(c.name)}</h2>${c.desc?`<p class="cdesc">“${esc(cleanText(c.desc))}”</p>`:''}<p class="desc">${mem.length} of ${CLAN_MAX} members · ${f(clanTr(c))} trophies · ${CLAN_TYPES[c.type||'open']}${c.minTr?` · needs ${f(c.minTr)} trophies`:''} · You are <b>${RANKS[myR].ic} ${RANKS[myR].name}</b></p>
+      <p class="desc">Clanmates cannot attack each other, and everyone in the clan is under a peace treaty while offline (unless inactive for over a week). Send troops to help defend a clanmate's kingdom.</p>
+      ${canManage(c)?`<details class="csets"><summary>Clan settings</summary><div class="mkform"><label>Who can join <select id="csType">${Object.entries(CLAN_TYPES).map(([k,v])=>`<option value="${k}"${(c.type||'open')===k?' selected':''}>${v}</option>`).join('')}</select></label>
+        <label>Trophies needed <input id="csMin" type="number" min="0" max="5000" step="10" value="${c.minTr||0}"></label><input id="csDesc" maxlength="120" placeholder="Clan description (what your clan is about)" value="${esc(c.desc||'')}" style="flex-basis:100%"><button class="prime" type="button" id="csSave">Save settings</button></div></details>`:''}
+      ${reqs.length&&canAccept(c)?`<div class="label">Join requests (${reqs.length})</div><div class="board">${reqs.map(([uid,r])=>`<div><span class="sw" style="background:${P(uid)?.color||'#888'}"></span><span>${esc(cleanText(r.name))}</span><span>${f(P(uid)?.tr??r.tr)} trophies</span><span class="row">${btn('Accept',null,'cr:accept:'+uid,'prime')}${btn('Deny',null,'cr:deny:'+uid,'soft')}</span></div>`).join('')}</div>`:''}
+      <div class="label">Members</div>
+      <div class="board">${mem.map(p=>{ const rk=rankOf(c,p.id), rn=RANKS[rk].n, mine=rankN(c,ME);
+        const acts=p.id===ME?'':[ (mine===3&&rn<2)||(mine===2&&rn===0)?btn(rn===0?'Make elder':'Make co-leader',null,'cr:promote:'+p.id,'soft'):'', (mine===3&&rn>=1)||(mine===2&&rn===1)?btn('Demote',null,'cr:demote:'+p.id,'soft'):'', mine===3&&rn===2?btn('Make leader',null,'cr:lead:'+p.id,'gemb'):'', canKick(c,p.id)?btn('Kick',null,'cr:kick:'+p.id,'war'):'' ].join('');
+        return `<div class="${p.id===ME?'me':''}"><span class="sw" style="background:${p.color}"></span><span>${esc(cleanText(p.name))} <span class="rk rk-${rk}">${RANKS[rk].ic} ${RANKS[rk].name}</span>${online(p)?' <span class="on">●</span>':''}</span><span>${f(p.tr||0)} trophies</span><span>${ccSp(p.cc)}/${CC_CAP}</span></div>${acts?`<div class="row donate">${acts}</div>`:''}
+        ${p.id!==ME&&!p.dead?`<div class="row donate">${btn('Send 5 archers',null,'don:'+p.id+':arc:5','soft')}${btn('Send 5 soldiers',null,'don:'+p.id+':sol:5','soft')}${m.giant?btn('Send a giant',null,'don:'+p.id+':giant:1','soft'):''}</div>`:''}`; }).join('')}</div>
       ${warHtml(c)}${btn('Leave clan',null,'clan:leave','war')}`; }
   else { const top=topClans();
     el.innerHTML=`<p class="desc">Join a clan to chat with other players, protect each other and share troops. Clan members get a <b>peace treaty</b>: nobody can attack you while you are offline, unless you have been inactive for over a week.</p>
-      <div class="label">Top clans</div><div class="board">${top.length?top.map((x,i)=>`<div><span class="sw" style="background:#ffd13b"></span><span>${i+1}. [${esc(x.tag)}] ${esc(x.name)}</span><span>${(x.members||[]).length}/${CLAN_MAX}</span><span>${(x.members||[]).length<CLAN_MAX?btn('Join',null,'clan:join:'+x.id,'prime'):'Full'}</span></div>`).join(''):'<p class="desc">No clans yet. Start the first one!</p>'}</div>`; }
+      <div class="label">Top clans</div><div class="board">${top.length?top.map((x,i)=>`<div><span class="sw" style="background:#ffd13b"></span><span>${i+1}. [${esc(x.tag)}] ${esc(x.name)}</span><span>${(x.members||[]).length}/${CLAN_MAX}</span><span>${(()=>{ const why=clanCanJoin(x,m); const asked=(x.requests||{})[ME], ok=(x.accepted||{})[ME]; return why?`<small class="desc">${why}</small>`:asked?'<small class="desc">Request sent</small>':btn(x.type==='request'&&!ok?'Ask to join':'Join',null,'clan:join:'+x.id,'prime'); })()}</span></div>${x.desc||x.minTr||x.type&&x.type!=='open'?`<p class="desc cinfo">${x.type&&x.type!=='open'?CLAN_TYPES[x.type]+' · ':''}${x.minTr?f(x.minTr)+'+ trophies · ':''}${esc(cleanText(x.desc||''))}</p>`:''}`).join(''):'<p class="desc">No clans yet. Start the first one!</p>'}</div>`; }
+  const sv=$('csSave'); if(sv) sv.onclick=clanSettings;
   refreshButtons();
 }
 async function clanTx(fn,after){ if(busy||!P(ME)||P(ME).dead) return; busy=true;
@@ -2658,18 +2685,38 @@ function createClan(name,tag){
   clanTx(async(t,me)=>{ const c=await t.getClan(tag); const old=me.clan?await t.getClan(me.clan):null;
     if(old&&(old.members||[]).includes(ME)) fail('Leave your clan first.'); if(c) fail('That tag is taken. Pick another.');
     settle(me); pay(me,CLAN_COST); me.clan=tag; me.lastSeen=now();
-    t.setClan(tag,{name,tag,leader:ME,members:[ME],created:now()}); t.setPlayer(ME,me); },
+    t.setClan(tag,{name,tag,leader:ME,members:[ME],created:now(),type:'open',minTr:0,desc:'',ranks:{},requests:{}}); t.setPlayer(ME,me); },
     ()=>{ snd('quest'); toast(`You founded [${tag}] ${name}!`); $('cName').value=''; $('cTag').value=''; }); }
 function joinClan(id){
   clanTx(async(t,me)=>{ const c=await t.getClan(id); const old=me.clan&&me.clan!==id?await t.getClan(me.clan):null;
     if(!c) fail('That clan no longer exists.'); if(old&&(old.members||[]).includes(ME)) fail('Leave your clan first.');
-    const mem=c.members||[]; if(!mem.includes(ME)){ if(mem.length>=CLAN_MAX) fail('That clan is full.'); mem.push(ME); }
+    const mem=c.members||[]; if(!mem.includes(ME)){ if(mem.length>=CLAN_MAX) fail('That clan is full.'); if(c.type==='closed') fail('That clan is closed to new members.'); if((me.tr||0)<(c.minTr||0)) fail(`[${c.tag}] needs at least ${f(c.minTr)} trophies. You have ${f(me.tr||0)}.`);
+      if(c.type==='request'&&!((c.accepted||{})[ME])){ c.requests=c.requests||{}; if(c.requests[ME]) fail('Your request is already waiting. A leader, co-leader or elder will answer it.'); c.requests[ME]={name:me.name,tr:me.tr||0,t:now()}; t.setClan(id,c); return {...c,asked:true}; }
+      mem.push(ME); if(c.accepted) delete c.accepted[ME]; if(c.ranks) delete c.ranks[ME]; }
     c.members=mem; me.clan=id; me.lastSeen=now(); t.setClan(id,c); t.setPlayer(ME,me); return c; },
-    c=>{ snd('quest'); toast(`Welcome to [${c.tag}] ${c.name}!`); }); }
+    c=>{ if(c.asked){ snd('click'); toast(`Request sent to [${c.tag}] ${c.name}. You join as soon as someone accepts it.`); return; } snd('quest'); toast(`Welcome to [${c.tag}] ${c.name}!`); }); }
 function leaveClan(){
   clanTx(async(t,me)=>{ const id=me.clan; const c=id?await t.getClan(id):null;
-    if(c){ c.members=(c.members||[]).filter(x=>x!==ME); if(!c.members.length) t.setClan(id,null); else { if(c.leader===ME) c.leader=c.members[0]; t.setClan(id,c); } }
+    if(c){ c.members=(c.members||[]).filter(x=>x!==ME); if(c.ranks) delete c.ranks[ME]; if(!c.members.length) t.setClan(id,null); else { if(c.leader===ME){ const nx=c.members.slice().sort((a,b)=>rankN(c,b)-rankN(c,a)||((P(b)?.tr||0)-(P(a)?.tr||0)))[0]; c.leader=nx; if(c.ranks) delete c.ranks[nx]; } t.setClan(id,c); } }
     me.clan=null; me.lastSeen=now(); t.setPlayer(ME,me); },()=>{ snd('click'); toast('You left the clan.'); }); }
+function clanAct(kind,uid,extra){ const label={promote:'promoted',demote:'demoted',kick:'removed',lead:'made leader',accept:'accepted',deny:'declined'}[kind];
+  clanTx(async(t,me)=>{ const c=await t.getClan(me.clan); if(!c||!(c.members||[]).includes(ME)) fail('You are not in a clan.'); c.ranks=c.ranks||{}; c.requests=c.requests||{}; const name=(P(uid)?.name)||(c.requests[uid]||{}).name||'That player';
+    if(kind==='accept'||kind==='deny'){ if(!canAccept(c)) fail('Only elders and above can answer requests.'); if(!c.requests[uid]) fail('That request is gone.');
+      if(kind==='accept'){ if((c.members||[]).length>=CLAN_MAX) fail('The clan is full.'); c.accepted=c.accepted||{}; c.accepted[uid]=now(); }
+      delete c.requests[uid]; t.setClan(c.id,c); return {name,kind}; }
+    if(!(c.members||[]).includes(uid)) fail('They are not in your clan.');
+    const me_n=rankN(c,ME), them=rankOf(c,uid);
+    if(kind==='kick'){ if(!canKick(c,uid)) fail('You cannot remove that member.'); c.members=c.members.filter(x=>x!==uid); delete c.ranks[uid]; }
+    else if(kind==='promote'){ const next=them==='member'?'elder':them==='elder'?'co':null; if(!next) fail('Use "Make leader" to hand over the clan.'); if(!(me_n===3||(me_n===2&&next==='elder'))) fail('You cannot promote them that high.'); c.ranks[uid]=next; }
+    else if(kind==='demote'){ const next=them==='co'?'elder':them==='elder'?'member':null; if(!next) fail('They are already a member.'); if(!(me_n===3||(me_n===2&&them==='elder'))) fail('You cannot demote them.'); if(next==='member') delete c.ranks[uid]; else c.ranks[uid]=next; }
+    else if(kind==='lead'){ if(me_n!==3) fail('Only the leader can do that.'); c.leader=uid; delete c.ranks[uid]; c.ranks[ME]='co'; }
+    t.setClan(c.id,c); return {name,kind,rank:rankOf(c,uid)}; },
+    r=>{ snd('click'); toast(r.kind==='promote'||r.kind==='demote'?`${r.name} is now ${RANKS[r.rank].name}.`:`${r.name} ${label}.`);
+      if(r.kind==='kick') report(uid,`You were removed from [${myClan()?.tag||''}] by ${P(ME).name}.`,'bad'); if(r.kind==='accept') report(uid,`Your request to join [${myClan()?.tag||''}] was accepted! Tap Join on the clan to come in.`,'good'); }); }
+setInterval(()=>{ try{ const m=P(ME); if(!m||m.dead||busy||myClan()) return; const c=Object.values(G.clans).find(x=>(x.accepted||{})[ME]&&!(x.members||[]).includes(ME)); if(c) joinClan(c.id); }catch(e){} },5000);
+function clanSettings(){ const type=$('csType').value, minTr=Math.max(0,Math.min(5000,parseInt($('csMin').value||'0',10)||0)), desc=$('csDesc').value.trim().slice(0,120);
+  if(isRude(desc)) return toast('Please keep the description friendly.',true);
+  clanTx(async(t,me)=>{ const c=await t.getClan(me.clan); if(!c||!canManage(c)) fail('Only the leader and co-leaders can change settings.'); Object.assign(c,{type,minTr,desc}); t.setClan(c.id,c); },()=>{ snd('coin'); toast('Clan settings saved.'); }); }
 function donate(uid,u,n){
   clanTx(async(t,me)=>{ const them=await t.getPlayer(uid); if(!them||them.dead) fail('That kingdom has fallen.');
     if(!me.clan||them.clan!==me.clan) fail('You can only send troops to clanmates.');
@@ -2778,7 +2825,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); i
   else if(a==='clear') clearObs(sel); else if(a==='finish') finishNow(sel); else if(a==='collect') collect(sel); else if(a==='rearm') rearm(sel);
   else if(a==='desel'){ sel=null; renderPanel(true); draw(); }
   else if(a==='boss:claim') bossClaim(sel); else if(a.startsWith('arm:')) armBuy(a.slice(4)); else if(a.startsWith('brew:')) brew(a.slice(5)); else if(a.startsWith('cast:')){ const k=a.slice(5); castSel[k]=!castSel[k]; renderPanel(true); }
-  else if(a.startsWith('don:')){ const [,uid,u,n]=a.split(':'); donate(uid,u,+n); } else if(a==='clan:leave') leaveClan(); else if(a.startsWith('clan:join:')) joinClan(a.slice(10));
+  else if(a.startsWith('don:')){ const [,uid,u,n]=a.split(':'); donate(uid,u,+n); } else if(a==='clan:leave') leaveClan(); else if(a.startsWith('cr:')){ const [,k,uid]=a.split(':'); clanAct(k,uid); } else if(a.startsWith('clan:join:')) joinClan(a.slice(10));
   else if(a.startsWith('b:')) build(sel,a.slice(2)); else if(a.startsWith('t:')){ const [,u,n]=a.split(':'); train(u,+n); } });
 $('bSound').onclick=()=>{ G.muted=!G.muted; try{ localStorage.setItem('iron-acre-muted',G.muted?'1':'0'); }catch(e){} tickUI(); snd('click'); };
 function devAccounts(){ const st=DB.st||{players:{}}; return Object.keys(st.players).filter(id=>id==='preview-player'||id.startsWith('local-')).map(id=>({id,...st.players[id]})); }
@@ -2819,14 +2866,25 @@ const CAM_KEY='iron-acre-cam-'+WORLD.id;
 function saveCam(){ if(!ME||!VW) return; try{ localStorage.setItem(CAM_KEY,JSON.stringify({k:ME,t:camTile(),z:cam.z})); }catch(e){} }
 function loadCam(){ try{ const c=JSON.parse(localStorage.getItem(CAM_KEY)); return c&&c.k===ME?c:null; }catch(e){ return null; } }
 setInterval(saveCam,4000); window.addEventListener('pagehide',saveCam);
-setInterval(()=>{ if(DB&&ME&&P(ME)&&!P(ME).dead&&document.visibilityState==='visible') DB.touch(ME); },2*60000);
-document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&DB&&ME&&P(ME)&&!P(ME).dead) DB.touch(ME); });
+let resuming=false;
+async function resumeOnline(){ const m=P(ME); if(!DB||!m||m.dead||resuming) return; const end=activeEnd(m), gap=now()-end; if(gap<=5000){ DB.touch(ME); return; }
+  if(busy){ setTimeout(resumeOnline,800); return; } resuming=true; busy=true; const cells=Object.keys(G.plots).filter(k=>{ const q=G.plots[k]; return q.o===ME&&PROD[q.b]&&q.ct; });
+  try{ await DB.tx(async t=>{ const me=await t.getPlayer(ME); if(!me||me.dead) fail('gone'); const e2=activeEnd(me), g2=Math.max(0,now()-e2);
+      const regs={}; for(const c of cells) regs[c]=await t.getRegion(regionOf(c));
+      settle(me); me.lastSeen=now();
+      for(const c of cells){ const q=regs[c][c]; if(!q||q.o!==ME||!q.ct) continue; const n=clone(q); n.ct=Math.min(now(),(n.ct||now())+g2); t.setPlot(c,n); }
+      t.setPlayer(ME,me); });
+    if(gap>10*60000) toast(`Welcome back! Your kingdom rested while you were away ${fmtT(gap/1000)}, so no resources were made.`); }
+  catch(e){ DB.touch(ME); } busy=false; resuming=false; }
+setInterval(()=>{ if(DB&&ME&&P(ME)&&!P(ME).dead&&document.visibilityState==='visible'&&Date.now()-lastInput<10*60000) resumeOnline(); },2*60000);
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&DB&&ME&&P(ME)&&!P(ME).dead) resumeOnline(); });
+['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,()=>{ const m=P(ME); if(m&&!m.dead&&now()-activeEnd(m)>5000&&!resuming) resumeOnline(); },{passive:true}));
 function start(){
   wrapSaving(); setSave(DB.name==='online'?'All progress saved online':'All progress saved on this device');
   DB.onAuth(uid=>{
     if(!uid){ ME=null; loginDialog(); return; }
     if(ME===uid) return; ME=uid; $('ov').innerHTML='';
-    DB.watchPlayers(onPlayers); setTimeout(()=>DB.touch(ME),1500);
+    DB.watchPlayers(onPlayers); setTimeout(()=>resumeOnline(),1500);
     DB.watchInbox(ME,onInbox);
     DB.watchClans(m=>{ G.clans=m; queueRender(); });
     DB.watchMarket(m=>{ G.market=m; const ae=document.activeElement; if($('shopOv')&&shopTab==='market'&&!busy&&!(ae&&/INPUT|SELECT/.test(ae.tagName))) shopDialog(); });
