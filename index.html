@@ -101,7 +101,7 @@ button.sel{outline:3px solid #fff;outline-offset:1px;filter:brightness(1.12)}
 .hero{border-top:1px dashed rgba(122,74,36,.35);padding-top:6px;display:flex;flex-direction:column;gap:4px}
 .battle{max-width:900px;gap:8px}.bhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.bhead b{flex:1;min-width:0}.bhead .stars{font-size:1.6rem}.bhead button{margin:0}
 #bat{border:3px solid var(--woodd);border-radius:12px;display:block}
-body.real #map,body.real #bat,body.real .petcv,body.real .castleCv{filter:saturate(.74) contrast(1.07) brightness(.96) sepia(.12)}
+body.real #map,body.real #bat,body.real .petcv,body.real .castleCv{filter:saturate(.95) contrast(1.04) brightness(1.04) sepia(.04)}
 .bbar{height:8px;background:rgba(74,42,16,.25);border-radius:5px;overflow:hidden}.bbar i{display:block;height:100%;width:0;background:#e8402f}
 .rbtn{display:inline-flex;font-size:.75rem!important;padding:2px 8px 3px!important;margin:2px 0 0!important}
 .reveal .bar{align-self:stretch}
@@ -377,7 +377,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 41;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
+const GAME_VERSION = 42;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
 const NEW_SHIELD_MIN = 120;     // peace shield for brand new kingdoms
 const DEFEND_SHIELD_MIN = 30;   // peace shield after being attacked
 const CAMP_MAX = 25;            // highest barbarian camp level
@@ -1784,12 +1784,12 @@ function drawInner(tm){
         ctx.strokeStyle='rgba(20,30,20,.18)'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(bx-6,by+40-fl*.4); ctx.lineTo(bx,by+42); ctx.lineTo(bx+6,by+40-fl*.4); ctx.stroke();
         ctx.strokeStyle='#2e2a26'; ctx.lineWidth=1.8; ctx.beginPath(); ctx.moveTo(bx-7,by-fl); ctx.quadraticCurveTo(bx-3,by-2,bx,by); ctx.quadraticCurveTo(bx+3,by-2,bx+7,by-fl); ctx.stroke(); } } }
   drawNight(); if(!lowGfx) drawWeather();
-  { const vg=ctx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.75); vg.addColorStop(0,'rgba(255,240,200,0)'); vg.addColorStop(1,'rgba(10,30,20,.32)'); ctx.fillStyle=vg; ctx.fillRect(0,0,VW,VH); }
+  { const vg=ctx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.75); vg.addColorStop(0,'rgba(255,240,200,0)'); vg.addColorStop(1,`rgba(10,30,20,${REAL?.2:.32})`); ctx.fillStyle=vg; ctx.fillRect(0,0,VW,VH); }
   if(!RM&&!lowGfx){ const dk2=darkness(); if(dk2<.4){ ctx.save(); ctx.globalCompositeOperation='lighter'; for(let i=0;i<4;i++){ const ph=T/18000+i*.27, x0=((ph%1.2)-.1)*VW*1.4-VW*.2, w=VW*(.06+.04*(i%2)), a=(.035+.02*Math.sin(T/2600+i*2))*(1-dk2/.4);
       const rg3=ctx.createLinearGradient(x0,0,x0+w,0); rg3.addColorStop(0,'rgba(255,240,190,0)'); rg3.addColorStop(.5,`rgba(255,240,190,${a})`); rg3.addColorStop(1,'rgba(255,240,190,0)'); ctx.fillStyle=rg3;
       ctx.beginPath(); ctx.moveTo(x0,0); ctx.lineTo(x0+w,0); ctx.lineTo(x0+w+VH*.55,VH); ctx.lineTo(x0+VH*.55,VH); ctx.closePath(); ctx.fill(); } ctx.restore(); } }
   if(!lowGfx){ const sun=ctx.createLinearGradient(0,0,VW,VH); sun.addColorStop(0,'rgba(255,225,150,.1)'); sun.addColorStop(.6,'rgba(255,225,150,0)'); ctx.fillStyle=sun; ctx.fillRect(0,0,VW,VH); }
-  grain(ctx,VW,VH,.55);
+  grain(ctx,VW,VH,.3);
   drawMini();
 }
 
@@ -2291,7 +2291,7 @@ function playBattle(rp){ return new Promise(resolve=>{
       g.setTransform(dpr,0,0,dpr,0,0);
       if(rp.rage&&!RM&&t>1500&&t<7300){ const rg2=g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,W*.75); rg2.addColorStop(0,'rgba(255,40,90,0)'); rg2.addColorStop(1,`rgba(255,40,90,${.16+.06*Math.sin(t/200)})`); g.fillStyle=rg2; g.fillRect(0,0,W,H); }
       { const lg2=g.createLinearGradient(0,0,W*.6,H); lg2.addColorStop(0,'rgba(255,236,170,.16)'); lg2.addColorStop(1,'rgba(255,236,170,0)'); g.fillStyle=lg2; g.fillRect(0,0,W,H); }
-      grain(g,W,H,.5);
+      grain(g,W,H,.28);
       const banner=(txt,col,a,sc)=>{ g.globalAlpha=a; { const rw=W*.62*sc, rh=W/9*sc, ry=H*.5-rh*.72; g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(W/2-rw/2+4,ry+5,rw,rh); const rgb=g.createLinearGradient(0,ry,0,ry+rh); rgb.addColorStop(0,col===('#ff7a5c')?'#6a2a2a':'#7a4a1c'); rgb.addColorStop(1,col===('#ff7a5c')?'#3a1414':'#4a2a0c'); g.fillStyle=rgb;
           g.beginPath(); g.moveTo(W/2-rw/2-rh*.5,ry); g.lineTo(W/2+rw/2+rh*.5,ry); g.lineTo(W/2+rw/2+rh*.2,ry+rh/2); g.lineTo(W/2+rw/2+rh*.5,ry+rh); g.lineTo(W/2-rw/2-rh*.5,ry+rh); g.lineTo(W/2-rw/2-rh*.2,ry+rh/2); g.closePath(); g.fill(); g.strokeStyle='#ffd13b'; g.lineWidth=2.5; g.stroke(); } g.font=`${Math.round(W/11*sc)}px "Lilita One",sans-serif`; g.textAlign='center'; g.lineJoin='round'; g.lineWidth=8; g.strokeStyle='#3b2412'; g.strokeText(txt,W/2,H*.5); g.fillStyle=col; g.fillText(txt,W/2,H*.5); g.globalAlpha=1; };
       if(t<1100&&!rp.deploy){ const q3=t/1100; banner('BATTLE!','#ffd13b',q3<.7?1:1-(q3-.7)/.3,.8+Math.min(1,q3*4)*.3); }
