@@ -120,7 +120,7 @@ body.real #map,body.real #bat,body.real .petcv,body.real .castleCv{filter:satura
   .bnav button{flex:1;margin:0;align-items:center;font-size:.95rem;padding:9px 4px}
   .bnav button.sel{--edge:#8a5a00;background:linear-gradient(180deg,#ffe27a,#f2b01e)}
   body{padding-bottom:calc(80px + env(safe-area-inset-bottom,0px))}
-  .lower{grid-template-columns:minmax(0,1fr)}
+  .lower{columns:1}
   header{gap:8px}.res{gap:5px}.chip{padding:2px 9px 2px 3px}.chip b{font-size:1.05rem}.ico{width:22px;height:22px}h1{font-size:2.2rem}
   .tut{right:10px;bottom:auto;top:62px}
   .toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
@@ -176,7 +176,14 @@ body.real #map,body.real #bat,body.real .petcv,body.real .castleCv{filter:satura
 .unit{border-top:1px dashed rgba(122,74,36,.35);padding-top:6px}
 .locked{opacity:.75}
 .sw{width:14px;height:14px;border-radius:50%;border:2px solid rgba(0,0,0,.5)}
-.lower{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}
+.lower{columns:2 320px;column-gap:14px}
+.lower>.card{break-inside:avoid;page-break-inside:avoid;margin:0 0 14px;width:100%;box-sizing:border-box}
+.lower .log:empty{display:none}
+.setRow{display:flex;flex-wrap:wrap;gap:6px}.setRow button{margin:0;font-size:.85rem;padding:5px 10px 6px}
+details.about summary{cursor:pointer;font-weight:800;color:var(--muted);font-size:.85rem}details.about p{margin:6px 0 0}
+details.intro{color:#eaf7d8;font-size:.9rem;max-width:80ch;text-shadow:0 1px 0 rgba(0,0,0,.35)}details.intro summary{cursor:pointer;font-weight:800;color:#fff}details.intro p{margin:4px 0 0}details.intro b{color:#fff}
+.mRows{display:flex;flex-direction:column;gap:6px}.mRow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.mRow b{flex:1 1 7rem}.mRow input{width:4.5rem}.mRow button{margin:0;padding:3px 10px 4px}
+.near .chat{max-height:200px}
 .overlay{position:fixed;inset:0;background:rgba(10,24,8,.72);display:flex;align-items:flex-start;justify-content:center;z-index:20;padding:20px;overflow:auto}
 .overlay>.dialog{margin:auto 0}
 .dialog{background:linear-gradient(180deg,var(--parch),var(--parch2));border:4px solid var(--woodd);border-radius:20px;padding:22px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:12px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.55),0 8px 0 rgba(0,0,0,.35)}
@@ -325,7 +332,7 @@ button.big{font-size:1.15rem;padding:10px 18px 11px}
       <button id="bShop" class="prime hbtn">Shop</button><button id="bGear" class="gemb hbtn">Gear</button><button id="bRew" class="war hbtn">Rewards</button><button id="bPet" class="gemb hbtn">🐾 Pets</button><button id="bKing" class="prime hbtn">👑 Kingdom</button><button id="bEvent" class="war hbtn" hidden>🎃 Event</button><button id="bMerch" class="gemb hbtn" hidden>🛒 Merchant</button><button id="bCamp" class="war hbtn">🗺️ Campaign</button><button id="bBadge" class="soft hbtn">Badges</button><button id="bHelp" class="soft hbtn">How to play</button>
     </div>
   </header>
-  <p class="help" data-t="more">Everyone who opens this page plays in the same world. Drag the map, pinch or scroll to zoom, and tap the minimap to jump anywhere. <b>Buy land</b> touching your borders, give your <b>builders</b> jobs, and <b>tap your mines</b> to collect. Train an army, open <b>crates</b> in the Shop for gear, build <b>walls</b> and hide <b>traps</b>, brew <b>spells</b>, and team up in a <b>clan</b>. Then <b>raid</b> barbarian camps and rival kingdoms for loot and trophies. Take a rival's <b>Town Hall</b> and you take everything they own.</p>
+  <details class="intro" data-t="more"><summary>👋 New here? How Crownforge works</summary><p>Everyone who opens this page plays in the same world. Drag the map, pinch or scroll to zoom, and tap the minimap to jump anywhere. <b>Buy land</b> touching your borders, give your <b>builders</b> jobs, and <b>tap your mines</b> to collect. Train an army, open <b>crates</b> in the Shop for gear, build <b>walls</b> and hide <b>traps</b>, brew <b>spells</b>, and team up in a <b>clan</b>. Then <b>raid</b> barbarian camps and rival kingdoms for loot and trophies. Take a rival's <b>Town Hall</b> and you take everything they own.</p></details>
   <div class="main">
     <div class="leftcol">
     <div class="mapbox" data-t="map">
@@ -341,18 +348,20 @@ button.big{font-size:1.15rem;padding:10px 18px 11px}
         <form id="clanCreate" class="row" hidden><input id="cName" maxlength="20" placeholder="Clan name"><input id="cTag" maxlength="5" placeholder="Tag, e.g. IRON" style="max-width:9rem"><button class="prime" type="submit">Found clan<span class="c">500 gold</span></button></form>
         <ul class="log chat" id="chatLog" hidden></ul>
         <form id="chatForm" class="row" hidden><input id="chatIn" maxlength="200" placeholder="Message your clan" autocomplete="off" style="flex:1;min-width:0"><button class="prime" type="submit">Send</button></form></div>
+      <div class="card near" data-t="clan"><div class="label">📢 Nearby chat</div><p class="desc" id="nearInfo">Talk with kingdoms close to yours.</p><ul class="log chat" id="nearLog"></ul>
+        <form id="nearForm" class="row"><input id="nearIn" maxlength="200" placeholder="Say something to your neighbours" autocomplete="off" style="flex:1;min-width:0"><button class="prime" type="submit">Send</button></form></div>
       <div class="card" data-t="more"><div class="label">📰 World news</div><ul class="log" id="news"></ul></div>
       <div class="card" data-t="more"><div class="label">Leaderboards</div><div class="row tabs" id="boardTabs"><button data-bt="kingdoms" class="prime">Kingdoms</button><button data-bt="clans" class="soft">Clans</button><button data-bt="raiders" class="soft">🏆 Weekly tournament</button></div><p class="desc" id="season"></p><div class="board" id="board"></div></div>
       <div class="card" data-t="more"><div class="label">War report</div><ul class="log" id="log"></ul></div>
-      <div class="card" data-t="more"><div class="label">Settings</div>
-        <div class="row">
+      <div class="card" data-t="more"><div class="label">⚙️ Settings</div>
+        <div class="setRow">
           <button id="bAlert" class="soft">Alerts: off</button><button id="bStyle" class="soft">Style: Realistic</button><button id="bGfx" class="soft">Graphics: Auto</button><button id="bSound" class="soft">Sound: on</button><button id="bMusic" class="soft">Music: off</button><button class="soft" data-act="tut:again">Replay tutorial</button><button class="soft" data-act="help">How to play</button>
           <button id="bNewAcct" class="soft">New account</button><button id="bChg" class="soft">Change account</button>
           <button id="bAbandon" class="war">Abandon kingdom</button>
         </div>
         <p class="desc"><b id="ver"></b></p>
-        <p class="desc">You stay signed in and everything saves automatically, so the game opens straight into your kingdom. Use <b>New account</b> to start another kingdom, and <b>Change account</b> to switch between them.</p>
-        <p class="desc">Your kingdom only makes gold and stone while you are online with the game open. While you are away it rests, but other players can still attack you, so build up your archers, walls, towers and traps before you log off.</p>
+        <details class="about"><summary>About saving and accounts</summary><p class="desc">You stay signed in and everything saves automatically, so the game opens straight into your kingdom. Use <b>New account</b> to start another kingdom, and <b>Change account</b> to switch between them.</p>
+        <p class="desc">Your kingdom only makes gold and stone while you are online with the game open. While you are away it rests, but other players can still attack you, so build up your archers, walls, towers and traps before you log off.</p></details>
       </div>
     </div>
       </div>
@@ -413,7 +422,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 47;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
+const GAME_VERSION = 48;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
 const NEW_SHIELD_MIN = 120;     // peace shield for brand new kingdoms
 const DEFEND_SHIELD_MIN = 30;   // peace shield after being attacked
 const CAMP_MAX = 25;            // highest barbarian camp level
@@ -426,7 +435,8 @@ const TREATY_AFK_DAYS = 7;      // clan peace treaty stops protecting players in
 
 /* ================= constants ================= */
 const B={
-  hall:{name:'Town Hall',desc:'Your capital. Upgrade it to raise storage and unlock higher building levels. Lose it and you lose everything.'},
+  hallx:{name:'Town Hall',desc:'Part of a Town Hall.'},
+  hall:{name:'Town Hall',desc:'Your capital. Upgrade it to earn more gold and unlock higher building levels. It covers 2×2 tiles. Lose it and you lose everything.'},
   mine:{name:'Gold Mine',cost:{gold:120,stone:40},desc:'Digs up 20 gold per minute each level. Tap it to collect.'},
   quarry:{name:'Quarry',cost:{gold:100,stone:0},desc:'Cuts 12 stone per minute each level. Tap it to collect.'},
   smine:{name:'Stone Mine',cost:{gold:350,stone:150},th:2,desc:'A deep mine that digs 8 stone per minute each level. Slower than a Quarry, but it holds far more and often turns up gems when you collect a big load.'},
@@ -590,11 +600,11 @@ const statsMemo=new Map(); let statsAt=0;
 function stats(id){ const tn=performance.now(); if(tn-statsAt>400){ statsMemo.clear(); statsAt=tn; } const hit=statsMemo.get(id); if(hit) return hit; const r=statsRaw(id); statsMemo.set(id,r); return r; }
 function statsRaw(id){
   const s={count:0,mine:0,quarry:0,smine:0,lab:0,barracks:0,armory:0,tower:0,cannon:0,hut:0,wall:0,trap:0,spells:0,wallN:0,trapN:0,hall:null,hallLvl:0,busy:0};
-  for(const k in G.plots){ const p=G.plots[k]; if(p.o!==id) continue; s.count++; if(p.bt) s.busy++;
+  for(const k in G.plots){ const p=G.plots[k]; if(p.o!==id) continue; if(p.b!=='hallx') s.count++; if(p.bt) s.busy++;
     if(p.b==='hall'){ s.hall=k; s.hallLvl=p.lvl; } else if(p.b&&p.lvl>0&&s[p.b]!==undefined){ s[p.b]+=(p.b==='hut'?1:p.lvl); if(p.b==='wall') s.wallN++; if(p.b==='trap') s.trapN++; } }
   s.hallReal=s.hallLvl; const pp=P(id); if(s.hallLvl&&presOf(pp)) s.hallLvl=Math.max(s.hallLvl,PRES_FLOOR);
   s.gBase=(8+4*s.hallLvl)*presProd(pp); s.sBase=4*presProd(pp); s.gRate=Math.round(s.gBase+20*s.mine); s.sRate=Math.round(s.sBase+12*s.quarry+8*s.smine);
-  s.cap=500+400*s.hallLvl+120*s.count+(s.hallLvl>5?(s.hallLvl-5)*(s.hallLvl-5)*500:0); s.troopCap=10+15*s.barracks; s.maxLvl=Math.min(BLD_MAX,s.hallLvl+1); s.builders=2+s.hut;
+  s.cap=STORE_MAX; s.troopCap=10+15*s.barracks; s.maxLvl=Math.min(BLD_MAX,s.hallLvl+1); s.builders=2+s.hut;
   return s;
 }
 /* Resources only grow while you are online. 'Online' means the game is open in a visible tab and you used it in the last few minutes. */
@@ -615,7 +625,8 @@ const attackers=p=>ATK.reduce((a,u)=>a+(p[u]||0),0);
 function atkOf(p,vsCamp,rage,noHero){ let a=0; for(const u of ATK) a+=(p[u]||0)*UNITS[u].atk*(vsCamp&&u==='cav'?1.5:1)*unitMult(p,u); if(!noHero&&heroReady(p)) a+=heroAtk(p); return presPow(p)*a*(1+0.2*stats(p.id).armory)*(rage?1.3:1)*(1+gearBonus(p,'atk')+.04*skl(p,'army')+castleB(p,'atk')+bookB(p,'atk')); }
 const cannonR=l=>(l||1)>=4?3:2;
 function defOf(p,cell,plot,cats=0,brks=0){ const s=stats(p.id), cc=p.cc||{}; let d=0;
-  for(const u of ALLU){ const am=u==='arc'?1+0.1*s.tower:1; d+=(p[u]||0)*UNITS[u].def*am*unitMult(p,u)+(cc[u]||0)*UNITS[u].def*am; }
+  const away=p.march&&p.march.u&&now()<p.march.arr+600000?p.march.u:{};
+  for(const u of ALLU){ const am=u==='arc'?1+0.1*s.tower:1; d+=Math.max(0,(p[u]||0)-(away[u]||0))*UNITS[u].def*am*unitMult(p,u)+(cc[u]||0)*UNITS[u].def*am; }
   d+=heroDefAll(p)+petPower(p);
   let fort=60*s.tower+25*s.wall;
   if(cell){ const [x,y]=xy(cell); for(let dy=-TOWER_MAX_R;dy<=TOWER_MAX_R;dy++) for(let dx=-TOWER_MAX_R;dx<=TOWER_MAX_R;dx++){ const q=G.plots[cid(x+dx,y+dy)]; if(!q||q.o!==p.id||!q.lvl) continue; if(q.b==='tower'&&Math.max(Math.abs(dx),Math.abs(dy))<=towerR(q.lvl)) fort+=40*q.lvl; if(q.b==='cannon'&&Math.max(Math.abs(dx),Math.abs(dy))<=cannonR(q.lvl)) fort+=50*q.lvl; if(q.b==='wall'&&Math.abs(dx)<=1&&Math.abs(dy)<=1) fort+=30*q.lvl; } }
@@ -623,6 +634,7 @@ function defOf(p,cell,plot,cats=0,brks=0){ const s=stats(p.id), cc=p.cc||{}; let
 function loseUnits(p,L,keys){ let lost=0; for(const u of keys){ const n=p[u]||0; if(!n) continue; const k=Math.min(n,Math.round(n*L*(UNITS[u].tough?.5:1))); p[u]=n-k; lost+=k; } return lost; }
 const landCost=n=>Math.round(50*Math.pow(Math.max(1,n),1.3));
 const bCost=(t,l)=>{const c=B[t].cost, m=l<=6?Math.pow(1.8,l):Math.pow(1.8,6)*Math.pow(1.3,l-6); return {gold:Math.round(c.gold*m),stone:Math.round(c.stone*m)};};
+const STORE_MAX=19000000;   // no storage limit any more (just a safety cap under the server's 20 million limit)
 const HALL_MAX=100, BLD_MAX=12, PRES_FLOOR=25;
 const presOf=p=>(p&&p.pres)||0;
 const presStars=n=>!n?'':n<=5?'⭐'.repeat(n):'⭐×'+n;
@@ -651,8 +663,10 @@ const inClan=p=>!!(p&&p.clan&&G.clans[p.clan]&&(G.clans[p.clan].members||[]).inc
 const treaty=p=>false;   // replaced by the 'attacked while offline' protection below
 const OFF_LOCK=30*864e5, BACK_MIN=15;          // after an offline attack: safe until back online, then 15 more minutes
 /* You can only attack a kingdom from outside: a tile is open if one of its 4 neighbours is land that this kingdom does not own. Lakes count as walls. */
-function exposedTile(cell,owner,reg){ const [x,y]=xy(cell); for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const nx=x+dx, ny=y+dy; if(!inB(nx,ny)||Wt(nx,ny)) continue; const nk=cid(nx,ny);
-    const q=reg&&regionOf(nk)===regionOf(cell)?reg[nk]:G.plots[nk]; if(!q||q.o!==owner) return true; } return false; }
+function exposedTile(cell,owner,reg){ const pq=(reg&&reg[cell])||G.plots[cell], cells=[cell]; if(pq&&pq.b==='hall'&&pq.big) cells.push(...hallParts(cell));
+  for(const c0 of cells){ const [x,y]=xy(c0); for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const nx=x+dx, ny=y+dy; if(!inB(nx,ny)||Wt(nx,ny)) continue; const nk=cid(nx,ny); if(cells.includes(nk)) continue;
+    const q=reg&&regionOf(nk)===regionOf(cell)?reg[nk]:G.plots[nk]; if(!q||q.o!==owner) return true; } } return false; }
+const hallParts=root=>{ const [x,y]=xy(root); return [cid(x-1,y),cid(x,y-1),cid(x-1,y-1)]; };
 const offLocked=p=>!!(p&&(p.shield||0)>now()+7*864e5);
 const shieldTxt=p=>offLocked(p)?'Attacked while offline: protected until they come back online, then for 15 more minutes.':'Protected by a peace shield for '+fmtT((((p&&p.shield)||0)-now())/1000)+'.';
 const nameKey=n=>encodeURIComponent(String(n).trim().toLowerCase().replace(/\s+/g,' ')).replace(/\./g,'%2E').slice(0,140)||'x';
@@ -889,7 +903,7 @@ function collectCells(cells,quiet){
       const key=PROD[p.b].res, n=Math.min(Math.max(0,s.cap-me[key]),st); if(n<1) continue;
       const rate=rateOf(p); me[key]+=n; p.ct=now()-((st-n)/rate)*60000; got.push([c,n,key]);
       if(p.b==='smine'&&n>=collCap(p)*.4&&Math.random()<.4){ const g=1+Math.floor(Math.random()*p.lvl); me.gems=(me.gems||0)+g; got.push([c,g,'gems']); } }
-    if(!got.length) fail('Storage is full. Upgrade your Town Hall for more room.'); me.stats.collected++; return {got}; },
+    if(!got.length) fail('Nothing to collect yet.'); me.stats.collected++; return {got}; },
     r=>{ snd('coin'); r.got.forEach(([c,n,key],i)=>setTimeout(()=>floatText(c,'+'+f(n)+(key==='gems'?' gems':''),key==='gold'?'#ffd13b':key==='gems'?'#e2a6ff':'#eef4f7'),key==='gems'?450:0)); }); }
 const collect=cell=>collectCells([cell]);
 function collectAll(){ const cells=Object.keys(G.plots).filter(k=>G.plots[k].o===ME&&stored(G.plots[k])>=1); if(cells.length) collectCells(cells); }
@@ -940,20 +954,23 @@ function bossClaim(cell){ act([cell],(me,pl)=>{ const p=pl[cell]; if(!p||p.b!=='
     me.bossClaims=me.bossClaims||[]; if(me.bossClaims.includes(p.bid)) fail('You already claimed this reward.'); me.bossClaims=[...me.bossClaims.slice(-19),p.bid];
     const top=Object.entries(p.hits).sort((a,b)=>b[1]-a[1])[0][0]===ME; me.stash=me.stash||{}; me.stash.legend=(me.stash.legend||0)+1; if(top) me.stash.royal=(me.stash.royal||0)+1; me.gems=(me.gems||0)+40; settle(me); me.gold+=1500; me.stone+=1000; return {top}; },
     r=>{ snd('quest'); confetti&&confetti(); toast(`Reward claimed: Legendary Chest, 40 gems, 1,500 gold and 1,000 stone${r.top?', plus a Royal Crate for dealing the most damage':''}! Open chests from the Shop.`); renderPanel(true); }); }
+function atkCheck(cell,rvg){ const tg0=G.plots[cell]; if(!tg0||tg0.o===ME) return 'Pick a tile to attack.'; if(tg0.b==='hallx') return 'Tap the Town Hall itself to attack it.';
+  if(!attackers(P(ME))&&!heroReady(P(ME))&&!(tg0.o==='npc'&&towerSup(ME,cell))) return 'You need an army to attack. Archers only defend.';
+  if(tg0.o!=='npc'&&isClanmate(tg0.o)) return 'You cannot attack your own clanmates.';
+  if(tg0.o!=='npc'&&areAllied(ME,tg0.o)) return 'Their clan is allied with yours, so you cannot attack them.';
+  if(tg0.o!=='npc'&&isNewbie(P(tg0.o))) return `${P(tg0.o)?.name||'They'} is a newcomer and protected for ${fmtT(newbieLeft(P(tg0.o))*60)} more.`;
+  if(!rvg&&distFromMe(cell)>MARCH_RANGE) return `Too far away. Your army can march ${MARCH_RANGE} tiles from your borders.`;
+  if(tg0.o!=='npc'&&!exposedTile(cell,tg0.o)) return `That tile is surrounded by ${P(tg0.o)?.name||'their'}'s land. Capture a tile on the edge of their kingdom first to open a path.`;
+  if(!rvg&&tg0.o!=='npc'&&treaty(P(tg0.o))) return `${P(tg0.o).name} is offline and protected by their clan's peace treaty.`;
+  if(tg0.o!=='npc'&&(P(tg0.o)?.shield||0)>now()) return `${P(tg0.o)?.name||'They'} ${P(tg0.o)?'is':'are'} under a peace shield.`;
+  return ''; }
 async function attack(cell,opts){
   if(busy||!P(ME)||P(ME).dead) return; const tg0=G.plots[cell]; if(!tg0||tg0.o===ME) return;
-  if(!attackers(P(ME))&&!heroReady(P(ME))&&!(tg0.o==='npc'&&towerSup(ME,cell))) return toast('You need an army to attack. Archers only defend.',true);
-  if(tg0.o!=='npc'&&isClanmate(tg0.o)) return toast('You cannot attack your own clanmates.',true);
-  if(tg0.o!=='npc'&&areAllied(ME,tg0.o)) return toast('Their clan is allied with yours, so you cannot attack them.',true);
-  if(tg0.o!=='npc'&&isNewbie(P(tg0.o))) return toast(`${P(tg0.o)?.name||'They'} is a newcomer and protected for ${fmtT(newbieLeft(P(tg0.o))*60)} more.`,true);
-  const rvg=!!(opts&&opts.revenge);
-  if(!rvg&&distFromMe(cell)>MARCH_RANGE) return toast(`Too far away. Your army can march ${MARCH_RANGE} tiles from your borders.`,true);
-  if(tg0.o!=='npc'&&!exposedTile(cell,tg0.o)) return toast(`That tile is surrounded by ${P(tg0.o)?.name||'their'}'s land. Capture a tile on the edge of their kingdom first to open a path.`,true);
-  if(!rvg&&tg0.o!=='npc'&&treaty(P(tg0.o))) return toast(`${P(tg0.o).name} is offline and protected by their clan's peace treaty.`,true);
-  if(tg0.o!=='npc'&&(P(tg0.o)?.shield||0)>now()) return toast(`${P(tg0.o)?.name||'They'} ${P(tg0.o)?'is':'are'} under a peace shield.`,true);
+  const rvg=!!(opts&&opts.revenge); { const why=atkCheck(cell,rvg); if(why) return toast(why,true); }
   const area=areaSnap(cell,tg0.o==='npc'?'npc':tg0.o);
   let drops=opts&&opts.drops;
-  if(!drops){ busy=true; const m0=P(ME), u0={}; ATK.forEach(u=>u0[u]=m0[u]||0);
+  const sendU=opts&&opts.send;
+  if(!drops){ busy=true; const m0=P(ME), u0={}; ATK.forEach(u=>u0[u]=sendU?Math.min(m0[u]||0,sendU[u]||0):(m0[u]||0));
     drops=await playBattle({deploy:1,cell,area,units:u0,hero:heroReady(m0)?hLvl(m0):0,hk:heroLeadK(m0),hx:heroXs(m0),color:m0.color,name:m0.name,npc:tg0.o==='npc',lvl:tg0.lvl,boss:tg0.b==='boss',vname:tg0.o!=='npc'?P(tg0.o)?.name:'',dcol:tg0.o!=='npc'?colorOf(tg0.o):null,pet:tg0.o!=='npc'?petSnap(P(tg0.o)):null});
     busy=false; if(!drops||!drops.length){ $('ov').innerHTML=''; renderAll(); return; } }
   const flank=flankSides(drops);
@@ -962,6 +979,7 @@ async function attack(cell,opts){
   const doTx=async ix=>{ castSel={rage:!!ix.rage,heal:!!ix.heal}; cryBonus=ix.cry?1+HEROES[heroKey(P(ME))].pB:1;
   try{
     res=await DB.tx(async t=>{
+      const held={}; let restored=false; if(sendU){ const sp0=t.setPlayer; t.setPlayer=(id,d)=>{ if(id===ME&&!restored){ restored=true; for(const u in held) d[u]=(d[u]||0)+held[u]; delete d.march; } return sp0(id,d); }; }
       const me=await t.getPlayer(ME); if(!me||me.dead) fail('Your kingdom has fallen.'); me.stats=Object.assign(defaultStats(),me.stats||{});
       const reg=await t.getRegion(regionOf(cell)); const tg=reg[cell]?normalize(clone(reg[cell])):null; if(!tg||tg.o===ME) fail('That tile changed hands. Take another look.');
       const myC=me.clan?await t.getClan(me.clan):null;
@@ -972,7 +990,7 @@ async function attack(cell,opts){
         if(!exposedTile(cell,v.id,reg)) fail(`That tile is surrounded by ${v.name}'s land. Capture a tile on the edge of their kingdom first to open a path.`);
         const rks=new Set([regionOf(cell)]); for(const k in G.plots){ const q=G.plots[k]; if(q.o===v.id&&(isHall||q.b==='trap')) rks.add(regionOf(k)); }
         for(const rk of rks) if(rk!==regionOf(cell)) vRegs.push([rk,await t.getRegion(rk)]); vRegs.push([regionOf(cell),reg]); }
-      settle(me); const heroOn=heroReady(me), sup=tg.o==='npc'?supTowers(ME,cell):[], supA=sup.reduce((a,q)=>a+TOWER_SUP*q[2],0); if(!attackers(me)&&!heroOn&&!supA) fail('You need an army to attack. Archers only defend.');
+      settle(me); if(sendU) ATK.forEach(u=>{ const n=Math.min(me[u]||0,sendU[u]||0); held[u]=(me[u]||0)-n; me[u]=n; }); const heroOn=heroReady(me), sup=tg.o==='npc'?supTowers(ME,cell):[], supA=sup.reduce((a,q)=>a+TOWER_SUP*q[2],0); if(!attackers(me)&&!heroOn&&!supA) fail('You need an army to attack. Archers only defend.');
       me.sp=me.sp||{}; const rage=castSel.rage&&(me.sp.rage||0)>0, heal=castSel.heal&&(me.sp.heal||0)>0; if(rage) me.sp.rage--; if(heal) me.sp.heal--;
       const roll=(0.85+Math.random()*0.3)*flankMult(flank)*cryBonus; me.shield=0; me.lastSeen=now();
       const units={}; ATK.forEach(u=>units[u]=me[u]||0);
@@ -1072,7 +1090,7 @@ async function join(name){
       for(const c of area){ const p=regs[regionOf(c)][c]; if(p&&(p.o!=='npc'||c===spot)) fail('That spot was just taken. Try again.'); }
       t.setPlayer(ME,{name,color:old?.color||colorFor(ME),gold:old?200:300,stone:old?100:150,t:now(),gems:old?(old.gems||0):30,tr:old?(old.tr||0):0,
         sol:old?5:6,arc:0,giant:0,cav:0,cat:0,cc:{},sp:{},inv:old?.inv||[],eq:old?.eq||{},clan:old?.clan||null,pets:old?.pets||[],petOn:old?.petOn||null,hero:old?.hero?{lvl:old.hero.lvl,rest:0}:null,heroes:old?.heroes||{},heroPick:old?.heroPick||null,pres:old?.pres||0,heroSlots:old?.heroSlots||1,heroTeam:old?.heroTeam||null,book:old?.book||{},skills:old?.skills||{},friends:old?.friends||[],pass:old?.pass||null,ev:old?.ev||null,decoInv:old?.decoInv||{},season:old?.season||null,shield:now()+NEW_SHIELD_MIN*60000,dead:false,stats:Object.assign(defaultStats(),old?.stats||{}),quest:old?.quest||0,created:old?.created||now(),lastSeen:now(),hall:spot});
-      t.setPlot(spot,{o:ME,b:'hall',lvl:1}); t.setName(key,{uid:ME,name,t:now()}); if(oldHeld&&oldHeld.uid===ME) t.setName(oldKey,null); });
+      t.setPlot(spot,{o:ME,b:'hall',lvl:1,big:1}); for(const c of hallParts(spot)) t.setPlot(c,{o:ME,b:'hallx',r:spot,lvl:0}); t.setName(key,{uid:ME,name,t:now()}); if(oldHeld&&oldHeld.uid===ME) t.setName(oldKey,null); });
     $('ov').innerHTML=''; sel=spot; camFor=null; camReady=true; try{ localStorage.removeItem(CAM_KEY); }catch(e){} cam.z=1; centerOn(spot); syncRegions(); addNews(`🌱 A new kingdom, ${name}, was founded.`,'good'); snd('quest'); toast('Welcome to the realm! Your peace shield lasts '+Math.round(NEW_SHIELD_MIN/60)+' hours.');
   }catch(e){ explain(e); }
   busy=false; renderAll();
@@ -1676,9 +1694,9 @@ function drawTrap(cx,cy,p){ const u=TW; ell(cx,cy,u*.2,u*.1,p.sprung?'#6b3a2a':'
   else { ctx.strokeStyle='#ff6b4a'; ctx.lineWidth=Math.max(LW*2,1/cam.z); ctx.beginPath(); ctx.moveTo(cx-u*.08,cy-u*.04); ctx.lineTo(cx+u*.08,cy+u*.04); ctx.moveTo(cx+u*.08,cy-u*.04); ctx.lineTo(cx-u*.08,cy+u*.04); ctx.stroke(); }
   if(cam.z>=.5) badge(cx,cy,p.lvl,p.sprung?'#ff8a70':'#ffd13b'); }
 function drawCell(x,y,t){ drawCell0(x,y,t); const p=G.plots[cid(x,y)]; if(!p||p.o==='npc') return; const [cx,cy]=ctr(x,y);
-  if(p.b&&p.b!=='wall'&&p.b!=='trap'&&p.b!=='deco'&&(p.lvl||p.bt)){ const hall=p.b==='hall'; if(hall?cam.z>=.3:cam.z>=1.05&&p.o!==ME) tagQ.push([cx,cy-TW*(hall?1.12:.78),p.o,hall]); }
-  if(p.b==='hall'&&p.lvl&&cam.z>=.4){ overDraw.push([cy-1,()=>bannerOnMap(cx,cy,p.o)]); if(p.o===ME&&merchHere()) overDraw.push([cy+TW*.1,()=>merchCart(cx,cy)]); }
-  if(p.b==='hall'&&p.lvl&&cam.z>=.4){ const pt=myPet(P(p.o)); if(pt&&PETS[pt.k]) overDraw.push([cy+TW*.2,()=>petOnMap(cx+TW*.36,cy+TW*.2,TW*.5,pt.k,pt.lvl,-1,(x*7+y)%6,NOWT)]); }
+  if(p.b&&p.b!=='wall'&&p.b!=='trap'&&p.b!=='deco'&&(p.lvl||p.bt)){ const hall=p.b==='hall'; if(hall?cam.z>=.3:cam.z>=1.05&&p.o!==ME) tagQ.push([cx,cy-TW*(hall?(p.big?2.05:1.12):.78),p.o,hall]); }
+  if(p.b==='hall'&&p.lvl&&cam.z>=.4){ overDraw.push([cy-1,()=>bannerOnMap(p.big?cx-TW*.42:cx,p.big?cy-TH*.1:cy,p.o)]); if(p.o===ME&&merchHere()) overDraw.push([cy+TW*.1,()=>merchCart(cx,cy)]); }
+  if(p.b==='hall'&&p.lvl&&cam.z>=.4){ const pt=myPet(P(p.o)); if(pt&&PETS[pt.k]) overDraw.push([cy+TW*.2,()=>petOnMap(cx+TW*(p.big?.62:.4),cy+TW*.2,TW*.72,pt.k,pt.lvl,-1,(x*7+y)%6,NOWT)]); }
   if(p.o===ME){ const m=P(ME); if(tmapOn(m)&&m.tmap.cell===cid(x,y)) overDraw.push([cy+TW,()=>drawTreasureX(cx,cy)]); } }
 let overDraw=[], glowTop=null, tagQ=[];
 /* name plates: every Town Hall shows its kingdom's name, and when you zoom in other players' buildings show whose they are */
@@ -1689,9 +1707,11 @@ function ownerTag(x,y,o,big){ const pl=P(o); if(!pl) return; const tag=(()=>{ co
 /* pets on the map are drawn once into a small picture and reused, so lots of pets on screen stay smooth */
 const petSprC=new Map();
 function petOnMap(x,y,size,k,lvl,dir,ph,T){ const px=Math.max(12,Math.min(400,Math.round(size*cam.z*mapDpr()/6)*6)), key=k+'|'+lvl+'|'+px+'|'+dir; let sp=petSprC.get(key);
-  if(!sp){ if(petSprC.size>48) petSprC.clear(); const W=Math.ceil(px*2.6), H=Math.ceil(px*2.3), cv=document.createElement('canvas'); cv.width=W; cv.height=H; petArt(cv.getContext('2d'),W/2,H*.86,px,k,900,{lvl,dir,ph}); sp={cv,W,H,px}; petSprC.set(key,sp); }
+  if(!sp){ if(petSprC.size>48) petSprC.clear(); const W=Math.ceil(px*2.6), H=Math.ceil(px*2.3), cv=document.createElement('canvas'); cv.width=W; cv.height=H; const g0=cv.getContext('2d'); petArt(g0,W/2,H*.86,px,k,900,{lvl,dir,ph,hq:1,noSh:1});
+    { const tm=document.createElement('canvas'); tm.width=W; tm.height=H; const tg=tm.getContext('2d'); tg.drawImage(cv,0,0); tg.globalCompositeOperation='source-in'; tg.fillStyle='rgba(255,250,232,.95)'; tg.fillRect(0,0,W,H); g0.globalCompositeOperation='destination-over'; const o2=Math.max(1,px*.035); for(const [dx,dy] of [[o2,0],[-o2,0],[0,o2],[0,-o2],[o2*.7,o2*.7],[-o2*.7,o2*.7],[o2*.7,-o2*.7],[-o2*.7,-o2*.7]]) g0.drawImage(tm,dx,dy); g0.globalCompositeOperation='source-over'; }
+    sp={cv,W,H,px}; petSprC.set(key,sp); }
   const sc=size/sp.px, br=RM?1:1+Math.sin(T/520+ph)*.02, hop=RM?0:Math.max(0,Math.sin(T/700+ph*3))**8*size*.12;
-  ctx.drawImage(sp.cv,x-sp.W/2*sc,y-sp.H*.86*sc*br-hop,sp.W*sc,sp.H*sc*br); }
+  ctx.save(); ctx.globalAlpha=.32; ell(x,y,size*.36,size*.09,'#000000',false); ctx.restore(); ctx.drawImage(sp.cv,x-sp.W/2*sc,y-sp.H*.86*sc*br-hop,sp.W*sc,sp.H*sc*br); }
 function drawCell0(x,y,t){
   const k=cid(x,y), p=G.plots[k], [cx,cy]=ctr(x,y);
   if(Wt(x,y)) return;
@@ -1702,10 +1722,11 @@ function drawCell0(x,y,t){
   if(p.o==='npc'){ pad(); campLvl=p.lvl||1; bLvl=1; if(campLvl>=10) drawB('camp',cx,cy,'#000000'); else building('camp',cx,cy,'#000000',1); if(cam.z>=.5) badge(cx,cy,p.lvl,'#ff8a70'); return; }
   if(p.ob==='tree') treeAt(cx,cy,TV(x,y),palFor(x,y,TV(x,y))); else if(p.ob==='rock') rockAt(cx,cy);
   if(!p.b){ if(!p.ob&&seasonNow()==='halloween'&&DETAIL()&&hash2(x,y,620)<.3) pumpkin(cx+(hash2(x,y,621)-.5)*TW*.4,cy+TW*.12,TW,true); if(!p.ob&&!RM&&!lowGfx&&cam.z>=.8&&p.o!=='npc'&&hash2(x,y,610)<.55) villager(cx,cy,hash2(x,y,611),p.o); return; }
+  if(p.b==='hallx'){ pad(); return; }
   if(p.b==='deco'){ drawDeco(p.d,cx,cy,colorOf(p.o)); return; }
   if(p.b==='trap'){ if(p.o===ME) drawTrap(cx,cy,p); return; }
   if(p.b==='wall'){ drawWall(x,y,cx,cy,p); return; }
-  const col=colorOf(p.o); pad();
+  const col=colorOf(p.o); const bigH=p.b==='hall'&&p.big; if(bigH){ ctx.save(); ctx.translate(cx,cy-TH/2); ctx.scale(1.85,1.85); ctx.translate(-cx,-cy); } try{ pad();
   if(p.bt&&!p.lvl) box(cx,cy,TW*.72,TW*.04,'#b89a6e'); else { drawStyle=styleOf(p.o); try{ building(p.b,cx,cy,col,p.lvl); } finally{ drawStyle=null; } }
   if(p.bt) scaffold(cx,cy,Math.min(1,(t-p.bt.start)/(p.bt.done-p.bt.start)));
   else if(p.b!=='hut'&&cam.z>=.5) badge(cx,cy,p.lvl,'#ffd13b');
@@ -1714,6 +1735,7 @@ function drawCell0(x,y,t){
     ctx.beginPath(); ctx.ellipse(cx,cy-TW*.25,TW*.6,TW*.54,0,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha=1; }
   if(p.b==='hall'&&(P(p.o)?.shield||0)>t){ const pulse=RM?0:Math.sin(NOWT/500)*.05; ctx.globalAlpha=.16+pulse; ell(cx,cy-TW*.25,TW*.62,TW*.56,'#9fd8ff',false); ctx.globalAlpha=.7; ctx.lineWidth=Math.max(LW,1.2/cam.z); ctx.setLineDash([4/cam.z,3/cam.z]); ctx.strokeStyle='#d8f0ff';
     ctx.beginPath(); ctx.ellipse(cx,cy-TW*.25,TW*.62,TW*.56,0,0,Math.PI*2); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha=1; }
+  } finally{ if(bigH) ctx.restore(); }
 }
 
 /* ================= effects and animation loop ================= */
@@ -1732,7 +1754,7 @@ function noteFrame(ms){ frameAvg=frameAvg?frameAvg*.85+ms*.15:ms; if(gfxPref!=='
 ['pointerdown','pointermove','wheel','keydown','touchstart'].forEach(ev=>window.addEventListener(ev,()=>{ if(!loopOn&&typeof G!=='undefined'&&G) startLoop(); },{passive:true}));
 function startLoop(){ if(loopOn) return; loopOn=true; requestAnimationFrame(loop); }
 function loop(t){
-  const sinceIn=Date.now()-(typeof lastInput==='number'?lastInput:Date.now()), idle=sinceIn>30000, ambient=!RM&&!!G&&!document.hidden&&!(lowGfx&&sinceIn>4000), busyFx=fx.length>0, gap=lowGfx?(idle?150:50):cam.z<.6?66:(idle?66:33);
+  const sinceIn=Date.now()-(typeof lastInput==='number'?lastInput:Date.now()), idle=sinceIn>30000, ambient=!RM&&!!G&&!document.hidden&&!(lowGfx&&sinceIn>4000&&!marchOn&&!(nearBub&&Object.keys(nearBub).length)), busyFx=fx.length>0, gap=lowGfx?(idle?150:50):cam.z<.6?66:(idle?66:33);
   if(busyFx||(ambient&&t-lastFrame>=gap)){ lastFrame=t; draw(t); }
   const keep=[]; for(const e of fx){ if(t-e.t0<e.dur) keep.push(e); else if(e.done) e.done(); } fx=keep;
   if(ambient||fx.length) requestAnimationFrame(loop); else { loopOn=false; draw(); }
@@ -1828,7 +1850,7 @@ function drawInner(tm){
   overDraw.sort((a,b)=>a[0]-b[0]).forEach(o=>{ try{ o[1](); }catch(e){} }); overDraw=[];
   if(glowTop){ try{ glowTop(); }catch(e){} glowTop=null; }
   { const done=[]; tagQ.sort((a,b)=>(b[3]-a[3])||(a[1]-b[1])); for(const [x,y,o,hall] of tagQ){ if(!hall&&done.some(d=>d[2]===o&&Math.hypot(d[0]-x,(d[1]-y)*2)<TW*2.2)) continue; done.push([x,y,o]); try{ ownerTag(x,y,o,hall); }catch(e){} } tagQ=[]; }
-  drawCaravans(v); drawPings(v);
+  drawCaravans(v); drawPings(v); drawMarches(v); drawBubbles(v);
   // butterflies by day, fireflies at night
   if(!RM&&!lowGfx&&cam.z>=.7){ const dk=darkness(), cs=TW*3, gx0=Math.floor(v.x0/cs), gx1=Math.ceil(v.x1/cs), gy0=Math.floor(v.y0/cs), gy1=Math.ceil(v.y1/cs);
     if((gx1-gx0)*(gy1-gy0)<400) for(let gy=gy0;gy<=gy1;gy++) for(let gx=gx0;gx<=gx1;gx++){ if(hash2(gx,gy,301)>.35) continue; const ph=hash2(gx,gy,302)*6.28, bx=(gx+.5)*cs+Math.sin(T/1700+ph)*cs*.35, by=(gy+.5)*cs+Math.sin(T/1300+ph*1.7)*cs*.2;
@@ -1934,7 +1956,7 @@ function endPtr(e){ ptrs.delete(e.pointerId); if(ptrs.size<2) pinch=null;
 cv.addEventListener('pointerup',endPtr); cv.addEventListener('pointercancel',endPtr);
 cv.addEventListener('wheel',e=>{ e.preventDefault(); zoomAt(cam.z*(e.deltaY<0?1.15:1/1.15),e.offsetX,e.offsetY); },{passive:false});
 cv.addEventListener('mouseleave',()=>{ hover=null; $('tip').hidden=true; draw(); });
-function tapCell(k){ sel=k; const p=G.plots[k];
+function tapCell(k){ if(G.plots[k]&&G.plots[k].b==='hallx'&&G.plots[k].r) k=G.plots[k].r; sel=k; const p=G.plots[k];
   if(p&&p.o===ME&&stored(p)>=1&&!busy&&P(ME)&&!P(ME).dead){ collect(k); draw(); renderPanel(); return; }
   snd('click'); draw(); renderPanel(); }
 function hoverAt(mx,my){ const k=cellAt(mx,my), tip=$('tip'); if(k!==hover){ hover=k; draw(); }
@@ -2194,7 +2216,7 @@ function playBattle(rp){ return new Promise(resolve=>{
   if(rp.boss){ defs[0].king=1; defs[0].x=target.sx+bT*.05; defs[0].y=target.sy+bT*.32; }
   const petD=rp.pet&&PETS[rp.pet.k]?{k:rp.pet.k,lvl:rp.pet.lvl||1,name:rp.pet.name||'',x:target.sx+bT*.62,y:target.sy+bT*.24,next:2000,actT:0}:null;
   const drawPetD=(t,now2)=>{ const lose=rp.win&&t>7200; if(lose&&t>7900) return; g.save(); if(lose) g.globalAlpha=Math.max(0,1-(t-7200)/700); const act=petD.actT&&t-petD.actT<350?1-(t-petD.actT)/350:0;
-    petArt(g,petD.x+(lose?(t-7200)/700*bT*.6:0),petD.y,bT*.62,petD.k,now2,{lvl:petD.lvl,dir:-1,act,ph:3}); if(petD.name){ g.font=`${Math.round(bT*.15)}px "Lilita One",sans-serif`; g.textAlign='center'; g.lineWidth=3; g.strokeStyle='#3b2412'; g.strokeText('🐾 '+petD.name,petD.x,petD.y-bT*.68); g.fillStyle='#fff3c0'; g.fillText('🐾 '+petD.name,petD.x,petD.y-bT*.68); } g.restore(); };
+    petArt(g,petD.x+(lose?(t-7200)/700*bT*.6:0),petD.y,bT*.62,petD.k,now2,{lvl:petD.lvl,dir:-1,act,ph:3,hq:1}); if(petD.name){ g.font=`${Math.round(bT*.15)}px "Lilita One",sans-serif`; g.textAlign='center'; g.lineWidth=3; g.strokeStyle='#3b2412'; g.strokeText('🐾 '+petD.name,petD.x,petD.y-bT*.68); g.fillStyle='#fff3c0'; g.fillText('🐾 '+petD.name,petD.x,petD.y-bT*.68); } g.restore(); };
   let resolved=!rp.live, tRes=0, hpAtRes=1, tgtFinal=1;
   function applyOutcome(from){ const tot2=ATK.reduce((a,u)=>a+((rp.units||{})[u]||0),0)||1, lo=Math.max(from,rp.live?from+250:2600), tr0=rp.live?from+150:1700;
     const nTrap=Math.min(mortal.length,Math.round(mortal.length*(rp.trapped||0)/tot2)), nDie=Math.min(mortal.length,Math.round(mortal.length*(rp.aLost||0)/tot2));
@@ -2616,7 +2638,7 @@ function upBtn(p,s){ if(p.lvl>=BLD_MAX) return '<p class="desc">Max level.</p>';
 function spellRow(m){ return (Object.values(m.sp||{}).some(n=>n>0))?'<p class="desc">⚡ Your spells and your hero\'s War Cry can be used during the battle.</p>':''; }
 function spellRowOld(m){ const sp=m.sp||{}, opts=Object.keys(SPELLS).filter(k=>(sp[k]||0)>0); if(!opts.length) return '';
   return `<div class="label">Cast spells in this battle</div><div class="row">${opts.map(k=>`<button type="button" class="gemb${castSel[k]?' sel':''}" data-act="cast:${k}">${castSel[k]?'✓ ':''}${SPELLS[k].name}<span class="c">${sp[k]} ready</span></button>`).join('')}</div>`; }
-function renderPanel(force){
+function renderPanel(force){ if(sel&&G.plots[sel]&&G.plots[sel].b==='hallx'&&G.plots[sel].r) sel=G.plots[sel].r;
   const el=$('panel'), m=P(ME), sp0=sel&&G.plots[sel], so=sp0&&P(sp0.o);
   const key=JSON.stringify([sel,sp0,myClan()&&[myClan().pings,myClan().allies],merchHere(),m&&[m.fish,m.merch,m.blocked,m.pets,m.petOn,m.tmap,m.decoInv,m.friends,m.frOut,m.sol,m.arc,m.giant,m.cav,m.cat,m.brk,m.heal,m.bossClaims,m.sp,m.gems,m.dead,m.clan,m.armB,(m.inv||[]).length],busy,castSel,so&&[so.shield,so.sol,so.arc,so.giant,so.cav,so.cat,so.cc,so.clan],stats(ME).hallLvl]);
   if(!force&&key===panelKey){ refreshButtons(); return; } panelKey=key;
@@ -2652,7 +2674,7 @@ function renderPanel(force){
       <div class="stat"><span>Time left</span><span id="bleft">${fmtT(left)}</span></div>${btn('Finish now',{gems:gemCost(left)},'finish','gemb')}`; }
     else if(p.b==='deco'){ h+=`<h2>${DECOS[p.d]?.name||'Decoration'}</h2><p class="desc">${B.deco.desc}</p>`+btn('Remove',null,'deco:rm','soft'); }
     else if(p.b==='hall'){ h+=`<h2>Town Hall · Lv ${p.lvl}</h2><p class="desc">${B.hall.desc}</p>${myPet(m)?`<div class="stat"><span>Guard pet</span><span>🐾 ${esc(cleanText(myPet(m).name))} · +${f(petPower(m))} defense</span></div>`:''}${merchHere()?btn('🛒 Visit the wandering merchant',null,'merch','gemb'):''}
-      <div class="stat"><span>Defense here</span><span>${f(defOf(m,sel))}</span></div><div class="stat"><span>Max building level</span><span>${s.maxLvl}</span></div><div class="stat"><span>Storage</span><span>${f(s.cap)}</span></div>
+      <div class="stat"><span>Defense here</span><span>${f(defOf(m,sel))}</span></div><div class="stat"><span>Max building level</span><span>${s.maxLvl}</span></div>
       <div class="stat"><span>Barbarian raids</span><span>from camps within ${raidRange()} tiles</span></div>
       ${p.lvl<HALL_MAX?`<button class="prime" data-act="up" data-g="${hallCost(p.lvl).gold}" data-s="${hallCost(p.lvl).stone}" data-m="0" data-b="1">Upgrade to level ${p.lvl+1}<span class="c">${costTxt(hallCost(p.lvl))} · ${fmtT(myBT('hall',p.lvl+1))}</span></button>`:'<p class="desc">Max level.</p>'}${presOf(m)?`<div class="stat"><span>Prestige</span><span>🌟 ${presOf(m)} · +${presOf(m)*10}% gold/stone · +${presOf(m)*5}% power</span></div>`:''}${prestigeHtml(p)}`; }
     else { h+=`<h2>${B[p.b].name}${p.b!=='hut'?' · Lv '+p.lvl:''}</h2><p class="desc">${B[p.b].desc}</p>`;
@@ -3165,8 +3187,8 @@ function renderAll(){ miniDirty=true; startLoop(); draw(); renderPanel(); render
 function tickUI(){ try{ featButtons(); }catch(e){} const m=P(ME); const alive=Object.values(G.players).filter(p=>!p.dead), on=alive.filter(online).length;
   $('who').textContent=m&&!m.dead?`${m.name} · ${darkness()>.5?'Night':'Day'}${WEATHER_NAME[weatherNow()]?' · '+WEATHER_NAME[weatherNow()]:''}${seasonNow()==='halloween'?' · 🎃 Halloween':''} · ${on} of ${alive.length} players online · ${N.toLocaleString()}×${N.toLocaleString()} world${DB&&DB.name==='preview'?' · playing on this device':''}`:`${alive.length} kingdoms in a ${N}×${N} world`;
   if(!m) return; const s=stats(ME), c=cur(m);
-  $('rg').textContent=f(c.gold); $('rgr').textContent='/'+f(s.cap); $('rs').textContent=f(c.stone); $('rsr').textContent='/'+f(s.cap);
-  $('cg').classList.toggle('full',c.gold>=s.cap); $('cs').classList.toggle('full',c.stone>=s.cap);
+  $('rg').textContent=f(c.gold); $('rgr').textContent=''; $('rs').textContent=f(c.stone); $('rsr').textContent='';
+  $('cg').classList.remove('full'); $('cs').classList.remove('full');
   $('rm').textContent=f(m.gems||0); $('rt').textContent=armySp(m); $('rtc').textContent='/ '+s.troopCap;
   $('rtr').textContent=f(m.tr||0); $('rlg').textContent=LEAGUES[leagueIdx(m.tr||0)][0]; $('rb').textContent=(s.builders-s.busy)+'/'+s.builders; $('rl').textContent=s.count;
   const sh=$('shd'); if(sh){ const left=(m.shield||0)-now(); sh.textContent=offLocked(m)?'Until you come back':left>0?fmtT(left/1000):'Off'; }
@@ -3180,7 +3202,7 @@ function tickUI(){ try{ featButtons(); }catch(e){} const m=P(ME); const alive=Ob
   refreshButtons(); rewardsBadge(); try{ kingBadge(); }catch(e){}
 }
 document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); if(!b||b.disabled) return; const a=b.dataset.act;
-  if(a==='buy') buyLand(sel); else if(a==='attack') attack(sel); else if(a==='up') upgrade(sel); else if(a==='demo') demolish(sel); else if(a==='quest') claimQuest();
+  if(a==='buy') buyLand(sel); else if(a==='attack') marchDialog(sel); else if(a==='up') upgrade(sel); else if(a==='demo') demolish(sel); else if(a==='quest') claimQuest();
   else if(a.startsWith('crate:')) openCrate(a.slice(6)); else if(a.startsWith('equip:')) equip(a.slice(6)); else if(a.startsWith('unequip:')) unequip(a.slice(8));
   else if(a.startsWith('sell:')) sellItem(a.slice(5)); else if(a.startsWith('tab:')) shopDialog(a.slice(4)); else if(a==='shop:close') $('ov').innerHTML=''; else if(a==='shop:open') shopDialog('crates');
   else if(a==='rew:daily') rewardsDialog('daily'); else if(a==='rew:spin') rewardsDialog('spin'); else if(a==='rew:open') rewardsDialog(); else if(a==='rew:close'){ if(!spinning) $('ov').innerHTML=''; }
@@ -3263,8 +3285,9 @@ const petGrowCost=l=>({gold:Math.round(900*Math.pow(1.75,l-1)),stone:Math.round(
 const petGrowHall=l=>Math.min(HALL_MAX,l+1);           // town hall needed to grow a pet to level l+1
 /* Draws a pet standing at (x,y) (feet), s = adult height in pixels. o: {lvl, dir, act (0..1 attack lunge), ph, sleep} */
 function petArt(c,x,y,s,k,t,o={}){
+  if(o.hq&&!o._in&&!o._only){ petArt(c,x,y,s,k,t,{...o,_only:'base'}); petArtHQ(c,x,y,s,k,t,o); return; }
   const P2=PETS[k]||PETS.fox, lvl=o.lvl||1, gq=Math.min(1,(lvl-1)/8), dir=o.dir||1, ph=o.ph||0, act=o.act||0;
-  const sz=s*(.62+.38*gq), hr=(REAL?1.12:1.32)-(REAL?.2:.36)*gq, lw=Math.max(.6,s*.022*(REAL?.62:1)), OL2=(()=>{ const n=parseInt((P2.dark||'#28160a').slice(1),16); return `rgba(${Math.round((n>>16)*.42)},${Math.round(((n>>8)&255)*.42)},${Math.round((n&255)*.42)},${REAL?.62:.93})`; })(), T=t||0, still=typeof RM!=='undefined'&&RM;
+  const sz=s*(.62+.38*gq), hr=(REAL?.98:1.2)-(REAL?.14:.3)*gq, lw=Math.max(.6,s*.022*(REAL?.62:1)), OL2=(()=>{ const n=parseInt((P2.dark||'#28160a').slice(1),16); return `rgba(${Math.round((n>>16)*.42)},${Math.round(((n>>8)&255)*.42)},${Math.round((n&255)*.42)},${REAL?.62:.93})`; })(), T=t||0, still=typeof RM!=='undefined'&&RM;
   const sh=(hex,a)=>{ const n=parseInt(hex.slice(1),16); let r=n>>16,g2=(n>>8)&255,b=n&255; const q=a<0?0:255,p=Math.abs(a); r=Math.round(r+(q-r)*p); g2=Math.round(g2+(q-g2)*p); b=Math.round(b+(q-b)*p); return `rgb(${r},${g2},${b})`; };
   const E=(cx,cy,rx,ry,fill,stroke=true,rot=0)=>{ c.beginPath(); c.ellipse(cx,cy,Math.max(.01,rx),Math.max(.01,ry),rot,0,7); if(fill){ c.fillStyle=fill; c.fill(); } if(stroke){ c.lineWidth=lw; c.strokeStyle=OL2; c.stroke(); } };
   const rg=(cx,cy,r,c0,c1)=>{ const g2=c.createRadialGradient(cx-r*.35,cy-r*.45,r*.1,cx,cy,r*1.15); g2.addColorStop(0,c0); g2.addColorStop(1,c1); return g2; };
@@ -3272,11 +3295,12 @@ function petArt(c,x,y,s,k,t,o={}){
   const breath=still?0:Math.sin(T/520+ph)*.025, blink=!still&&((T/1000+ph*1.7)%3.6)<.13, bob=P2.ghost||P2.flame?(still?0:Math.sin(T/420+ph)*sz*.05)-sz*.08:0;
   c.save(); c.translate(x,y);
   // shadow and the level aura
-  c.globalAlpha=P2.ghost?.25:.32; E(0,sz*.01,sz*.42,sz*.1,'#000000',false); c.globalAlpha=1;
-  if(lvl>=10||P2.r===3){ c.save(); c.globalCompositeOperation='lighter'; const col=P2.fire||(lvl>=10?'255,226,122':'200,140,255'), pulse=still?.7:.55+.25*Math.sin(T/380+ph);
+  if(!o._in&&!o.noSh){ c.globalAlpha=P2.ghost?.25:.32; E(0,sz*.01,sz*.42,sz*.1,'#000000',false); c.globalAlpha=1; }
+  if(!o._in&&(lvl>=10||P2.r===3)){ c.save(); c.globalCompositeOperation='lighter'; const col=P2.fire||(lvl>=10?'255,226,122':'200,140,255'), pulse=still?.7:.55+.25*Math.sin(T/380+ph);
     const ag=c.createRadialGradient(0,-sz*.45,sz*.1,0,-sz*.45,sz*.8); ag.addColorStop(0,`rgba(${col},${.32*pulse})`); ag.addColorStop(1,`rgba(${col},0)`); c.fillStyle=ag; c.beginPath(); c.arc(0,-sz*.45,sz*.8,0,7); c.fill();
     if(!still) for(let i=0;i<6;i++){ const a=T/900+i*1.047+ph, rr=sz*(.45+.08*Math.sin(T/300+i)), px=Math.cos(a)*rr, py=-sz*.45+Math.sin(a)*rr*.45, k2=(Math.sin(T/200+i*2)+1)/2; c.fillStyle=`rgba(255,250,220,${.5+.5*k2})`; c.beginPath(); for(let j=0;j<4;j++){ const b=j*Math.PI/2; c.lineTo(px+Math.cos(b)*sz*.04*k2,py+Math.sin(b)*sz*.04*k2); c.lineTo(px+Math.cos(b+.78)*sz*.012,py+Math.sin(b+.78)*sz*.012); } c.closePath(); c.fill(); }
     c.restore(); }
+  if(o._only==='base'){ c.restore(); return; }
   c.translate(act*sz*.18*dir,bob-act*sz*.04); c.scale(dir,1);
   if(P2.ghost) c.globalAlpha=.86;
   const eye=(ex,ey,r,big)=>{ if(REAL) r*=.72; if(o.sleep||blink){ c.strokeStyle=OL2; c.lineWidth=lw*1.3; c.beginPath(); c.arc(ex,ey,r*.8,.2,Math.PI-.2); c.stroke(); return; }
@@ -3315,7 +3339,12 @@ function petArt(c,x,y,s,k,t,o={}){
       if(P2.flame&&!still){ c.save(); c.globalCompositeOperation='lighter'; for(let i=0;i<n;i+=2){ const q=i/n, x=-span*1.0+q*span*.85, y=-span*.7+q*span*.78, fl=.6+.4*Math.sin(T/80+i); c.globalAlpha=.5*fl; E(x-span*.05,y+span*.04,span*.06,span*.04,'#ffcf4a',false); } c.restore(); } }
     c.restore(); };
   if(P2.shape==='quad'){
-    const sit=P2.sitting, bodyY=-sz*(sit?.26:.32), bx=-sz*.04, brx=sz*(P2.chunky?.34:.29), bry=sz*(P2.chunky?.22:.19)*(1+breath), headR=sz*.21*hr, hx=sz*(sit?.12:.25), hy=bodyY-sz*(sit?.32:.2)-headR*.12;
+    const sit=P2.sitting, bodyY=-sz*(sit?.26:P2.chunky?.33:.37), bx=-sz*.06, brx=sz*(P2.chunky?.35:.31), bry=sz*(P2.chunky?.21:.165)*(1+breath), headR=sz*(sit?.21:.245)*hr, hx=sit?sz*.12:bx+brx*.92, hy=sit?bodyY-sz*.32-headR*.12:bodyY-bry*.95-headR*.42;
+    const SN={fox:.95,wolf:1.05,bear:.7,dragon:.75,ghostcat:.5,bunny:.42,sunlion:.62}[k]??.7;
+    const tp=()=>{ c.beginPath(); c.moveTo(bx-brx*.95,bodyY-bry*.15); c.bezierCurveTo(bx-brx*.9,bodyY-bry*1.02,bx-brx*.35,bodyY-bry*1.0,bx+brx*.1,bodyY-bry*.86); c.bezierCurveTo(bx+brx*.5,bodyY-bry*.76,bx+brx*.82,bodyY-bry*1.1,bx+brx*1.0,bodyY-bry*.55);
+      c.bezierCurveTo(bx+brx*1.16,bodyY-bry*.05,bx+brx*1.06,bodyY+bry*.78,bx+brx*.68,bodyY+bry*.88); c.bezierCurveTo(bx+brx*.3,bodyY+bry*.98,bx-brx*.1,bodyY+bry*.66,bx-brx*.45,bodyY+bry*.86); c.bezierCurveTo(bx-brx*.86,bodyY+bry*1.04,bx-brx*1.1,bodyY+bry*.42,bx-brx*.95,bodyY-bry*.15); c.closePath(); };
+    const hp=()=>{ const R=headR, L=SN; c.beginPath(); c.moveTo(hx-R*.92,hy+R*.1); c.bezierCurveTo(hx-R*.98,hy-R*.78,hx-R*.12,hy-R*1.06,hx+R*.42,hy-R*.7); c.bezierCurveTo(hx+R*(.58+L*.3),hy-R*.5,hx+R*(.72+L*.55),hy-R*.25,hx+R*(.78+L*.6),hy+R*.0);
+      c.bezierCurveTo(hx+R*(.84+L*.64),hy+R*.2,hx+R*(.74+L*.58),hy+R*.42,hx+R*(.46+L*.42),hy+R*.48); c.bezierCurveTo(hx+R*(.26+L*.2),hy+R*.64,hx+R*.05,hy+R*.84,hx-R*.3,hy+R*.8); c.bezierCurveTo(hx-R*.8,hy+R*.74,hx-R*1.0,hy+R*.46,hx-R*.92,hy+R*.1); c.closePath(); };
     const legW=sz*(P2.chunky?.14:.12), legTop=bodyY+bry*.35, legLen=-legTop-sz*.02;
     // tail (behind)
     const wag=still?0:Math.sin(T/(act?120:320)+ph)*.3; c.save(); c.translate(bx-brx*.85,bodyY-bry*.15); c.rotate(-.55+wag);
@@ -3331,15 +3360,17 @@ function petArt(c,x,y,s,k,t,o={}){
     // far legs
     if(!sit){ legs(legTop-sz*.02,[bx-brx*.42+sz*.04,bx+brx*.55+sz*.04],legLen+sz*.005,legW*.92,P2.body,true); }
     if(!sit) legs(legTop-sz*.03,[bx-brx*.6,bx+brx*.42],legLen+sz*.03,legW,P2.body,false);
+    if(!sit){ c.beginPath(); c.moveTo(bx+brx*.42,bodyY-bry*.8); c.quadraticCurveTo(hx-headR*.95,hy-headR*.1,hx-headR*.6,hy-headR*.45); c.lineTo(hx+headR*.2,hy+headR*.6); c.quadraticCurveTo(bx+brx*1.08,bodyY-bry*.2,bx+brx*.98,bodyY+bry*.35); c.closePath(); c.fillStyle=fur(hx-headR*.3,hy+headR*.4,headR*1.4); c.fill(); c.lineWidth=lw; c.strokeStyle=OL2; c.stroke();
+      c.save(); c.clip(); E(hx+headR*.15,hy+headR*1.2,headR*.45,headR*1.1,P2.belly,false,-.4); c.restore(); }
     // body
     if(sit){ E(bx-brx*.15,bodyY+bry*.1,brx*.95,bry*1.25,fur(bx,bodyY,brx)); furTex(bx-brx*.15,bodyY+bry*.1,brx*.95,bry*1.25); E(bx+brx*.35,bodyY-bry*.05,brx*.45,bry*.9,P2.belly,false); }
-    else { E(bx,bodyY,brx,bry,fur(bx,bodyY,brx)); c.save(); c.beginPath(); c.ellipse(bx,bodyY,brx,bry,0,0,7); c.clip(); E(bx+brx*.38,bodyY+bry*.6,brx*.55,bry*.62,P2.belly,false);
+    else { tp(); c.fillStyle=fur(bx,bodyY,brx); c.fill(); c.save(); tp(); c.clip(); E(bx+brx*.38,bodyY+bry*.75,brx*.6,bry*.55,P2.belly,false);
       if(k==='wolf'){ E(bx-brx*.1,bodyY-bry*.8,brx*.85,bry*.42,sh(P2.body,-.2),false); }
       if(k==='dragon'){ c.strokeStyle=sh(P2.belly,-.25); c.lineWidth=lw; for(let i=0;i<4;i++){ c.beginPath(); c.arc(bx+brx*.38,bodyY+bry*(.05+i*.24),brx*.42,.3,Math.PI-.3); c.stroke(); } c.fillStyle='rgba(80,0,10,.16)'; for(let i=0;i<12;i++){ c.beginPath(); c.arc(bx-brx*.75+i*brx*.12,bodyY-bry*.35+((i%2)*bry*.22),sz*.022,0,Math.PI); c.fill(); } }
       if(k==='sunlion'||k==='griffin'||k==='fox'){ for(let i=0;i<3;i++) E(bx-brx*.55+i*brx*.28,bodyY-bry*.55,brx*.07,bry*.32,'rgba(120,60,10,.13)',false); }
-      c.restore(); furTex(bx,bodyY,brx,bry); c.save(); c.beginPath(); c.ellipse(bx,bodyY,brx,bry,0,0,7); c.clip(); c.fillStyle='rgba(30,10,0,.14)'; c.beginPath(); c.ellipse(bx,bodyY+bry*.95,brx*1.15,bry*.5,0,0,7); c.fill(); c.restore(); c.lineWidth=lw; c.strokeStyle=OL2; c.beginPath(); c.ellipse(bx,bodyY,brx,bry,0,0,7); c.stroke();
+      c.restore(); c.save(); tp(); c.clip(); furTex(bx,bodyY,brx,bry); c.fillStyle='rgba(30,10,0,.16)'; c.beginPath(); c.ellipse(bx,bodyY+bry*.95,brx*1.15,bry*.5,0,0,7); c.fill(); c.fillStyle='rgba(30,10,0,.1)'; c.beginPath(); c.ellipse(bx+brx*.55,bodyY+bry*.1,brx*.25,bry*.75,.2,0,7); c.fill(); c.restore(); c.lineWidth=lw; c.strokeStyle=OL2; tp(); c.stroke();
       // the near back thigh
-      E(bx-brx*.55,bodyY+bry*.1,brx*.4,bry*.78,rg(bx-brx*.55,bodyY,brx*.4,sh(P2.body,.22),sh(P2.body,-.12))); }
+      c.save(); tp(); c.clip(); E(bx-brx*.55,bodyY+bry*.05,brx*.42,bry*.85,rg(bx-brx*.55,bodyY-bry*.1,brx*.42,sh(P2.body,.18),sh(P2.body,-.1)),false); c.strokeStyle='rgba(40,20,5,.35)'; c.lineWidth=lw; c.beginPath(); c.arc(bx-brx*.55,bodyY+bry*.05,brx*.42,-.6,1.9); c.stroke(); c.restore(); }
     if(P2.spikes){ for(let i=0;i<5;i++){ const sx=bx-brx*.7+i*brx*.32, sy=bodyY-bry*Math.sqrt(Math.max(0,1-Math.pow((sx-bx)/brx,2)))+lw; c.beginPath(); c.moveTo(sx-sz*.035,sy+sz*.012); c.quadraticCurveTo(sx-sz*.01,sy-sz*.04,sx+sz*.01,sy-sz*.075*(1+gq*.5)); c.quadraticCurveTo(sx+sz*.015,sy-sz*.02,sx+sz*.035,sy+sz*.012); c.closePath(); c.fillStyle=P2.spikes; c.fill(); c.lineWidth=lw*.8; c.strokeStyle=OL2; c.stroke(); } }
     // near legs
     if(sit) { E(bx-brx*.45,-sz*.045,sz*.17,sz*.065,rg(bx-brx*.45,-sz*.05,sz*.17,'#ffffff',sh(P2.belly,-.05))); E(bx-brx*.55,bodyY+bry*.45,brx*.48,bry*.75,rg(bx-brx*.5,bodyY+bry*.3,brx*.5,'#ffffff',sh(P2.body,-.1))); leg(bx+brx*.48,bodyY+bry*.55,-bodyY-bry*.55-sz*.01,sz*.075,P2.body,false,2); }
@@ -3357,9 +3388,12 @@ function petArt(c,x,y,s,k,t,o={}){
     const hc=P2.head==='eagle'?'#f6f2ea':P2.body;
     // cheek fluff
     if(P2.ears==='point'||k==='sunlion'){ c.fillStyle=k==='fox'||k==='wolf'?P2.belly:hc; c.beginPath(); c.moveTo(hx-headR*.75,hy+headR*.1); for(let i=0;i<4;i++){ const a=2.2+i*.35; c.lineTo(hx+Math.cos(a)*headR*1.22,hy+Math.sin(a)*headR*1.05); c.lineTo(hx+Math.cos(a+.17)*headR*.9,hy+Math.sin(a+.17)*headR*.8); } c.closePath(); c.fill(); c.lineWidth=lw; c.strokeStyle=OL2; c.stroke(); }
-    if(k!=='dragon'&&P2.head!=='eagle'&&!P2.sunmane){ const fx=hx-headR*.2, fy=hy+headR*.78; c.beginPath(); c.moveTo(fx-headR*.42,fy-headR*.1); for(let i=0;i<4;i++){ const x0=fx-headR*.42+i*headR*.21; c.quadraticCurveTo(x0+headR*.105,fy+headR*(.55+(i%2?.04:.12)),x0+headR*.21,fy+headR*.3); } c.lineTo(fx+headR*.42,fy-headR*.1); c.closePath(); c.fillStyle=P2.belly; c.fill(); c.lineWidth=lw*.9; c.strokeStyle=OL2; c.stroke(); }
-    E(hx,hy,headR,headR*.92,rg(hx,hy,headR,sh(hc,REAL?.16:.4),sh(hc,REAL?-.2:-.15)));
-    c.save(); c.beginPath(); c.ellipse(hx,hy,headR,headR*.92,0,0,7); c.clip(); c.fillStyle='rgba(30,10,0,.12)'; c.beginPath(); c.ellipse(hx-headR*.25,hy+headR*1.0,headR*1.1,headR*.45,0,0,7); c.fill(); c.restore();
+    if(sit&&k!=='dragon'&&P2.head!=='eagle'&&!P2.sunmane){ const fx=hx-headR*.2, fy=hy+headR*.78; c.beginPath(); c.moveTo(fx-headR*.42,fy-headR*.1); for(let i=0;i<4;i++){ const x0=fx-headR*.42+i*headR*.21; c.quadraticCurveTo(x0+headR*.105,fy+headR*(.55+(i%2?.04:.12)),x0+headR*.21,fy+headR*.3); } c.lineTo(fx+headR*.42,fy-headR*.1); c.closePath(); c.fillStyle=P2.belly; c.fill(); c.lineWidth=lw*.9; c.strokeStyle=OL2; c.stroke(); }
+    const eg=P2.head==='eagle'||sit; const headShape=()=>{ if(eg){ c.beginPath(); c.ellipse(hx,hy,headR,headR*.92,0,0,7); } else hp(); };
+    headShape(); c.fillStyle=rg(hx,hy,headR,sh(hc,REAL?.16:.4),sh(hc,REAL?-.2:-.15)); c.fill(); c.lineWidth=lw; c.strokeStyle=OL2; c.stroke();
+    c.save(); headShape(); c.clip(); c.fillStyle='rgba(30,10,0,.14)'; c.beginPath(); c.ellipse(hx-headR*.25,hy+headR*1.0,headR*1.1,headR*.45,0,0,7); c.fill();
+    if(!eg&&k!=='dragon'){ E(hx+headR*(.42+SN*.38),hy+headR*.46,headR*(.36+SN*.26),headR*.3,P2.belly,false); c.strokeStyle=sh(hc,-.35); c.globalAlpha*=.5; c.lineWidth=lw*.8; c.beginPath(); c.moveTo(hx+headR*.35,hy-headR*.55); c.quadraticCurveTo(hx+headR*(.6+SN*.3),hy-headR*.35,hx+headR*(.7+SN*.55),hy-headR*.05); c.stroke(); c.globalAlpha/=.5; }
+    c.restore();
     if(!REAL){ c.save(); c.strokeStyle='rgba(255,255,255,.6)'; c.lineWidth=lw*1.5; c.beginPath(); c.ellipse(hx,hy,headR*.82,headR*.75,0,Math.PI*1.12,Math.PI*1.6); c.stroke(); c.restore(); }
     if(P2.head==='eagle'){ c.beginPath(); c.moveTo(hx+headR*.6,hy-headR*.2); c.quadraticCurveTo(hx+headR*1.5,hy-headR*.15,hx+headR*1.28,hy+headR*.55); c.quadraticCurveTo(hx+headR*1.0,hy+headR*.3,hx+headR*.55,hy+headR*.38); c.closePath(); const bg=c.createLinearGradient(hx,hy-headR*.2,hx,hy+headR*.5); bg.addColorStop(0,'#ffe14a'); bg.addColorStop(1,'#e8801a'); c.fillStyle=bg; c.fill(); c.lineWidth=lw; c.strokeStyle=OL2; c.stroke(); E(hx+headR*.95,hy-headR*.04,headR*.07,headR*.04,'#3b2412',false);
       c.fillStyle=sh(hc,-.1); for(let i=0;i<4;i++){ c.beginPath(); c.moveTo(hx-headR*(.92-i*.1),hy+headR*(.1+i*.15)); c.lineTo(hx-headR*(1.3-i*.05),hy+headR*(.28+i*.18)); c.lineTo(hx-headR*(.82-i*.1),hy+headR*(.38+i*.15)); c.closePath(); c.fill(); c.lineWidth=lw*.7; c.strokeStyle=OL2; c.stroke(); }
@@ -3367,10 +3401,14 @@ function petArt(c,x,y,s,k,t,o={}){
     else { const mz=P2.ghost||k==='bunny'?.32:k==='dragon'?.5:.45;
       if(k==='dragon'){ E(hx+headR*.68,hy+headR*.3,headR*.58,headR*.4,rg(hx+headR*.68,hy+headR*.3,headR*.5,sh(P2.body,.3),sh(P2.body,-.1))); E(hx+headR*1.05,hy+headR*.16,headR*.07,headR*.05,'#3b0a10',false); c.strokeStyle=OL2; c.lineWidth=lw; c.beginPath(); c.moveTo(hx+headR*1.2,hy+headR*.45); c.quadraticCurveTo(hx+headR*.8,hy+headR*.62,hx+headR*.35,hy+headR*.45); c.stroke(); c.fillStyle='#ffffff'; for(const tx of [.6,.85]){ c.beginPath(); c.moveTo(hx+headR*tx,hy+headR*.53); c.lineTo(hx+headR*(tx+.06),hy+headR*.68); c.lineTo(hx+headR*(tx+.11),hy+headR*.52); c.fill(); }
         if(act||!still&&Math.sin(T/700+ph)>.85){ c.save(); c.globalCompositeOperation='lighter'; for(let i=0;i<3;i++){ const q=((T/600)+i/3)%1; c.globalAlpha=.6*(1-q); E(hx+headR*(1.15+q*.5),hy+headR*(.1-q*.6),headR*(.1+q*.15),headR*(.1+q*.15),'#ffb84a',false); } c.restore(); c.globalAlpha=1; } }
+      else if(!eg){ const nx=hx+headR*(.74+SN*.6), ny=hy+headR*.08, nr=headR*(.1+SN*.04); c.beginPath(); c.moveTo(nx-nr*1.1,ny-nr*.5); c.quadraticCurveTo(nx,ny-nr*1.1,nx+nr*.9,ny-nr*.3); c.quadraticCurveTo(nx+nr*.6,ny+nr*.9,nx-nr*.2,ny+nr*.7); c.quadraticCurveTo(nx-nr*1.2,ny+nr*.3,nx-nr*1.1,ny-nr*.5); c.closePath(); const ng=c.createRadialGradient(nx-nr*.2,ny-nr*.3,nr*.1,nx,ny,nr*1.2); ng.addColorStop(0,k==='bunny'?'#ffb0cc':'#5a4a4a'); ng.addColorStop(1,k==='bunny'?'#d8608a':'#140c0c'); c.fillStyle=ng; c.fill();
+        E(nx-nr*.25,ny-nr*.35,nr*.32,nr*.18,'rgba(255,255,255,.7)',false); c.strokeStyle=OL2; c.lineWidth=lw; c.beginPath(); c.moveTo(nx-nr*.2,ny+nr*.7); c.quadraticCurveTo(nx-nr*.4,ny+nr*2.2,hx+headR*(.3+SN*.3),hy+headR*.5); c.stroke();
+        { c.fillStyle='rgba(40,20,10,.5)'; for(let i=0;i<3;i++) for(let j=0;j<2;j++){ c.beginPath(); c.arc(hx+headR*(.42+SN*.32+i*.08),hy+headR*(.32+j*.09),Math.max(.4,headR*.018),0,7); c.fill(); } } }
       else { E(hx+headR*.55,hy+headR*.32,headR*mz,headR*mz*.72,rg(hx+headR*.55,hy+headR*.32,headR*mz,'#ffffff',P2.belly)); E(hx+headR*(.55+mz*.75),hy+headR*.16,headR*.13,headR*.1,k==='bunny'?'#ff8ab0':'#2b1a12'); E(hx+headR*(.51+mz*.7),hy+headR*.12,headR*.045,headR*.028,'rgba(255,255,255,.75)',false);
-        c.strokeStyle=OL2; c.lineWidth=lw; c.beginPath(); c.moveTo(hx+headR*(.55+mz*.75),hy+headR*.26); c.lineTo(hx+headR*(.55+mz*.72),hy+headR*.36); c.quadraticCurveTo(hx+headR*(.5+mz*.5),hy+headR*.5,hx+headR*.42,hy+headR*.42); c.stroke();
+        c.strokeStyle=OL2; c.lineWidth=lw; c.beginPath(); c.moveTo(hx+headR*(.55+mz*.75),hy+headR*.26); c.lineTo(hx+headR*(.55+mz*.72),hy+headR*.36); c.quadraticCurveTo(hx+headR*(.5+mz*.5),hy+headR*.5,hx+headR*.42,hy+headR*.42); c.stroke(); }
+      {
         if(act){ c.beginPath(); c.ellipse(hx+headR*.66,hy+headR*.48,headR*.17,headR*.12,0,0,Math.PI); c.fillStyle='#8a1a2a'; c.fill(); c.stroke(); }
-        if(P2.ears==='point'||k==='bunny'){ c.strokeStyle='rgba(40,22,10,.45)'; c.lineWidth=lw*.7; for(const dy of [-.05,.08]){ c.beginPath(); c.moveTo(hx+headR*.8,hy+headR*(.3+dy)); c.lineTo(hx+headR*1.3,hy+headR*(.22+dy*2)); c.stroke(); } } }
+        if(P2.ears==='point'||k==='bunny'){ c.strokeStyle='rgba(40,22,10,.45)'; c.lineWidth=lw*.7; for(const dy of [-.05,.08]){ const wx=eg?hx+headR*.8:hx+headR*(.5+SN*.35); c.beginPath(); c.moveTo(wx,hy+headR*(.34+dy)); c.lineTo(wx+headR*.55,hy+headR*(.26+dy*2)); c.stroke(); } } }
       eye(hx+headR*.28,hy-headR*.1,headR*.3,1); eye(hx-headR*.33,hy-headR*.14,headR*.23,0); blush(hx+headR*.18,hy+headR*.42,headR*.15); }
     if(P2.crown){ for(let i=0;i<5;i++){ const a=-2.6+i*.42, fx=hx+Math.cos(a)*headR*.85, fy=hy+Math.sin(a)*headR*.8; for(let j=0;j<5;j++){ const b=j*1.256+T/3000; E(fx+Math.cos(b)*headR*.11,fy+Math.sin(b)*headR*.11,headR*.08,headR*.08,i%2?'#ff9ec4':'#ffffff',false); } E(fx,fy,headR*.06,headR*.06,'#ffd13b',false); } }
     if(P2.collar){ c.lineWidth=sz*.05; c.strokeStyle=OL2; c.beginPath(); c.arc(hx-headR*.15,hy+headR*.15,headR*1.0,1.25,2.45); c.stroke(); c.lineWidth=sz*.034; c.strokeStyle=P2.collar; c.stroke(); const px=hx-headR*.45, py=hy+headR*1.12; E(px,py,sz*.055,sz*.048,rg(px,py,sz*.05,'#ffc46a','#e8701a')); c.strokeStyle='rgba(120,50,10,.6)'; c.lineWidth=lw*.7; c.beginPath(); c.moveTo(px,py-sz*.045); c.lineTo(px,py+sz*.045); c.stroke(); c.fillStyle='#2b1a0c'; c.beginPath(); c.moveTo(px-sz*.025,py-sz*.005); c.lineTo(px-sz*.012,py-sz*.02); c.lineTo(px,py-sz*.005); c.fill(); c.strokeStyle='#3b6a1a'; c.lineWidth=lw*1.2; c.beginPath(); c.moveTo(px,py-sz*.045); c.lineTo(px+sz*.01,py-sz*.065); c.stroke(); }
@@ -3436,6 +3474,28 @@ function petArt(c,x,y,s,k,t,o={}){
   }
   c.restore(); c.globalAlpha=1;
 }
+
+/* High-quality pet render: draws the pet on its own canvas, then adds soft lighting, ambient shade, a fur texture and a warm rim light */
+const petHQ={cv:null,g:null,tp:null,tg:null,noise:null};
+function petNoise(){ if(petHQ.noise) return petHQ.noise; const n=document.createElement('canvas'); n.width=n.height=48; const g=n.getContext('2d'); g.lineCap='round'; let sd=11; const R=()=>{ sd=(sd*16807)%2147483647; return sd/2147483647; };
+  for(let i=0;i<150;i++){ const x=R()*48,y=R()*48,a=Math.PI*.55+R()*.6,l=2+R()*3.5; g.strokeStyle=R()<.55?'rgba(0,0,0,.6)':'rgba(255,255,255,.55)'; g.lineWidth=.5+R()*.6; g.beginPath(); g.moveTo(x,y); g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l); g.stroke(); } return petHQ.noise=n; }
+function petArtHQ(c,x,y,s,k,t,o){ const m=c.getTransform(), sc=Math.max(1,Math.min(3,Math.hypot(m.a,m.b))), P2=PETS[k]||PETS.fox;
+  const W=Math.ceil(s*2.9), H=Math.ceil(s*2.6), ox=W/2, oy=H*.84, pw=Math.ceil(W*sc), ph=Math.ceil(H*sc);
+  if(!petHQ.cv){ petHQ.cv=document.createElement('canvas'); petHQ.g=petHQ.cv.getContext('2d'); petHQ.tp=document.createElement('canvas'); petHQ.tg=petHQ.tp.getContext('2d'); }
+  const cv=petHQ.cv, g=petHQ.g, tp=petHQ.tp, tg=petHQ.tg;
+  if(cv.width<pw||cv.height<ph){ cv.width=tp.width=Math.max(cv.width,pw); cv.height=tp.height=Math.max(cv.height,ph); }
+  g.setTransform(1,0,0,1,0,0); g.globalCompositeOperation='source-over'; g.globalAlpha=1; g.clearRect(0,0,pw,ph);
+  g.setTransform(sc,0,0,sc,0,0); petArt(g,ox,oy,s,k,t,{...o,_in:1}); g.setTransform(1,0,0,1,0,0);
+  // a thin crescent along the top-left edge, for the rim light
+  const d=Math.max(1,s*sc*.03); tg.setTransform(1,0,0,1,0,0); tg.globalAlpha=1; tg.globalCompositeOperation='source-over'; tg.clearRect(0,0,pw,ph); tg.drawImage(cv,0,0,pw,ph,0,0,pw,ph);
+  tg.globalCompositeOperation='source-in'; tg.fillStyle=P2.ghost?'#d8c8ff':'#fff1cc'; tg.fillRect(0,0,pw,ph); tg.globalCompositeOperation='destination-out'; tg.drawImage(cv,0,0,pw,ph,d,d*1.1,pw,ph);
+  const cx=ox*sc, cy=oy*sc, S=s*sc;
+  g.globalCompositeOperation='source-atop';
+  const lg=g.createLinearGradient(cx-S*.55,cy-S*1.05,cx+S*.45,cy); lg.addColorStop(0,'rgba(255,246,220,.22)'); lg.addColorStop(.48,'rgba(255,255,255,0)'); lg.addColorStop(1,'rgba(24,10,36,.30)'); g.fillStyle=lg; g.fillRect(0,0,pw,ph);
+  const ag=g.createLinearGradient(0,cy-S*.22,0,cy); ag.addColorStop(0,'rgba(0,0,0,0)'); ag.addColorStop(1,'rgba(12,6,0,.32)'); g.fillStyle=ag; g.fillRect(0,0,pw,ph);
+  const pat=g.createPattern(petNoise(),'repeat'); if(pat){ const ps=Math.max(.45,S/115); try{ pat.setTransform(new DOMMatrix([ps,0,0,ps,0,0])); }catch(e){} g.globalAlpha=P2.ghost?.04:P2.shape==='turtle'?.07:.12; g.fillStyle=pat; g.fillRect(0,0,pw,ph); g.globalAlpha=1; }
+  g.globalCompositeOperation='lighter'; g.globalAlpha=REAL?.35:.5; g.drawImage(tp,0,0,pw,ph,0,0,pw,ph); g.globalAlpha=1; g.globalCompositeOperation='source-over';
+  c.drawImage(cv,0,0,pw,ph,x-ox,y-oy,W,H); }
 /* A pet's guard attack, drawn in battles: a projectile from the pet to (x1,y1) at progress q (0..1) */
 function petShot(c,k,x0,y0,x1,y1,q,s){ const P2=PETS[k]||PETS.fox, x=x0+(x1-x0)*q, y=y0+(y1-y0)*q-Math.sin(q*Math.PI)*s*.2;
   c.save(); c.globalCompositeOperation='lighter';
@@ -3493,7 +3553,7 @@ function petLoop(){ const cvs=[...document.querySelectorAll('canvas[data-pet]')]
     else { const fx=petFx[cv.dataset.id]||+cv.dataset.fx||0, age=T-fx, pop=fx&&age<900?1+.15*Math.sin(age/900*Math.PI):1, sz=h*(big?.62:.7)*pop;
       if(fx&&age<1600){ c.save(); c.globalCompositeOperation='lighter'; const q=age/1600; const gl=c.createRadialGradient(w/2,h*.55,0,w/2,h*.55,w*.45); gl.addColorStop(0,`rgba(255,240,170,${.7*(1-q)})`); gl.addColorStop(1,'rgba(255,240,170,0)'); c.fillStyle=gl; c.fillRect(0,0,w,h);
         for(let i=0;i<14;i++){ const a=i/14*Math.PI*2, r=w*(.1+q*.4); c.fillStyle=`rgba(255,250,200,${1-q})`; c.beginPath(); c.arc(w/2+Math.cos(a)*r,h*.55+Math.sin(a)*r*.6,3,0,7); c.fill(); } c.restore(); }
-      petArt(c,w/2+(PETS[k]?.shape==='quad'?-w*.02:0),h*.84,sz,k,T,{lvl,dir:1,ph:(cv.dataset.id||'a').charCodeAt(0)%7}); } }
+      petArt(c,w/2+(PETS[k]?.shape==='quad'?-w*.02:0),h*.84,sz,k,T,{lvl,dir:1,ph:(cv.dataset.id||'a').charCodeAt(0)%7,hq:1}); } }
   requestAnimationFrame(petLoop); }
 function startPetLoop(){ if(!petLoopOn){ petLoopOn=true; requestAnimationFrame(petLoop); } }
 function petsDialog(){ const m=P(ME); if(!m||m.dead) return; const pets=m.pets||[], on=(petView&&pets.find(x=>x.id===petView))||myPet(m)||pets[0], hl=stats(ME).hallLvl||1;
@@ -4209,6 +4269,111 @@ setInterval(()=>{ if(DB&&ME&&P(ME)&&!P(ME).dead&&document.visibilityState==='vis
 let wasNewbie=null; setInterval(()=>{ const m=P(ME); if(!m||m.dead) return; const n=isNewbie(m); if(wasNewbie&&!n) toast('Your newcomer protection has ended. Other players can attack you now, so keep your defenses strong!',true); wasNewbie=n; },20000);
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&DB&&ME&&P(ME)&&!P(ME).dead) resumeOnline(); });
 ['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,()=>{ const m=P(ME); if(m&&!m.dead&&now()-activeEnd(m)>5000&&!resuming) resumeOnline(); },{passive:true}));
+/* ===== v48 ===== *//* ----- old 1×1 Town Halls grow to 2×2; buildings in the way get pushed back to the nearest free tile ----- */
+var hallMigT=0;
+function freeSpotNear(c,taken){ const [x0,y0]=xy(c); let wild=null;
+  for(let r=1;r<=8;r++){ for(let dx=-r;dx<=r;dx++){ const ry=r-Math.abs(dx); for(const dy of ry?[-ry,ry]:[0]){ const x=x0+dx, y=y0+dy, k=cid(x,y); if(!inB(x,y)||Wt(x,y)||taken.has(k)) continue; const q=G.plots[k];
+        if(q&&q.o===ME&&!q.b&&!q.bt) return k; if(!q&&!wild&&adjOwn(ME,x,y)) wild=k; } } if(wild) return wild; } return null; }
+function migrateHall(){ const m=P(ME); if(!m||m.dead||busy||!DB) return; const h=stats(ME).hall; if(!h) return; const hp=G.plots[h]; if(!hp||hp.big) return; if(now()-hallMigT<15000) return; hallMigT=now();
+  const [hx,hy]=xy(h); let best=null;
+  for(const [ox,oy] of [[0,0],[1,0],[0,1],[1,1]]){ const root=cid(hx+ox,hy+oy), blk=[root,...hallParts(root)]; let bad=false; const push=[];
+    for(const c of blk){ const [x,y]=xy(c); if(!inB(x,y)||Wt(x,y)){ bad=true; break; } if(c===h) continue; const q=G.plots[c]; if(q&&q.o!==ME){ bad=true; break; } if(q&&(q.b||q.bt)) push.push(c); }
+    if(!bad&&(!best||push.length<best.push.length)) best={root,blk,push}; }
+  if(!best) return; const taken=new Set(best.blk), dests=[];
+  for(const c of best.push){ const d=freeSpotNear(c,taken); if(!d) return; taken.add(d); dests.push(d); }
+  const cells=[...new Set([...best.blk,h,...dests])];
+  act(cells,(me,pl)=>{ const old=pl[h]; if(!old||old.b!=='hall'||old.o!==ME) fail('Your Town Hall changed.'); if(old.big) return {skip:1};
+    for(const c of best.blk){ if(c!==h&&pl[c]&&pl[c].o!==ME) fail('Something is in the way.'); }
+    best.push.forEach((c,i)=>{ const q=pl[c], d=dests[i], dq=pl[d]; if(!q||q.o!==ME) return; if(dq&&(dq.o!==ME||dq.b)) fail('Something is in the way.'); pl[d]={...q}; });
+    for(const c of best.blk) pl[c]={o:ME,b:'hallx',r:best.root,lvl:0};
+    pl[best.root]={...old,big:1}; me.hall=best.root; return {n:best.push.length}; },
+    r=>{ if(r&&!r.skip){ toast(`🏰 Your Town Hall is now 2×2!${r.n?` ${r.n} building${r.n>1?'s were':' was'} pushed back to make room.`:''}`); sel=stats(ME).hall; draw(); } }); }
+setInterval(()=>{ try{ migrateHall(); }catch(e){ reportErr(e,'growing the Town Hall'); } },5000);
+
+/* ----- marching: pick how many troops to send, watch them walk there, then fight ----- */
+var MARCH_S_PER_TILE=1.6, MARCH_MIN_S=5, MARCH_MAX_S=90, MARCH_STALE=10*60000;
+var marchFiring=false, marchOn=false, mSend={};
+const marchLive=p=>!!(p&&p.march&&p.march.arr&&now()<p.march.arr+MARCH_STALE);
+const marchN=u=>ATK.reduce((a,k)=>a+((u||{})[k]||0),0);
+function marchFrom(cell){ let best=null, bd=1e9; for(const k in G.plots){ const q=G.plots[k]; if(q.o!==ME) continue; const d=dist(k,cell); if(d<bd){ bd=d; best=k; } } return best||stats(ME).hall; }
+const marchSecs=(a,b)=>Math.round(Math.max(MARCH_MIN_S,Math.min(MARCH_MAX_S,dist(a,b)*MARCH_S_PER_TILE)));
+function marchDialog(cell){ const m=P(ME), tg=G.plots[cell]; if(!m||!tg) return; const why=atkCheck(cell,false); if(why) return toast(why,true);
+  if(marchLive(m)) return toast('Your army is already marching. Wait for it to arrive.',true);
+  const have=ATK.filter(u=>(m[u]||0)>0); if(!have.length&&!heroReady(m)) return toast('You need an army to attack. Archers only defend.',true);
+  mSend={}; have.forEach(u=>mSend[u]=m[u]); const from=marchFrom(cell), secs=marchSecs(from,cell);
+  const who=tg.o==='npc'?(tg.b==='boss'?'the Barbarian Fortress':`a level ${tg.lvl||1} barbarian camp`):esc(cleanText(P(tg.o)?.name||'that kingdom'));
+  $('ov').innerHTML=`<div class="overlay" id="marchOv"><div class="dialog"><h2>⚔️ Send troops</h2><p class="desc">Choose how many troops march to ${who}. Everyone can see your army walking on the map. When they arrive, you place them and the battle starts. Troops that march away can't help defend your kingdom until they're back.</p>
+    <div class="mRows">${have.map(u=>`<div class="mRow"><b>${UNITS[u].pl||UNITS[u].name+'s'}</b><button class="soft" data-m="${u}:-">−</button><input type="number" min="0" max="${m[u]}" value="${m[u]}" data-mi="${u}"><button class="soft" data-m="${u}:+">+</button><button class="soft" data-m="${u}:all">All ${m[u]}</button><button class="soft" data-m="${u}:0">None</button></div>`).join('')||'<p class="desc">Only your heroes will go.</p>'}</div>
+    <p class="desc" id="mSum"></p><p class="desc">🚶 They walk about <b>${dist(from,cell)} tiles</b>, which takes <b>${fmtT(secs)}</b>.${heroReady(m)?' Your heroes go with them.':''}</p>
+    <div class="row"><button class="war" id="mGo">⚔️ March!</button><button class="soft" data-act="ov:close">Cancel</button></div></div></div>`;
+  const sum=()=>{ const n=marchN(mSend); $('mSum').innerHTML=`Sending <b>${f(n)} troops</b>${n?'':' (pick at least one, or send only your heroes)'}.`; };
+  document.querySelectorAll('#marchOv [data-mi]').forEach(inp=>inp.oninput=()=>{ const u=inp.dataset.mi; mSend[u]=Math.max(0,Math.min(m[u]||0,Math.floor(+inp.value||0))); sum(); });
+  document.querySelectorAll('#marchOv [data-m]').forEach(b=>b.onclick=()=>{ const [u,op]=b.dataset.m.split(':'), mx=m[u]||0, step=Math.max(1,Math.round(mx/10)); let v=mSend[u]||0;
+    v=op==='+'?v+step:op==='-'?v-step:op==='all'?mx:0; mSend[u]=Math.max(0,Math.min(mx,v)); const inp=document.querySelector(`#marchOv [data-mi="${u}"]`); if(inp) inp.value=mSend[u]; sum(); });
+  $('mGo').onclick=()=>sendMarch(cell,from); sum(); }
+function sendMarch(cell,from){ const u={}; ATK.forEach(k=>{ if(mSend[k]>0) u[k]=mSend[k]; }); if(!marchN(u)&&!heroReady(P(ME))) return toast('Pick some troops to send.',true);
+  act([],me=>{ if(marchLive(me)) fail('Your army is already marching.'); for(const k in u) if((me[k]||0)<u[k]) fail('You do not have that many troops any more.');
+    const secs=marchSecs(from,cell); me.march={to:cell,from,start:now(),arr:now()+secs*1000,n:marchN(u),u}; return {secs,n:marchN(u)}; },
+    r=>{ $('ov').innerHTML=''; snd('march'); toast(`⚔️ ${f(r.n)} troops are marching! They arrive in ${fmtT(r.secs)}.`); startLoop(); }); }
+function clearMarch(tries=0){ if(!P(ME)||!P(ME).march) return; if(busy){ if(tries<20) setTimeout(()=>clearMarch(tries+1),1500); return; } act([],me=>{ delete me.march; }); }
+async function marchArrive(){ const m=P(ME), mm=m&&m.march; if(!mm||marchFiring||busy) return; marchFiring=true;
+  try{ if(now()>mm.arr+MARCH_STALE){ toast('Your troops waited too long and came home.'); clearMarch(); return; }
+    const tg=G.plots[mm.to], why=!tg||tg.o===ME?'The target changed while your troops were marching, so they came home.':atkCheck(mm.to,false);
+    if(why){ toast(why,true); clearMarch(); return; }
+    const own=$('ov').innerHTML.trim(); if(own) $('ov').innerHTML=''; toast('⚔️ Your troops have arrived! Place them to start the battle.');
+    await attack(mm.to,{send:mm.u}); }
+  finally{ marchFiring=false; setTimeout(()=>{ if(P(ME)&&P(ME).march&&P(ME).march.start===mm.start) clearMarch(); },800); } }
+setInterval(()=>{ try{ const m=P(ME); if(m&&m.march&&now()>=m.march.arr&&!busy&&!marchFiring) marchArrive(); }catch(e){ reportErr(e,'marching'); } },1000);
+function drawMarches(v){ if(!MARCH_STALE) return; const tn=now(); let any=false; if(cam.z<.25) { marchOn=Object.values(G.players).some(p=>p.march&&tn<p.march.arr); return; }
+  for(const p of Object.values(G.players)){ const mm=p.march; if(!mm||!mm.from||!mm.to||tn>mm.arr+4000||p.dead) continue; any=true;
+    const q=Math.max(0,Math.min(1,(tn-mm.start)/Math.max(1,mm.arr-mm.start))), [ax,ay]=ctr(...xy(mm.from)), [bx,by]=ctr(...xy(mm.to)), px=ax+(bx-ax)*q, py=ay+(by-ay)*q;
+    const vis=!(px<v.x0-TW*2||px>v.x1+TW*2||py<v.y0-TW*2||py>v.y1+TW*2); if(!vis) continue; const dir=bx>=ax?1:-1, u=TW, col=p.color||'#c4402f';
+    // the path ahead
+    ctx.save(); ctx.globalAlpha=.55; ctx.setLineDash([u*.08,u*.08]); ctx.lineDashOffset=-(NOWT/40)%(u*.16); ctx.lineWidth=Math.max(u*.03,1.5/cam.z); ctx.strokeStyle=col; ctx.beginPath(); ctx.moveTo(px,py); ctx.lineTo(bx,by); ctx.stroke(); ctx.restore();
+    ell(bx,by,u*.22,u*.11,'rgba(255,60,40,.18)',false);
+    // a little squad of walking troops
+    const n=Math.min(7,Math.max(1,Math.ceil((mm.n||1)/6))), arrived=q>=1;
+    const spots=[[0,0],[-.2,.08],[.2,.08],[-.1,-.1],[.12,-.1],[-.3,-.04],[.3,-.04]];
+    const order=spots.slice(0,n).sort((a,b)=>a[1]-b[1]);
+    ell(px,py+u*.04,u*.46,u*.14,'rgba(0,0,0,.2)',false);
+    for(const [sx,sy] of order){ const ph=(sx*7+sy*13+(mm.start%5)); chibi(ctx,px+sx*u*1.25,py+sy*u*.7,u*.46,{dir,walk:!arrived,ph,body:col,helmet:'cap',helmCol:col,weapon:'sword',pants:'#4a3626',vary:true},NOWT); }
+    // banner and name: everyone sees one label, the player's name and how many troops
+    const tx=`${cleanText(p.name||'?')} · ${f(mm.n||0)} troop${mm.n===1?'':'s'}`, fs=Math.max(u*.15,11/cam.z), ty=py-u*.72;
+    ctx.font=`${fs}px "Lilita One",sans-serif`; ctx.textAlign='center'; const w=ctx.measureText(tx).width+fs*1.6, h=fs*1.45;
+    ctx.fillStyle='rgba(43,26,12,.82)'; pillPath(px-w/2,ty-h*.78,w,h,h/2); ctx.fill(); ctx.fillStyle=col; ctx.beginPath(); ctx.arc(px-w/2+fs*.75,ty-h*.06,fs*.33,0,7); ctx.fill();
+    ctx.fillStyle='#fff3c0'; ctx.fillText(tx,px+fs*.3,ty+fs*.12); }
+  marchOn=any; }
+function pillPath(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+
+/* ----- nearby chat: talk with players whose kingdoms are close to yours ----- */
+const NEAR_R=30, NEAR_Z=40;
+var nearMsgs={}, nearSubs=[], nearKey='', nearSeen=0, nearBub={};
+const zoneOf=cell=>{ const [x,y]=xy(cell); return [Math.floor(x/NEAR_Z),Math.floor(y/NEAR_Z)]; };
+function syncNear(){ const h=P(ME)&&!P(ME).dead?stats(ME).hall:null; if(!h||!DB){ return; } const [zx,zy]=zoneOf(h), key=zx+'_'+zy; if(key===nearKey) return; nearKey=key;
+  nearSubs.forEach(f=>{ try{ f&&f(); }catch(e){} }); nearSubs=[]; nearMsgs={};
+  for(let dx=-1;dx<=1;dx++) for(let dy=-1;dy<=1;dy++){ const id=`near_${zx+dx}_${zy+dy}`; nearSubs.push(DB.watchChat(id,l=>{ nearMsgs[id]=l; renderNear(); })); } }
+function nearList(){ const h=stats(ME).hall; if(!h) return []; const all=[].concat(...Object.values(nearMsgs)).filter(x=>x&&x.cell&&x.t&&!isBlocked(x.uid)&&dist(x.cell,h)<=NEAR_R);
+  const seen=new Set(); return all.filter(x=>{ const k=x.uid+x.t; if(seen.has(k)) return false; seen.add(k); return true; }).sort((a,b)=>a.t-b.t).slice(-50); }
+function nearPeople(){ const h=stats(ME).hall; if(!h) return []; return Object.values(G.players).filter(p=>p.id!==ME&&!p.dead&&p.hall&&dist(p.hall,h)<=NEAR_R); }
+function renderNear(){ const l=nearList(); const last=l.length?l[l.length-1].t:0;
+  for(const x of l) if(now()-x.t<12000) nearBub[x.uid]={text:x.text,t:x.t};
+  if(last>nearSeen&&nearSeen){ const x=l[l.length-1]; if(x.uid!==ME){ snd('click'); if(!$('nearLog')||document.querySelector('.card.near')?.offsetParent===null) toast(`📢 ${cleanText(x.name)}: ${cleanText(x.text).slice(0,60)}`); } }
+  if(last) nearSeen=Math.max(nearSeen,last); else if(!nearSeen) nearSeen=1;
+  const el=$('nearLog'); if(!el) return; const atB=el.scrollHeight-el.scrollTop-el.clientHeight<40, ppl=nearPeople();
+  $('nearInfo').innerHTML=`Talk with kingdoms within <b>${NEAR_R} tiles</b> of your Town Hall. ${ppl.length?`<b>${ppl.length}</b> nearby: ${ppl.slice(0,6).map(p=>plink(p.id,esc(cleanText(p.name)))+(online(p)?' <span class="on">●</span>':'')).join(', ')}${ppl.length>6?'…':''}`:'Nobody lives close to you yet.'}`;
+  el.innerHTML=l.length?l.map(x=>`<li class="${x.uid===ME?'mine':''}"><b>${plink(x.uid,esc(cleanText(x.name)))}</b> <time>${new Date(x.t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}</time><br>${esc(cleanText(x.text))}</li>`).join(''):'<li class="desc">No messages nearby yet. Say hi to your neighbours!</li>';
+  if(atB) el.scrollTop=el.scrollHeight; }
+let nearLastSent=0;
+function sendNear(text){ text=(text||'').replace(/\s+/g,' ').trim().slice(0,200); const h=stats(ME).hall; if(!text||!h) return; if(now()-nearLastSent<1500) return toast('Slow down a little!',true); nearLastSent=now();
+  const [zx,zy]=zoneOf(h), msg={uid:ME,name:P(ME).name,text,t:now(),cell:h}; $('nearIn').value=''; Promise.resolve(DB.sendChat(`near_${zx}_${zy}`,msg)).catch(e=>explain(e)); snd('click'); }
+function drawBubbles(v){ if(cam.z<.4||!nearBub) return; const tn=now();
+  for(const uid in nearBub){ const b=nearBub[uid]; if(tn-b.t>10000){ delete nearBub[uid]; continue; } const p=P(uid); if(!p||!p.hall) continue; const [hx,hy]=ctr(...xy(p.hall)); if(hx<v.x0-TW||hx>v.x1+TW||hy<v.y0-TW*2||hy>v.y1+TW) continue;
+    const txt=cleanText(b.text).slice(0,40)+(b.text.length>40?'…':''), fs=Math.max(TW*.14,11/cam.z); ctx.font=`600 ${fs}px sans-serif`; ctx.textAlign='center'; const w=ctx.measureText(txt).width+fs, h=fs*1.6, y=hy-TW*1.7;
+    ctx.save(); ctx.globalAlpha=Math.min(1,(10000-(tn-b.t))/800); ctx.fillStyle='#fffaf0'; ctx.strokeStyle='#3b2412'; ctx.lineWidth=Math.max(1,1.5/cam.z); pillPath(hx-w/2,y-h,w,h,h/2.4); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(hx-fs*.3,y-1); ctx.lineTo(hx,y+fs*.5); ctx.lineTo(hx+fs*.3,y-1); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.fillStyle='#3b2412'; ctx.fillText(txt,hx,y-h*.3); ctx.restore(); } }
+
+setInterval(()=>{ try{ syncNear(); }catch(e){} },4000);
+{ const nf=document.getElementById('nearForm'); if(nf) nf.onsubmit=e=>{ e.preventDefault(); sendNear($('nearIn').value); }; }
 /* ===== v47 ===== */
 /* ----- prestige: a Town Hall at level 100 can prestige back to level 1 for a permanent star ----- */
 const PRES_GEMS=250;
@@ -4309,6 +4474,7 @@ function start(){
     DB.watchInbox(ME,onInbox);
     DB.watchClans(m=>{ G.clans=m; snapRender(); try{ notePings(); }catch(e){} });
     if(DB.watchNews) DB.watchNews(l=>{ newsList=l; renderNews(); });
+    setTimeout(()=>{ try{ syncNear(); }catch(e){} },1500);
     DB.watchMarket(m=>{ G.market=m; const ae=document.activeElement; if($('shopOv')&&shopTab==='market'&&!busy&&!(ae&&/INPUT|SELECT/.test(ae.tagName))) shopDialog(); });
   });
 }
