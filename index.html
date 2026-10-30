@@ -422,7 +422,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 48;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
+const GAME_VERSION = 49;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
 const NEW_SHIELD_MIN = 120;     // peace shield for brand new kingdoms
 const DEFEND_SHIELD_MIN = 30;   // peace shield after being attacked
 const CAMP_MAX = 25;            // highest barbarian camp level
@@ -1696,7 +1696,7 @@ function drawTrap(cx,cy,p){ const u=TW; ell(cx,cy,u*.2,u*.1,p.sprung?'#6b3a2a':'
 function drawCell(x,y,t){ drawCell0(x,y,t); const p=G.plots[cid(x,y)]; if(!p||p.o==='npc') return; const [cx,cy]=ctr(x,y);
   if(p.b&&p.b!=='wall'&&p.b!=='trap'&&p.b!=='deco'&&(p.lvl||p.bt)){ const hall=p.b==='hall'; if(hall?cam.z>=.3:cam.z>=1.05&&p.o!==ME) tagQ.push([cx,cy-TW*(hall?(p.big?2.05:1.12):.78),p.o,hall]); }
   if(p.b==='hall'&&p.lvl&&cam.z>=.4){ overDraw.push([cy-1,()=>bannerOnMap(p.big?cx-TW*.42:cx,p.big?cy-TH*.1:cy,p.o)]); if(p.o===ME&&merchHere()) overDraw.push([cy+TW*.1,()=>merchCart(cx,cy)]); }
-  if(p.b==='hall'&&p.lvl&&cam.z>=.4){ const pt=myPet(P(p.o)); if(pt&&PETS[pt.k]) overDraw.push([cy+TW*.2,()=>petOnMap(cx+TW*(p.big?.62:.4),cy+TW*.2,TW*.72,pt.k,pt.lvl,-1,(x*7+y)%6,NOWT)]); }
+  if(p.b==='hall'&&p.lvl&&cam.z>=.4){ const pt=myPet(P(p.o)); if(pt&&PETS[pt.k]) overDraw.push([cy+TW*.2,()=>petOnMap(cx+TW*(p.big?.78:.45),cy+TW*.24,TW*1.05,pt.k,pt.lvl,-1,(x*7+y)%6,NOWT)]); }
   if(p.o===ME){ const m=P(ME); if(tmapOn(m)&&m.tmap.cell===cid(x,y)) overDraw.push([cy+TW,()=>drawTreasureX(cx,cy)]); } }
 let overDraw=[], glowTop=null, tagQ=[];
 /* name plates: every Town Hall shows its kingdom's name, and when you zoom in other players' buildings show whose they are */
@@ -1708,7 +1708,7 @@ function ownerTag(x,y,o,big){ const pl=P(o); if(!pl) return; const tag=(()=>{ co
 const petSprC=new Map();
 function petOnMap(x,y,size,k,lvl,dir,ph,T){ const px=Math.max(12,Math.min(400,Math.round(size*cam.z*mapDpr()/6)*6)), key=k+'|'+lvl+'|'+px+'|'+dir; let sp=petSprC.get(key);
   if(!sp){ if(petSprC.size>48) petSprC.clear(); const W=Math.ceil(px*2.6), H=Math.ceil(px*2.3), cv=document.createElement('canvas'); cv.width=W; cv.height=H; const g0=cv.getContext('2d'); petArt(g0,W/2,H*.86,px,k,900,{lvl,dir,ph,hq:1,noSh:1});
-    { const tm=document.createElement('canvas'); tm.width=W; tm.height=H; const tg=tm.getContext('2d'); tg.drawImage(cv,0,0); tg.globalCompositeOperation='source-in'; tg.fillStyle='rgba(255,250,232,.95)'; tg.fillRect(0,0,W,H); g0.globalCompositeOperation='destination-over'; const o2=Math.max(1,px*.035); for(const [dx,dy] of [[o2,0],[-o2,0],[0,o2],[0,-o2],[o2*.7,o2*.7],[-o2*.7,o2*.7],[o2*.7,-o2*.7],[-o2*.7,-o2*.7]]) g0.drawImage(tm,dx,dy); g0.globalCompositeOperation='source-over'; }
+    { const tm=document.createElement('canvas'); tm.width=W; tm.height=H; const tg=tm.getContext('2d'); tg.drawImage(cv,0,0); tg.globalCompositeOperation='source-in'; tg.fillStyle='rgba(255,252,238,1)'; tg.fillRect(0,0,W,H); g0.globalCompositeOperation='destination-over'; const o2=Math.max(1.5,px*.05); for(const [dx,dy] of [[o2,0],[-o2,0],[0,o2],[0,-o2],[o2*.7,o2*.7],[-o2*.7,o2*.7],[o2*.7,-o2*.7],[-o2*.7,-o2*.7]]) g0.drawImage(tm,dx,dy); g0.globalCompositeOperation='source-over'; }
     sp={cv,W,H,px}; petSprC.set(key,sp); }
   const sc=size/sp.px, br=RM?1:1+Math.sin(T/520+ph)*.02, hop=RM?0:Math.max(0,Math.sin(T/700+ph*3))**8*size*.12;
   ctx.save(); ctx.globalAlpha=.32; ell(x,y,size*.36,size*.09,'#000000',false); ctx.restore(); ctx.drawImage(sp.cv,x-sp.W/2*sc,y-sp.H*.86*sc*br-hop,sp.W*sc,sp.H*sc*br); }
@@ -2216,7 +2216,7 @@ function playBattle(rp){ return new Promise(resolve=>{
   if(rp.boss){ defs[0].king=1; defs[0].x=target.sx+bT*.05; defs[0].y=target.sy+bT*.32; }
   const petD=rp.pet&&PETS[rp.pet.k]?{k:rp.pet.k,lvl:rp.pet.lvl||1,name:rp.pet.name||'',x:target.sx+bT*.62,y:target.sy+bT*.24,next:2000,actT:0}:null;
   const drawPetD=(t,now2)=>{ const lose=rp.win&&t>7200; if(lose&&t>7900) return; g.save(); if(lose) g.globalAlpha=Math.max(0,1-(t-7200)/700); const act=petD.actT&&t-petD.actT<350?1-(t-petD.actT)/350:0;
-    petArt(g,petD.x+(lose?(t-7200)/700*bT*.6:0),petD.y,bT*.62,petD.k,now2,{lvl:petD.lvl,dir:-1,act,ph:3,hq:1}); if(petD.name){ g.font=`${Math.round(bT*.15)}px "Lilita One",sans-serif`; g.textAlign='center'; g.lineWidth=3; g.strokeStyle='#3b2412'; g.strokeText('🐾 '+petD.name,petD.x,petD.y-bT*.68); g.fillStyle='#fff3c0'; g.fillText('🐾 '+petD.name,petD.x,petD.y-bT*.68); } g.restore(); };
+    petArt(g,petD.x+(lose?(t-7200)/700*bT*.6:0),petD.y,bT*.82,petD.k,now2,{lvl:petD.lvl,dir:-1,act,ph:3,hq:1}); if(petD.name){ g.font=`${Math.round(bT*.15)}px "Lilita One",sans-serif`; g.textAlign='center'; g.lineWidth=3; g.strokeStyle='#3b2412'; g.strokeText('🐾 '+petD.name,petD.x,petD.y-bT*.68); g.fillStyle='#fff3c0'; g.fillText('🐾 '+petD.name,petD.x,petD.y-bT*.68); } g.restore(); };
   let resolved=!rp.live, tRes=0, hpAtRes=1, tgtFinal=1;
   function applyOutcome(from){ const tot2=ATK.reduce((a,u)=>a+((rp.units||{})[u]||0),0)||1, lo=Math.max(from,rp.live?from+250:2600), tr0=rp.live?from+150:1700;
     const nTrap=Math.min(mortal.length,Math.round(mortal.length*(rp.trapped||0)/tot2)), nDie=Math.min(mortal.length,Math.round(mortal.length*(rp.aLost||0)/tot2));
@@ -2574,18 +2574,19 @@ function drawNight(){ const dk=darkness(); if(dk<=.01) return; ctx.fillStyle=`rg
 /* ================= crate stash, market and merchant ================= */
 const MK_MAX=6, EXCH={give:1000,get:600};
 G.market={};
-function mkName(L){ return L.kind==='item'?ITEMS[L.k].name:L.kind==='crate'?CRATES[L.k].name:`${f(L.n)} ${L.k}`; }
+function mkName(L){ return L.kind==='item'?ITEMS[L.k].name:L.kind==='crate'?CRATES[L.k].name:L.kind==='pet'?`${cleanText(L.pname||'')} the ${PETS[L.k]?.name||'pet'} (Lv ${L.lvl||1})`:`${f(L.n)} ${L.k}`; }
 function mkHtml(){ const m=P(ME), inv=m.inv||[], eq=Object.values(m.eq||{}), stash=m.stash||{};
   const opts=[...inv.filter(i=>!eq.includes(i.id)).map(i=>`<option value="item:${i.id}">${esc(ITEMS[i.k].name)} (${RAR[ITEMS[i.k].r].name})</option>`),
     ...Object.entries(stash).filter(([,n])=>n>0).map(([k,n])=>`<option value="crate:${k}">${esc(CRATES[k].name)} (you have ${n})</option>`),
+    ...(m.pets||[]).filter(pt=>pt.id!==m.petOn&&PETS[pt.k]).map(pt=>`<option value="pet:${pt.id}">🐾 ${esc(cleanText(pt.name||''))} the ${PETS[pt.k].name} (Lv ${pt.lvl||1})</option>`),
     '<option value="res:gold">Gold</option>','<option value="res:stone">Stone</option>'].join('');
   const list=Object.values(G.market).sort((a,b)=>b.t-a.t);
   const mine=list.filter(L=>L.seller===ME).length;
-  return `<p class="desc">Trade gear, crates and resources with other players for gold or stone. You can have up to ${mkMax()} things for sale at once (more as your Town Hall grows).${mkNext()} Equipped gear can't be sold.</p>
+  return `<p class="desc">Trade gear, crates, pets and resources with other players for gold or stone. You can have up to ${mkMax()} things for sale at once (more as your Town Hall grows).${mkNext()} Equipped gear can't be sold.</p>
   <form id="mkForm" class="mkform"><select id="mkWhat">${opts}</select><input id="mkAmt" type="number" min="1" placeholder="Amount" hidden><span>for</span><input id="mkPrice" type="number" min="1" placeholder="Price" required><select id="mkCur"><option value="gold">gold</option><option value="stone">stone</option></select><button class="prime" type="submit">List for sale<span class="c">${mine} of ${mkMax()} used</span></button></form>
   <div class="label">Merchant</div><div class="row">${btn(`Trade ${f(EXCH.give)} gold for ${f(EXCH.get)} stone`,{gold:EXCH.give},'exch:gold','soft')}${btn(`Trade ${f(EXCH.give)} stone for ${f(EXCH.get)} gold`,{stone:EXCH.give},'exch:stone','soft')}</div>
   <div class="label">For sale (${list.length})</div><div class="bag">${list.length?list.map(L=>{ const own=L.seller===ME, it=L.kind==='item'?ITEMS[L.k]:null, col=it?RAR[it.r].col:L.kind==='crate'?'#c98a4a':'#ffd13b';
-      return `<div class="gear" style="--rc:${col}">${icon(it?it.ic:L.kind==='crate'?'crate':L.k,col)}<div><b>${esc(mkName(L))}</b><div class="desc">${it?RAR[it.r].name+' · '+itemText(it):L.kind==='crate'?'Unopened crate':'Resources'} · sold by ${esc(L.sname||'?')}</div>
+      return `<div class="gear" style="--rc:${col}">${L.kind==='pet'&&PETS[L.k]?`<canvas data-pet="${L.k}" data-lvl="${L.lvl||1}" data-id="${L.id}" class="petcv" style="width:64px;height:56px;flex:0 0 64px"></canvas>`:icon(it?it.ic:L.kind==='crate'?'crate':L.k,col)}<div><b>${esc(mkName(L))}</b><div class="desc">${it?RAR[it.r].name+' · '+itemText(it):L.kind==='crate'?'Unopened crate':L.kind==='pet'?`${PET_RAR[(PETS[L.k]||{r:0}).r]} pet · +${f(petDefOf({k:L.k,lvl:L.lvl||1}))} guard power`:'Resources'} · sold by ${esc(L.sname||'?')}</div>
         <div class="row">${own?btn('Take back',null,'mk:cancel:'+L.id,'soft'):btn('Buy',{[L.cur]:L.price},'mk:buy:'+L.id,'prime')}<b>${f(L.price)} ${L.cur}</b></div></div></div>`; }).join(''):'<p class="desc">Nothing for sale yet.</p>'}</div>`; }
 function bindMk(){ const w=$('mkWhat'), a=$('mkAmt'); if(!w) return; const upd=()=>{ a.hidden=!w.value.startsWith('res:'); }; w.onchange=upd; upd();
   $('mkForm').onsubmit=e=>{ e.preventDefault(); const [kind,ref]=w.value.split(':'), price=Math.floor(+$('mkPrice').value), n=Math.floor(+a.value||0); listMarket(kind,ref,price,$('mkCur').value,n); }; }
@@ -2595,6 +2596,7 @@ function listMarket(kind,ref,price,cur,n){ if(!(price>=1)) return toast('Enter a
   mkTx(async(t,me)=>{ const L={seller:ME,sname:me.name,kind,price,cur,t:now()};
     if(kind==='item'){ const i=(me.inv||[]).findIndex(x=>x.id===ref); if(i<0) fail('That item is gone.'); if(Object.values(me.eq||{}).includes(ref)) fail('Unequip it first.'); L.k=me.inv[i].k; L.iid=ref; me.inv.splice(i,1); }
     else if(kind==='crate'){ me.stash=me.stash||{}; if(!(me.stash[ref]>0)) fail('You have no crate like that.'); me.stash[ref]--; L.k=ref; }
+    else if(kind==='pet'){ const i=(me.pets||[]).findIndex(x=>x.id===ref); if(i<0) fail('That pet is gone.'); if(me.petOn===ref) fail('Your guardian pet cannot be sold. Pick another guardian first.'); const pt=me.pets[i]; L.k=pt.k; L.pid=pt.id; L.lvl=pt.lvl||1; L.pname=pt.name||PETS[pt.k].name; me.pets.splice(i,1); }
     else { settle(me); if((me[ref]||0)<n) fail(`You don't have ${f(n)} ${ref}.`); me[ref]-=n; L.k=ref; L.n=n; }
     t.setMk(id,L); t.setPlayer(ME,me); },()=>{ snd('coin'); toast('Listed for sale.'); }); }
 async function mkTx(fn,after){ if(busy) return; busy=true; try{ const out=await DB.tx(async t=>{ const me=await t.getPlayer(ME); if(!me||me.dead) fail('Your kingdom has fallen.'); me.stats=Object.assign(defaultStats(),me.stats||{}); return await fn(t,me); }); if(after) after(out); }catch(e){ explain(e); } busy=false; if($('shopOv')) shopDialog(); renderAll(); }
@@ -2603,6 +2605,7 @@ function buyListing(id){ busy||(async()=>{ busy=true;
       if(L.seller===ME) fail('That is your own listing.'); const sel2=await t.getPlayer(L.seller); settle(me); pay(me,{[L.cur]:L.price});
       if(L.kind==='item'){ me.inv=me.inv||[]; if(me.inv.length>=INV_MAX) fail('Your bag is full. Sell something first.'); me.inv.push({id:L.iid||Math.random().toString(36).slice(2,9),k:L.k}); }
       else if(L.kind==='crate'){ me.stash=me.stash||{}; me.stash[L.k]=(me.stash[L.k]||0)+1; }
+      else if(L.kind==='pet'){ me.pets=me.pets||[]; if(me.pets.length>=PET_KEEP) fail('Your pet house is full. Sell a pet first.'); me.pets.push({id:Math.random().toString(36).slice(2,9),k:L.k,lvl:L.lvl||1,name:L.pname||PETS[L.k].name}); if(!me.petOn) me.petOn=me.pets[me.pets.length-1].id; bookAdd(me,'p',L.k); }
       else me[L.k]=(me[L.k]||0)+L.n;
       if(sel2){ settle(sel2); sel2[L.cur]=(sel2[L.cur]||0)+L.price; t.setPlayer(L.seller,sel2); }
       me.lastSeen=now(); t.setPlayer(ME,me); t.setMk(id,null); return L; });
@@ -2610,7 +2613,9 @@ function buyListing(id){ busy||(async()=>{ busy=true;
   }catch(e){ explain(e); } busy=false; if($('shopOv')) shopDialog(); renderAll(); })(); }
 function cancelListing(id){ mkTx(async(t,me)=>{ const L=await t.getMk(id); if(!L||L.seller!==ME) fail('That listing is gone.');
     if(L.kind==='item'){ me.inv=me.inv||[]; if(me.inv.length>=INV_MAX) fail('Your bag is full. Sell something first.'); me.inv.push({id:L.iid||Math.random().toString(36).slice(2,9),k:L.k}); }
-    else if(L.kind==='crate'){ me.stash=me.stash||{}; me.stash[L.k]=(me.stash[L.k]||0)+1; } else { settle(me); me[L.k]=(me[L.k]||0)+L.n; }
+    else if(L.kind==='crate'){ me.stash=me.stash||{}; me.stash[L.k]=(me.stash[L.k]||0)+1; }
+    else if(L.kind==='pet'){ me.pets=me.pets||[]; if(me.pets.length>=PET_KEEP) fail('Your pet house is full.'); me.pets.push({id:L.pid||Math.random().toString(36).slice(2,9),k:L.k,lvl:L.lvl||1,name:L.pname||PETS[L.k].name}); }
+    else { settle(me); me[L.k]=(me[L.k]||0)+L.n; }
     t.setMk(id,null); t.setPlayer(ME,me); },()=>toast('Taken back.')); }
 function exchange(from){ act([],me=>{ const to=from==='gold'?'stone':'gold'; pay(me,{[from]:EXCH.give}); me[to]+=EXCH.get; return {to}; },r=>{ snd('coin'); toast(`+${f(EXCH.get)} ${r.to}`); if($('shopOv')) shopDialog(); }); }
 function buyCrate(k){ const c=CRATES[k]; act([],me=>{ if(stats(ME).hallLvl<c.th) fail(`${c.name}s need Town Hall ${c.th}.`); pay(me,c.cost); me.stash=me.stash||{}; me.stash[k]=(me.stash[k]||0)+1; },()=>{ snd('coin'); toast(`${c.name} added to your bag. Open it later or sell it on the Market.`); if($('shopOv')) shopDialog(); }); }
@@ -2625,8 +2630,8 @@ function setTab(t){ if(t==='shop'){ shopDialog('crates'); return; } curTab=t; do
   document.querySelectorAll('.bnav button').forEach(b=>b.classList.toggle('sel',b.dataset.tab===t)); sheetState(); if(t==='map'){ VW=0; draw(); } try{ window.scrollTo({top:0}); }catch(e){} }
 /* ================= panels ================= */
 function btn(label,cost,on,cls='',needB=false){ return `<button class="${cls}" data-act="${on}" data-g="${cost?.gold||0}" data-s="${cost?.stone||0}" data-m="${cost?.gems||0}" data-b="${needB?1:0}">${label}${cost?`<span class="c">${costTxt(cost)}</span>`:''}</button>`; }
-function odds(A,D){ if(!A) return 'Train an army before you attack.'; const n=.75+.5*hash2(Math.floor(Date.now()/36e5),(sel||'').length*97+(sel?xy(sel)[0]:0),7), r=A/D*n;
-  return 'Scout report: '+(r>1.7?'they look easy to beat.':r>1.2?'you probably have the stronger army.':r>.85?'it looks close. Hard to tell who would win.':r>.6?'they look stronger than you.':'they look much stronger. Be careful!')+' Scouts can be wrong.'; }
+function odds(A,D,lead){ if(!A) return lead?'Pick some troops to send.':'Train an army before you attack.'; const n=.75+.5*hash2(Math.floor(Date.now()/36e5),(sel||'').length*97+(sel?xy(sel)[0]:0),7), r=A/D*n;
+  return (lead||'Scout report (if you send your whole army): ')+(r>1.7?'they look easy to beat.':r>1.2?'you probably have the stronger army.':r>.85?'it looks close. Hard to tell who would win.':r>.6?'they look stronger than you.':'they look much stronger. Be careful!')+' Scouts can be wrong.'; }
 let panelKey='', castSel={rage:false,heal:false};
 const isClanmate=id=>{ const m=P(ME), o=P(id); return !!(m&&o&&id!==ME&&m.clan&&o.clan===m.clan&&G.clans[m.clan]); };
 function lockTxt(t){ const th=B[t].th||1; return stats(ME).hallLvl<th?`Needs Town Hall ${th}`:''; }
@@ -2802,7 +2807,7 @@ function shopDialog(tab){ if(tab) shopTab=tab; const m=P(ME); if(!m||m.dead) ret
       :`${stashHtml?`<div class="label">Unopened crates</div><div class="bag">${stashHtml}</div>`:''}<p class="desc">Gear bonuses now: +${tot('atk')}% attack · -${tot('armor')}% troop losses · +${tot('def')}% defense · +${tot('mine')}% mine output · -${tot('build')}% build time</p>
         <div class="slots">${eqHtml}</div><div class="label">Bag</div><div class="bag">${bag||'<p class="desc">No gear yet. Open a crate!</p>'}</div>`}
     <button class="soft" data-act="shop:close">Close</button></div></div>`;
-  if(shopTab==='market') bindMk(); refreshButtons();
+  if(shopTab==='market'){ bindMk(); try{ startPetLoop(); }catch(e){} } refreshButtons();
 }
 const CRATE_TROOPS={wood:[.08,[['sol',3,6]]],stone:[.08,[['sol',3,6],['arc',3,6]]],iron:[.12,[['sol',6,10],['arc',5,8],['giant',1,2]]],war:[.2,[['giant',2,3],['cav',2,4],['cat',1,2],['kn',1,3]]],
   royal:[.15,[['cav',3,5],['giant',2,4],['cat',1,3]]],legend:[.15,[['giant',4,6],['cav',5,8],['cat',2,4],['kn',3,5],['drg',1,1]]],troop:[1,[['sol',6,12],['arc',5,10],['giant',1,3],['cav',2,4],['cat',1,2]]]};
@@ -3491,10 +3496,10 @@ function petArtHQ(c,x,y,s,k,t,o){ const m=c.getTransform(), sc=Math.max(1,Math.m
   tg.globalCompositeOperation='source-in'; tg.fillStyle=P2.ghost?'#d8c8ff':'#fff1cc'; tg.fillRect(0,0,pw,ph); tg.globalCompositeOperation='destination-out'; tg.drawImage(cv,0,0,pw,ph,d,d*1.1,pw,ph);
   const cx=ox*sc, cy=oy*sc, S=s*sc;
   g.globalCompositeOperation='source-atop';
-  const lg=g.createLinearGradient(cx-S*.55,cy-S*1.05,cx+S*.45,cy); lg.addColorStop(0,'rgba(255,246,220,.22)'); lg.addColorStop(.48,'rgba(255,255,255,0)'); lg.addColorStop(1,'rgba(24,10,36,.30)'); g.fillStyle=lg; g.fillRect(0,0,pw,ph);
+  const lg=g.createLinearGradient(cx-S*.55,cy-S*1.05,cx+S*.45,cy); lg.addColorStop(0,'rgba(255,246,220,.3)'); lg.addColorStop(.45,'rgba(255,255,255,0)'); lg.addColorStop(1,'rgba(24,10,36,.36)'); g.fillStyle=lg; g.fillRect(0,0,pw,ph);
   const ag=g.createLinearGradient(0,cy-S*.22,0,cy); ag.addColorStop(0,'rgba(0,0,0,0)'); ag.addColorStop(1,'rgba(12,6,0,.32)'); g.fillStyle=ag; g.fillRect(0,0,pw,ph);
   const pat=g.createPattern(petNoise(),'repeat'); if(pat){ const ps=Math.max(.45,S/115); try{ pat.setTransform(new DOMMatrix([ps,0,0,ps,0,0])); }catch(e){} g.globalAlpha=P2.ghost?.04:P2.shape==='turtle'?.07:.12; g.fillStyle=pat; g.fillRect(0,0,pw,ph); g.globalAlpha=1; }
-  g.globalCompositeOperation='lighter'; g.globalAlpha=REAL?.35:.5; g.drawImage(tp,0,0,pw,ph,0,0,pw,ph); g.globalAlpha=1; g.globalCompositeOperation='source-over';
+  g.globalCompositeOperation='lighter'; g.globalAlpha=REAL?.5:.6; g.drawImage(tp,0,0,pw,ph,0,0,pw,ph); g.globalAlpha=1; g.globalCompositeOperation='source-over';
   c.drawImage(cv,0,0,pw,ph,x-ox,y-oy,W,H); }
 /* A pet's guard attack, drawn in battles: a projectile from the pet to (x1,y1) at progress q (0..1) */
 function petShot(c,k,x0,y0,x1,y1,q,s){ const P2=PETS[k]||PETS.fox, x=x0+(x1-x0)*q, y=y0+(y1-y0)*q-Math.sin(q*Math.PI)*s*.2;
@@ -4306,7 +4311,9 @@ function marchDialog(cell){ const m=P(ME), tg=G.plots[cell]; if(!m||!tg) return;
     <div class="mRows">${have.map(u=>`<div class="mRow"><b>${UNITS[u].pl||UNITS[u].name+'s'}</b><button class="soft" data-m="${u}:-">−</button><input type="number" min="0" max="${m[u]}" value="${m[u]}" data-mi="${u}"><button class="soft" data-m="${u}:+">+</button><button class="soft" data-m="${u}:all">All ${m[u]}</button><button class="soft" data-m="${u}:0">None</button></div>`).join('')||'<p class="desc">Only your heroes will go.</p>'}</div>
     <p class="desc" id="mSum"></p><p class="desc">🚶 They walk about <b>${dist(from,cell)} tiles</b>, which takes <b>${fmtT(secs)}</b>.${heroReady(m)?' Your heroes go with them.':''}</p>
     <div class="row"><button class="war" id="mGo">⚔️ March!</button><button class="soft" data-act="ov:close">Cancel</button></div></div></div>`;
-  const sum=()=>{ const n=marchN(mSend); $('mSum').innerHTML=`Sending <b>${f(n)} troops</b>${n?'':' (pick at least one, or send only your heroes)'}.`; };
+  const sum=()=>{ const n=marchN(mSend), mm={...m}; ATK.forEach(u=>mm[u]=mSend[u]||0); let sc='';
+    try{ if(tg.b!=='boss'){ const A=atkOf(mm,tg.o==='npc'), D=tg.o==='npc'?(tg.power||1):defOf(P(tg.o),cell,tg,mm.cat||0,mm.brk||0); sc=`<br>🔭 ${odds(A,D,'Scout report with <b>these</b> troops: ')}`; } }catch(e){}
+    $('mSum').innerHTML=`Sending <b>${f(n)} troop${n===1?'':'s'}</b>${n?'':' (pick at least one, or send only your heroes)'}.${sc}`; };
   document.querySelectorAll('#marchOv [data-mi]').forEach(inp=>inp.oninput=()=>{ const u=inp.dataset.mi; mSend[u]=Math.max(0,Math.min(m[u]||0,Math.floor(+inp.value||0))); sum(); });
   document.querySelectorAll('#marchOv [data-m]').forEach(b=>b.onclick=()=>{ const [u,op]=b.dataset.m.split(':'), mx=m[u]||0, step=Math.max(1,Math.round(mx/10)); let v=mSend[u]||0;
     v=op==='+'?v+step:op==='-'?v-step:op==='all'?mx:0; mSend[u]=Math.max(0,Math.min(mx,v)); const inp=document.querySelector(`#marchOv [data-mi="${u}"]`); if(inp) inp.value=mSend[u]; sum(); });
@@ -4368,7 +4375,7 @@ function sendNear(text){ text=(text||'').replace(/\s+/g,' ').trim().slice(0,200)
   const [zx,zy]=zoneOf(h), msg={uid:ME,name:P(ME).name,text,t:now(),cell:h}; $('nearIn').value=''; Promise.resolve(DB.sendChat(`near_${zx}_${zy}`,msg)).catch(e=>explain(e)); snd('click'); }
 function drawBubbles(v){ if(cam.z<.4||!nearBub) return; const tn=now();
   for(const uid in nearBub){ const b=nearBub[uid]; if(tn-b.t>10000){ delete nearBub[uid]; continue; } const p=P(uid); if(!p||!p.hall) continue; const [hx,hy]=ctr(...xy(p.hall)); if(hx<v.x0-TW||hx>v.x1+TW||hy<v.y0-TW*2||hy>v.y1+TW) continue;
-    const txt=cleanText(b.text).slice(0,40)+(b.text.length>40?'…':''), fs=Math.max(TW*.14,11/cam.z); ctx.font=`600 ${fs}px sans-serif`; ctx.textAlign='center'; const w=ctx.measureText(txt).width+fs, h=fs*1.6, y=hy-TW*1.7;
+    const txt=cleanText(b.text).slice(0,40)+(b.text.length>40?'…':''), fs=Math.max(TW*.14,11/cam.z); ctx.font=`600 ${fs}px sans-serif`; ctx.textAlign='center'; const w=ctx.measureText(txt).width+fs, h=fs*1.6, y=hy-TW*(G.plots[p.hall]&&G.plots[p.hall].big?2.5:1.7);
     ctx.save(); ctx.globalAlpha=Math.min(1,(10000-(tn-b.t))/800); ctx.fillStyle='#fffaf0'; ctx.strokeStyle='#3b2412'; ctx.lineWidth=Math.max(1,1.5/cam.z); pillPath(hx-w/2,y-h,w,h,h/2.4); ctx.fill(); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(hx-fs*.3,y-1); ctx.lineTo(hx,y+fs*.5); ctx.lineTo(hx+fs*.3,y-1); ctx.closePath(); ctx.fill(); ctx.stroke(); ctx.fillStyle='#3b2412'; ctx.fillText(txt,hx,y-h*.3); ctx.restore(); } }
 
