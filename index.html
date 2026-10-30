@@ -101,6 +101,7 @@ button.sel{outline:3px solid #fff;outline-offset:1px;filter:brightness(1.12)}
 .hero{border-top:1px dashed rgba(122,74,36,.35);padding-top:6px;display:flex;flex-direction:column;gap:4px}
 .battle{max-width:900px;gap:8px}.bhead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.bhead b{flex:1;min-width:0}.bhead .stars{font-size:1.6rem}.bhead button{margin:0}
 #bat{border:3px solid var(--woodd);border-radius:12px;display:block}
+body.real #map,body.real #bat,body.real .petcv,body.real .castleCv{filter:saturate(.74) contrast(1.07) brightness(.96) sepia(.12)}
 .bbar{height:8px;background:rgba(74,42,16,.25);border-radius:5px;overflow:hidden}.bbar i{display:block;height:100%;width:0;background:#e8402f}
 .rbtn{display:inline-flex;font-size:.75rem!important;padding:2px 8px 3px!important;margin:2px 0 0!important}
 .reveal .bar{align-self:stretch}
@@ -238,7 +239,7 @@ textarea{min-height:110px;font-size:.75rem;word-break:break-all}
 .cdesc{margin:0;font-style:italic}.cinfo{grid-column:1/-1;margin:-2px 0 4px 24px;font-size:.8rem}
 .csets summary{cursor:pointer;font-weight:900;color:var(--ink)}.csets .mkform{margin-top:6px}.csets label{display:flex;flex-direction:column;font-size:.8rem;font-weight:800;gap:2px;flex:1}
 .hbtn.locked{filter:grayscale(.7);opacity:.75}
-details.help{border:2px solid rgba(122,74,36,.3);border-radius:12px;padding:6px 10px;background:rgba(255,255,255,.35)}details.help summary{cursor:pointer;font-weight:900;font-size:1.05rem;color:var(--ink);text-shadow:none;-webkit-text-stroke:0}details.help p{margin:6px 0 2px}
+details.help,details.help div,details.help p,details.help li{color:var(--ink);text-shadow:none}details.help b{color:#5a2a0c}details.help{border:2px solid rgba(122,74,36,.3);border-radius:12px;padding:6px 10px;background:rgba(255,255,255,.35)}details.help summary{cursor:pointer;font-weight:900;font-size:1.05rem;color:var(--ink);text-shadow:none;-webkit-text-stroke:0}details.help p{margin:6px 0 2px}
 .warbox{display:flex;align-items:center;justify-content:space-between;gap:8px;background:linear-gradient(90deg,rgba(58,123,213,.15),rgba(232,64,47,.15));border-radius:12px;padding:8px 10px}
 .warbox div{display:flex;flex-direction:column;align-items:center;flex:1}.warbox .wst{font-size:1.6rem;font-weight:900;color:#c98a00}.warbox .vs{font-weight:900;font-size:1.2rem;color:#7a1a0f}
 .bspells{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.bspells .desc{flex:1 1 100%;margin:0}.bspells button{margin:0;font-size:.9rem;padding:6px 12px 7px}.bspells button[disabled]{opacity:.55}.bspells button.used{outline:3px solid #ffd13b}
@@ -309,7 +310,7 @@ button.big{font-size:1.15rem;padding:10px 18px 11px}
       <div class="card" data-t="more"><div class="label">War report</div><ul class="log" id="log"></ul></div>
       <div class="card" data-t="more"><div class="label">Settings</div>
         <div class="row">
-          <button id="bGfx" class="soft">Graphics: Auto</button><button id="bSound" class="soft">Sound: on</button><button id="bMusic" class="soft">Music: off</button><button class="soft" data-act="tut:again">Replay tutorial</button><button class="soft" data-act="help">How to play</button>
+          <button id="bStyle" class="soft">Style: Realistic</button><button id="bGfx" class="soft">Graphics: Auto</button><button id="bSound" class="soft">Sound: on</button><button id="bMusic" class="soft">Music: off</button><button class="soft" data-act="tut:again">Replay tutorial</button><button class="soft" data-act="help">How to play</button>
           <button id="bNewAcct" class="soft">New account</button><button id="bChg" class="soft">Change account</button>
           <button id="bAbandon" class="war">Abandon kingdom</button>
         </div>
@@ -376,7 +377,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 36;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
+const GAME_VERSION = 41;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
 const NEW_SHIELD_MIN = 120;     // peace shield for brand new kingdoms
 const DEFEND_SHIELD_MIN = 30;   // peace shield after being attacked
 const CAMP_MAX = 25;            // highest barbarian camp level
@@ -495,15 +496,32 @@ const defaultStats=()=>({bosses:0,brk:0,heal:0,crates:0,dailies:0,spins:0,jackpo
 
 /* ================= sound ================= */
 let AC=null;
+/* medieval instruments made from tones and noise: lute plucks, brass horns, bells, war drums and coins */
+let sndOut=null;
+function sndBus(){ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(!sndOut){ const comp=AC.createDynamicsCompressor(); comp.threshold.value=-18; comp.ratio.value=3; const g=AC.createGain(); g.gain.value=.9; g.connect(comp).connect(AC.destination); sndOut=g; } return sndOut; }
+function iPluck(f,t,dur,vol,dest){ const o=AC.createOscillator(), o2=AC.createOscillator(), lp=AC.createBiquadFilter(), g=AC.createGain(), g2=AC.createGain(); o.type='sawtooth'; o2.type='triangle'; o.frequency.value=f; o2.frequency.value=f*2.004; g2.gain.value=.35;
+  lp.type='lowpass'; lp.Q.value=2; lp.frequency.setValueAtTime(Math.min(9000,f*9),t); lp.frequency.exponentialRampToValueAtTime(Math.max(200,f*1.3),t+dur*.5);
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.004); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.connect(lp); o2.connect(g2).connect(lp); lp.connect(g).connect(dest||sndBus()); o.start(t); o2.start(t); o.stop(t+dur+.05); o2.stop(t+dur+.05); }
+function iHorn(f,t,dur,vol,dest){ const o=AC.createOscillator(), lp=AC.createBiquadFilter(), g=AC.createGain(), lfo=AC.createOscillator(), lg=AC.createGain(); o.type='sawtooth'; o.frequency.value=f; lfo.frequency.value=5.2; lg.gain.value=f*.006; lfo.connect(lg).connect(o.frequency);
+  lp.type='lowpass'; lp.Q.value=.8; lp.frequency.setValueAtTime(f*1.5,t); lp.frequency.linearRampToValueAtTime(f*5,t+.08); lp.frequency.linearRampToValueAtTime(f*3.2,t+dur);
+  g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.06); g.gain.setValueAtTime(vol*.85,t+Math.max(.07,dur-.12)); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.connect(lp).connect(g).connect(dest||sndBus()); o.start(t); lfo.start(t); o.stop(t+dur+.05); lfo.stop(t+dur+.05); }
+function iBell(f,t,dur,vol,dest){ [[1,1],[2.76,.5],[5.4,.28],[8.93,.12]].forEach(([m,a])=>{ const o=AC.createOscillator(), g=AC.createGain(); o.type='sine'; o.frequency.value=f*m; g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol*a,t+.003); g.gain.exponentialRampToValueAtTime(.0001,t+dur/(1+m*.3)); o.connect(g).connect(dest||sndBus()); o.start(t); o.stop(t+dur+.05); }); }
+function iNoise(t,dur,type,f,q,vol,dest){ if(!noiseBuf){ noiseBuf=AC.createBuffer(1,AC.sampleRate*.6,AC.sampleRate); const d=noiseBuf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; }
+  const n=AC.createBufferSource(); n.buffer=noiseBuf; const fl=AC.createBiquadFilter(); fl.type=type; fl.frequency.value=f; fl.Q.value=q; const g=AC.createGain(); g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur); n.connect(fl).connect(g).connect(dest||sndBus()); n.start(t); n.stop(t+dur+.02); }
+function iDrum(t,vol,f0,dest){ const o=AC.createOscillator(), g=AC.createGain(); o.type='sine'; o.frequency.setValueAtTime(f0||120,t); o.frequency.exponentialRampToValueAtTime(42,t+.28); g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol,t+.005); g.gain.exponentialRampToValueAtTime(.0001,t+.35); o.connect(g).connect(dest||sndBus()); o.start(t); o.stop(t+.4); iNoise(t,.12,'lowpass',500,.7,vol*.5,dest); }
+const NT=n=>146.83*Math.pow(2,n/12);   // semitones above low D
 function snd(kind){
   if(G.muted) return;
-  try{
-    AC=AC||new (window.AudioContext||window.webkitAudioContext)();
-    const seq={click:[[660,.035]],build:[[440,.06],[660,.09]],coin:[[880,.05],[1320,.09]],gem:[[1046,.05],[1568,.12]],win:[[523,.1],[659,.1],[784,.22]],lose:[[300,.16],[210,.3]],alarm:[[720,.12],[500,.12],[720,.12],[500,.14]],march:[[160,.05],[0,.04],[160,.05],[0,.04],[160,.05]],quest:[[660,.07],[880,.07],[1100,.16]]}[kind];
-    let t=AC.currentTime;
-    for(const [fq,d] of seq){ if(fq){ const o=AC.createOscillator(),g=AC.createGain(); o.type=(kind==='lose'||kind==='march'||kind==='alarm')?'sawtooth':'triangle'; o.frequency.value=fq;
-      g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.09,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+d);
-      o.connect(g).connect(AC.destination); o.start(t); o.stop(t+d+.02);} t+=d; }
+  try{ sndBus(); if(AC.state==='suspended') AC.resume(); const t=AC.currentTime+.01;
+    if(kind==='click'){ iNoise(t,.05,'bandpass',1600,1.2,.5); iPluck(NT(24),t,.15,.07); }
+    else if(kind==='build'){ for(const d of [0,.16]){ iBell(1180,t+d,.35,.06); iNoise(t+d,.05,'highpass',3000,1,.06); } }
+    else if(kind==='coin'){ iBell(2350,t,.3,.07); iBell(3120,t+.07,.32,.06); iNoise(t+.07,.05,'highpass',6000,1,.05); }
+    else if(kind==='gem'){ [0,.08,.16].forEach((d,i)=>iBell(NT(36+[0,7,12][i]),t+d,.9,.05)); }
+    else if(kind==='win'){ [[0,0,.22],[.22,4,.22],[.44,7,.22],[.66,12,.7]].forEach(([d,n,len])=>{ iHorn(NT(12+n),t+d,len,.07); iHorn(NT(n),t+d,len,.04); }); iDrum(t,.25,110); iDrum(t+.66,.3,100); }
+    else if(kind==='lose'){ iHorn(NT(7),t,.45,.06); iHorn(NT(3),t+.45,.5,.06); iHorn(NT(0),t+.95,.9,.06); iDrum(t+.95,.25,80); }
+    else if(kind==='alarm'){ iHorn(NT(0),t,.6,.08); iHorn(NT(7)/2,t,.6,.05); iHorn(NT(0),t+.75,.9,.08); iHorn(NT(7)/2,t+.75,.9,.05); iDrum(t,.3,90); iDrum(t+.75,.3,90); }
+    else if(kind==='march'){ [0,.18,.36,.6].forEach((d,i)=>iDrum(t+d,i===3?.32:.22,i===3?95:130)); }
+    else if(kind==='quest'){ [0,4,7,12,7,12].forEach((n,i)=>iPluck(NT(12+n),t+i*.075,.9,.06)); iBell(NT(36),t+.45,1.1,.025); }
   }catch(e){}
 }
 /* battle sound effects made from noise and tones (no sound files needed) */
@@ -520,7 +538,7 @@ function sfx(kind,vol=1){ if(G.muted) return; const nowMs=performance.now(), gap
     else if(kind==='swoosh'){ noise(.18,'bandpass',600,2400,3,.18); }
     else if(kind==='crumble'){ noise(.8,'lowpass',900,60,.5,.5); tone('sine',70,35,.6,.25); }
     else if(kind==='heal'){ tone('sine',660,990,.25,.05); tone('sine',990,1320,.3,.04,.08); }
-    else if(kind==='cheer'){ noise(1.4,'bandpass',900,1500,.8,.25); [523,659,784,1046].forEach((f,i)=>tone('triangle',f,f,.35,.06,i*.09)); }
+    else if(kind==='cheer'){ noise(1.4,'bandpass',900,1500,.8,.25); [0,4,7,12].forEach((n,i)=>iHorn(NT(12+n),t+i*.14,i===3?.6:.16,.05,out)); }
   }catch(e){} }
 const toastQ=[]; let toastOn=false;
 function toast(t,bad){ if(toastQ.some(q=>q.t===t)) return; const cur=document.querySelector('.toast'); if(cur&&cur.textContent===t) return;
@@ -542,7 +560,7 @@ function statsRaw(id){
 }
 /* Resources only grow while you are online. 'Online' means the game is open in a visible tab and you used it in the last few minutes. */
 const ONLINE_GRACE=4*60000, NEWBIE_MIN=150;
-const newbieLeft=p=>!p||p.newbieOff?0:Math.max(0,NEWBIE_MIN-(p.played||0));
+const newbieLeft=p=>!p||p.newbieOff||!p.created?0:Math.max(0,NEWBIE_MIN-(now()-p.created)/60000);   // 2.5 hours of real time after founding your kingdom
 const isNewbie=p=>newbieLeft(p)>0;
 const activeEnd=p=>!p?now():Math.min(now(),Math.max(p.t||0,p.lastSeen||p.t||now())+ONLINE_GRACE);
 function cur(p){ if(!p) return {gold:0,stone:0}; const s=stats(p.id), el=Math.max(0,(activeEnd(p)-(p.t||now()))/60000);
@@ -587,7 +605,13 @@ function nearestOwn(id,cell){ let best=null,bd=1e9; for(const k in G.plots) if(G
 const online=p=>p&&now()-(p.lastSeen||0)<ONLINE_MIN*60000;
 const afkDays=p=>(now()-(p.lastSeen||0))/864e5;
 const inClan=p=>!!(p&&p.clan&&G.clans[p.clan]&&(G.clans[p.clan].members||[]).includes(p.id));
-const treaty=p=>inClan(p)&&!online(p)&&afkDays(p)<TREATY_AFK_DAYS;
+const treaty=p=>false;   // replaced by the 'attacked while offline' protection below
+const OFF_LOCK=30*864e5, BACK_MIN=15;          // after an offline attack: safe until back online, then 15 more minutes
+/* You can only attack a kingdom from outside: a tile is open if one of its 4 neighbours is land that this kingdom does not own. Lakes count as walls. */
+function exposedTile(cell,owner,reg){ const [x,y]=xy(cell); for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const nx=x+dx, ny=y+dy; if(!inB(nx,ny)||Wt(nx,ny)) continue; const nk=cid(nx,ny);
+    const q=reg&&regionOf(nk)===regionOf(cell)?reg[nk]:G.plots[nk]; if(!q||q.o!==owner) return true; } return false; }
+const offLocked=p=>!!(p&&(p.shield||0)>now()+7*864e5);
+const shieldTxt=p=>offLocked(p)?'Attacked while offline: protected until they come back online, then for 15 more minutes.':'Protected by a peace shield for '+fmtT((((p&&p.shield)||0)-now())/1000)+'.';
 const nameKey=n=>encodeURIComponent(String(n).trim().toLowerCase().replace(/\s+/g,' ')).replace(/\./g,'%2E').slice(0,140)||'x';
 
 /* ================= backends ================= */
@@ -612,7 +636,7 @@ function firebaseBackend(){
     watchPlayers:cb=>PL.onSnapshot(guard(s=>{ const m={}; s.forEach(d=>m[d.id]={...d.data(),id:d.id}); cb(m); },'loading players'),netError),
     watchRegion:(rk,cb)=>RG.doc(rk).onSnapshot(guard(d=>cb(d.exists?(d.data().p||{}):{}),'loading the map'),netError),
     watchInbox:(uid,cb)=>PL.doc(uid).collection('inbox').orderBy('t','desc').limit(20).onSnapshot(guard(s=>cb(s.docs.map(d=>d.data())),'the war report'),()=>{}),
-    addInbox:(uid,e)=>PL.doc(uid).collection('inbox').add(e).catch(()=>{}),
+    addInbox:(uid,e)=>{ try{ return PL.doc(uid).collection('inbox').add(e).catch(()=>{}); }catch(err){ return Promise.resolve(); } },
     watchClans:cb=>CL.onSnapshot(guard(s=>{ const m={}; s.forEach(d=>m[d.id]={...d.data(),id:d.id}); cb(m); },'loading clans'),netError),
     watchChat:(id,cb)=>CL.doc(id).collection('chat').orderBy('t','desc').limit(40).onSnapshot(guard(s=>cb(s.docs.map(d=>d.data())),'clan chat'),()=>{}),
     sendChat:(id,msg)=>CL.doc(id).collection('chat').add(msg),
@@ -714,6 +738,7 @@ let lastSnapR=0, snapT=null;
 function snapRender(){ const d=Date.now()-lastSnapR; if(d>900){ lastSnapR=Date.now(); queueRender(); } else if(!snapT) snapT=setTimeout(()=>{ snapT=null; lastSnapR=Date.now(); queueRender(); },900-d); }
 function onPlayers(m){ G.players=m; playersReady=true; checkMe(); snapRender(); { const ae=document.activeElement; if($('shopOv')&&!busy&&!(ae&&/INPUT|SELECT/.test(ae.tagName)&&$('shopOv').contains(ae))) shopDialog(); } checkSeasonAndWar(); if($('rewOv')&&!busy&&!spinning) rewardsDialog(); }
 function onInbox(list){
+  list=list.map(e=>{ if(e&&e.rj&&!e.replay){ try{ return {...e,replay:JSON.parse(e.rj)}; }catch(err){} } return e; });
   const fresh=list.filter(e=>e.t>sessionStart&&e.from&&e.from!==ME&&!inbox.some(o=>o.t===e.t&&o.text===e.text));
   inbox=list;
   if(fresh.length){ const e=fresh[0]; snd(e.kind==='bad'?'alarm':'quest'); toast(e.text,e.kind==='bad'); if(e.cell) flash(e.cell,e.kind==='bad'?'#d8402f':'#8be35a'); }
@@ -734,7 +759,8 @@ function syncRegions(){ if(!DB||!ME||!playersReady) return; const want=wantedReg
   for(const rk of want){ const s=regSubs.get(rk); if(s) s.last=t; else { const rec={last:t}; regSubs.set(rk,rec); rec.unsub=DB.watchRegion(rk,p=>onRegion(rk,p)); } }
   for(const [rk,s] of regSubs) if(!want.has(rk)&&t-s.last>30000){ try{ s.unsub&&s.unsub(); }catch(e){} regSubs.delete(rk); onRegion(rk,{}); } }
 let camReady=false;
-function report(uid,text,kind,cell,replay,extra){ return DB.addInbox(uid,{t:now(),text,kind,from:ME,cell:cell||null,...(replay?{replay}:{}),...(extra||{})}); }
+// battle replays are saved as text: the online database cannot store lists inside lists
+function report(uid,text,kind,cell,replay,extra){ let rj=null; try{ rj=replay?JSON.stringify(replay):null; }catch(e){} return DB.addInbox(uid,{t:now(),text,kind,from:ME,cell:cell||null,...(rj&&rj.length<600000?{rj}:{}),...(extra||{})}); }
 
 /* ================= actions (each one is a server transaction) ================= */
 class UErr extends Error{}
@@ -859,9 +885,10 @@ async function attack(cell,opts){
   if(busy||!P(ME)||P(ME).dead) return; const tg0=G.plots[cell]; if(!tg0||tg0.o===ME) return;
   if(!attackers(P(ME))&&!heroReady(P(ME))&&!(tg0.o==='npc'&&towerSup(ME,cell))) return toast('You need an army to attack. Archers only defend.',true);
   if(tg0.o!=='npc'&&isClanmate(tg0.o)) return toast('You cannot attack your own clanmates.',true);
-  if(tg0.o!=='npc'&&isNewbie(P(tg0.o))) return toast(`${P(tg0.o)?.name||'They'} is a newcomer and protected for ${fmtT(newbieLeft(P(tg0.o))*60)} more of play time.`,true);
+  if(tg0.o!=='npc'&&isNewbie(P(tg0.o))) return toast(`${P(tg0.o)?.name||'They'} is a newcomer and protected for ${fmtT(newbieLeft(P(tg0.o))*60)} more.`,true);
   const rvg=!!(opts&&opts.revenge);
   if(!rvg&&distFromMe(cell)>MARCH_RANGE) return toast(`Too far away. Your army can march ${MARCH_RANGE} tiles from your borders.`,true);
+  if(tg0.o!=='npc'&&!exposedTile(cell,tg0.o)) return toast(`That tile is surrounded by ${P(tg0.o)?.name||'their'}'s land. Capture a tile on the edge of their kingdom first to open a path.`,true);
   if(!rvg&&tg0.o!=='npc'&&treaty(P(tg0.o))) return toast(`${P(tg0.o).name} is offline and protected by their clan's peace treaty.`,true);
   if(tg0.o!=='npc'&&(P(tg0.o)?.shield||0)>now()) return toast(`${P(tg0.o)?.name||'They'} ${P(tg0.o)?'is':'are'} under a peace shield.`,true);
   const area=areaSnap(cell,tg0.o==='npc'?'npc':tg0.o);
@@ -882,7 +909,7 @@ async function attack(cell,opts){
       if(tg.o!=='npc'){ v=await t.getPlayer(tg.o); if(!v||v.dead) fail('That kingdom is gone.'); if((v.shield||0)>now()) fail(`${v.name} is under a peace shield.`);
         if(me.clan&&v.clan===me.clan) fail('You cannot attack your own clanmates.'); if(isNewbie(v)) fail(`${v.name} is a newcomer and still protected.`); isHall=tg.b==='hall';
         if(rvg){ me.rev=me.rev||[]; if(me.rev.includes(opts.revenge)) fail('You already took your revenge.'); me.rev=[...me.rev.slice(-19),opts.revenge]; }
-        if(v.clan&&!rvg){ const vc=v.clan===me.clan?myC:await t.getClan(v.clan); const idle=now()-(v.lastSeen||0); if(vc&&(vc.members||[]).includes(v.id)&&idle>=ONLINE_MIN*60000&&idle<TREATY_AFK_DAYS*864e5) fail(`${v.name} is offline and protected by their clan's peace treaty.`); }
+        if(!exposedTile(cell,v.id,reg)) fail(`That tile is surrounded by ${v.name}'s land. Capture a tile on the edge of their kingdom first to open a path.`);
         const rks=new Set([regionOf(cell)]); for(const k in G.plots){ const q=G.plots[k]; if(q.o===v.id&&(isHall||q.b==='trap')) rks.add(regionOf(k)); }
         for(const rk of rks) if(rk!==regionOf(cell)) vRegs.push([rk,await t.getRegion(rk)]); vRegs.push([regionOf(cell),reg]); }
       settle(me); const heroOn=heroReady(me), sup=tg.o==='npc'?supTowers(ME,cell):[], supA=sup.reduce((a,q)=>a+TOWER_SUP*q[2],0); if(!attackers(me)&&!heroOn&&!supA) fail('You need an army to attack. Archers only defend.');
@@ -928,7 +955,7 @@ async function attack(cell,opts){
       const share=win?(isHall?1:.35):0; let sg=v.gold*share, ss=v.stone*share; me.gold+=sg; me.stone+=ss; v.gold-=sg; v.stone-=ss;
       { const lm=win?lootB(me)+(rvg?.5:0):0; if(lm>0){ const bg=Math.round(sg*lm), bs=Math.round(ss*lm); me.gold+=bg; me.stone+=bs; sg+=bg; ss+=bs; } if(win) out.tok=evGain(me,4); }
       if(win&&!isHall){ const c=stored(tg); if(c>0){ if(PROD[tg.b].res==='gold'){ me.gold+=c; sg+=c; } else { me.stone+=c; ss+=c; } } }
-      v.shield=now()+DEFEND_SHIELD_MIN*60000;
+      const vOff=now()-(v.lastSeen||0)>=ONLINE_MIN*60000; v.shield=vOff?now()+OFF_LOCK:now()+DEFEND_SHIELD_MIN*60000; out.vOff=vOff;
       const trA=win?6+stars*6:-10, trD=win?-(4+stars*4):8; out.promo=trophyChange(me,trA); trophyChange(v,trD);
       v.stats=Object.assign(defaultStats(),v.stats||{}); win?v.stats.lost++:v.stats.won++;
       if(win){ me.stats.captures++; me.stats.looted+=sg+ss; me.wk.wins++; me.wk.loot+=sg+ss; me.wk.stars+=stars;
@@ -941,7 +968,7 @@ async function attack(cell,opts){
       const trapTxt=out.sprung?` ${out.sprung} hidden trap${out.sprung>1?'s':''} caught ${out.trapped} of your troops.`:'';
       const extraTxt=(brkN?` ${brkN} wall breaker${brkN>1?'s':''} blew up the defenses.`:'')+(flank>1?` Attacking from ${flank} sides gave +${Math.round((flankMult(flank)-1)*100)}% attack.`:'');
       out.text=(rvg?'Revenge! ':'')+(!win?`Your attack on ${v.name}'s ${what} failed. ${aLost} troops lost.`:isHall?`You conquered ${v.name}! Took all their land, ${f(sg)} gold, ${f(ss)} stone and 25 gems.`:`Captured ${v.name}'s ${what}: +${f(sg)} gold, +${f(ss)} stone.`)+trapTxt+extraTxt+(out.warStars?` +${out.warStars} clan war stars!`:'');
-      out.vText=(!win?`${me.name} attacked your ${what} and was beaten back. You lost ${dLost} troops and gained ${trD} trophies.`:isHall?`${me.name} took your Town Hall and everything you owned.`:`${me.name} captured your ${what} and stole ${f(sg)} gold and ${f(ss)} stone. You lost ${-trD} trophies.`)+(out.sprung?` Your traps caught ${out.trapped} of their troops.`:'');
+      out.vText=(vOff?'While you were offline, ':'')+(!win?`${me.name} attacked your ${what} and was beaten back. You lost ${dLost} troops and gained ${trD} trophies.`:isHall?`${me.name} took your Town Hall and everything you owned.`:`${me.name} captured your ${what} and stole ${f(sg)} gold and ${f(ss)} stone. You lost ${-trD} trophies.`)+(out.sprung?` Your traps caught ${out.trapped} of their troops.`:'')+(vOff?' You are now protected until you come back online, and for 15 minutes after that.':'');
       t.setPlayer(ME,me); t.setPlayer(v.id,v);
       return out;
     });
@@ -1102,7 +1129,16 @@ const grassCol=(x,y)=>{ const S=G.seed|0, n=vnoise(x/3.5,y/3.5,S+4), m=vnoise(y/
 
 /* ================= camera ================= */
 let lastIH=0, VW=0,VH=0,TW=46,TH=23,OX=0,OY=0,LW=1,cam={z:1,x:0,y:0},camFor=null;
-const OL='rgba(48,26,10,.85)';
+/* Art style: 'realistic' (default: muted colours, fine outlines, film grain) or 'classic' (bright cartoon) */
+let REAL=(()=>{ try{ return localStorage.getItem('iron-acre-style')!=='classic'; }catch(e){ return true; } })();
+let OL=REAL?'rgba(38,28,18,.5)':'rgba(48,26,10,.85)';
+let grainPat=null;
+function grain(g,W,H,a){ if(!REAL||lowGfx) return; if(!grainPat){ const c=document.createElement('canvas'); c.width=c.height=160; const x=c.getContext('2d'), im=x.createImageData(160,160);
+    for(let i=0;i<im.data.length;i+=4){ const v=Math.random()*255; im.data[i]=im.data[i+1]=im.data[i+2]=v; im.data[i+3]=Math.random()<.5?40:0; } x.putImageData(im,0,0); grainPat=c; }
+  g.save(); g.globalAlpha=a; g.fillStyle=g.createPattern(grainPat,'repeat'); g.translate((Math.random()*160)|0,(Math.random()*160)|0); g.fillRect(-160,-160,W+320,H+320); g.restore(); }
+function setStyle(real){ REAL=real; try{ localStorage.setItem('iron-acre-style',real?'realistic':'classic'); }catch(e){} OL=REAL?'rgba(38,28,18,.5)':'rgba(48,26,10,.85)'; CH_OL=REAL?'rgba(30,22,14,.55)':'rgba(36,22,10,.92)';
+  document.body.classList.toggle('real',REAL); try{ spriteCache.clear&&spriteCache.clear(); }catch(e){} try{ petSprC.clear(); }catch(e){} VW=0; if(typeof clearChunks==='function') clearChunks(); styleBtn(); draw(); }
+function styleBtn(){ const b=$('bStyle'); if(b) b.textContent='Style: '+(REAL?'Realistic':'Cartoon'); }
 let camInit=false;
 function layout(){
   const w=cv.clientWidth; if(!w) return false;
@@ -1577,9 +1613,15 @@ function drawTrap(cx,cy,p){ const u=TW; ell(cx,cy,u*.2,u*.1,p.sprung?'#6b3a2a':'
   else { ctx.strokeStyle='#ff6b4a'; ctx.lineWidth=Math.max(LW*2,1/cam.z); ctx.beginPath(); ctx.moveTo(cx-u*.08,cy-u*.04); ctx.lineTo(cx+u*.08,cy+u*.04); ctx.moveTo(cx+u*.08,cy-u*.04); ctx.lineTo(cx-u*.08,cy+u*.04); ctx.stroke(); }
   if(cam.z>=.5) badge(cx,cy,p.lvl,p.sprung?'#ff8a70':'#ffd13b'); }
 function drawCell(x,y,t){ drawCell0(x,y,t); const p=G.plots[cid(x,y)]; if(!p||p.o==='npc') return; const [cx,cy]=ctr(x,y);
-  if(p.b==='hall'&&p.lvl&&cam.z>=.4){ const pt=myPet(P(p.o)); if(pt&&PETS[pt.k]) overDraw.push([cy+TW*.2,()=>petArt(ctx,cx+TW*.36,cy+TW*.2,TW*.5,pt.k,lowGfx?0:NOWT,{lvl:pt.lvl,dir:-1,ph:(x*7+y)%6})]); }
+  if(p.b==='hall'&&p.lvl&&cam.z>=.4){ const pt=myPet(P(p.o)); if(pt&&PETS[pt.k]) overDraw.push([cy+TW*.2,()=>petOnMap(cx+TW*.36,cy+TW*.2,TW*.5,pt.k,pt.lvl,-1,(x*7+y)%6,NOWT)]); }
   if(p.o===ME){ const m=P(ME); if(tmapOn(m)&&m.tmap.cell===cid(x,y)) overDraw.push([cy+TW,()=>drawTreasureX(cx,cy)]); } }
-let overDraw=[];
+let overDraw=[], glowTop=null;
+/* pets on the map are drawn once into a small picture and reused, so lots of pets on screen stay smooth */
+const petSprC=new Map();
+function petOnMap(x,y,size,k,lvl,dir,ph,T){ const px=Math.max(12,Math.min(400,Math.round(size*cam.z*mapDpr()/6)*6)), key=k+'|'+lvl+'|'+px+'|'+dir; let sp=petSprC.get(key);
+  if(!sp){ if(petSprC.size>48) petSprC.clear(); const W=Math.ceil(px*2.6), H=Math.ceil(px*2.3), cv=document.createElement('canvas'); cv.width=W; cv.height=H; petArt(cv.getContext('2d'),W/2,H*.86,px,k,900,{lvl,dir,ph}); sp={cv,W,H,px}; petSprC.set(key,sp); }
+  const sc=size/sp.px, br=RM?1:1+Math.sin(T/520+ph)*.02, hop=RM?0:Math.max(0,Math.sin(T/700+ph*3))**8*size*.12;
+  ctx.drawImage(sp.cv,x-sp.W/2*sc,y-sp.H*.86*sc*br-hop,sp.W*sc,sp.H*sc*br); }
 function drawCell0(x,y,t){
   const k=cid(x,y), p=G.plots[k], [cx,cy]=ctr(x,y);
   if(Wt(x,y)) return;
@@ -1611,12 +1653,12 @@ function flash(cell,col){ const [x,y]=xy(cell); fx.push({k:'flash',x,y,col,t0:pe
 function march(from,to,col,done){ if(RM){ done(); return; } fx.push({k:'march',from,to,col,t0:performance.now(),dur:Math.min(2200,400+70*Math.hypot(to[0]-from[0],to[1]-from[1])),done}); startLoop(); }
 /* Graphics quality. 'auto' watches how long each frame takes and switches to the light mode on slower computers and phones. */
 const GFX_KEY='iron-acre-gfx'; let gfxPref=(()=>{ try{ return localStorage.getItem(GFX_KEY)||'auto'; }catch(e){ return 'auto'; } })(), lowGfx=gfxPref==='low'||(gfxPref==='auto'&&((navigator.deviceMemory&&navigator.deviceMemory<=4)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=4)||(window.matchMedia&&matchMedia('(pointer:coarse)').matches))), frameAvg=0, slowFrames=0, fastFrames=0;
-const mapDpr=()=>lowGfx?.8:Math.min(window.devicePixelRatio||1,2);
+const mapDpr=()=>lowGfx?1:Math.min(window.devicePixelRatio||1,2);
 function setGfx(p){ gfxPref=p; try{ localStorage.setItem(GFX_KEY,p); }catch(e){} lowGfx=p==='low'; slowFrames=fastFrames=0; spriteCache.clear&&spriteCache.clear(); VW=0; if(typeof clearChunks==='function') clearChunks(); gfxBtn(); draw(); }
 function gfxBtn(){ const b=$('bGfx'); if(b) b.textContent='Graphics: '+(gfxPref==='auto'?'Auto'+(lowGfx?' (light)':' (full)'):gfxPref==='low'?'Light':'Full'); }
 function noteFrame(ms){ frameAvg=frameAvg?frameAvg*.85+ms*.15:ms; if(gfxPref!=='auto') return;
-  if(!lowGfx&&frameAvg>24){ if(++slowFrames>12){ lowGfx=true; slowFrames=0; VW=0; gfxBtn(); } } else slowFrames=0;
-  if(lowGfx&&frameAvg<6){ if(++fastFrames>200){ lowGfx=false; fastFrames=0; VW=0; gfxBtn(); } } else fastFrames=0; }
+  // switch to Light only after a long run of slow frames, and never flip back and forth in the same visit (that flicker looked bright and blurry)
+  if(document.hidden) return; if(!lowGfx&&frameAvg>26){ if(++slowFrames>45){ lowGfx=true; slowFrames=0; VW=0; gfxBtn(); } } else slowFrames=Math.max(0,slowFrames-2); }
 ['pointerdown','pointermove','wheel','keydown','touchstart'].forEach(ev=>window.addEventListener(ev,()=>{ if(!loopOn&&typeof G!=='undefined'&&G) startLoop(); },{passive:true}));
 function startLoop(){ if(loopOn) return; loopOn=true; requestAnimationFrame(loop); }
 function loop(t){
@@ -1634,7 +1676,7 @@ function drawInner(tm){
   ctx.setTransform(dpr,0,0,dpr,0,0);
   const wg=ctx.createLinearGradient(0,0,0,VH); wg.addColorStop(0,'#3db4f0'); wg.addColorStop(1,'#1d68b4'); ctx.fillStyle=wg; ctx.fillRect(0,0,VW,VH);
   ctx.setTransform(dpr*cam.z,0,0,dpr*cam.z,dpr*cam.x,dpr*cam.y);
-  LW=Math.max(.5,TW*.022);
+  LW=Math.max(.5,TW*.022)*(REAL?.6:1);
   const v=view(), bd=bounds();
   const L=[OX-N*TW/2,OY+N*TH/2], Bt=[OX,OY+N*TH], R=[OX+N*TW/2,OY+N*TH/2], Tp=[OX,OY], d=TW*.45, sE=TW*1.2;
   const Lg=[L[0],L[1]+d], Bg=[Bt[0],Bt[1]+d], Rg=[R[0],R[1]+d], Tg=[Tp[0],Tp[1]+d];
@@ -1687,8 +1729,18 @@ function drawInner(tm){
     const lw=Math.max(TW*(p.o===ME?.065:.045),1.5/cam.z); ctx.lineCap='round'; ctx.beginPath();
     [[0,-1,Tt,Rr],[1,0,Rr,Bb],[0,1,Bb,Ll],[-1,0,Ll,Tt]].forEach(([dx,dy,a,b])=>{ if(ownerAt(x+dx,y+dy)!==p.o){ ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); } });
     ctx.strokeStyle='rgba(20,30,10,.4)'; ctx.lineWidth=lw*1.9; ctx.stroke(); ctx.strokeStyle=colorOf(p.o); ctx.lineWidth=lw; ctx.stroke(); }
-  if(P(ME)&&!P(ME).dead){ ctx.fillStyle=`rgba(255,236,140,${RM?.22:.16+.08*Math.sin(T/600)})`; const seen=new Set();
-    for(const k in G.plots){ if(G.plots[k].o!==ME) continue; const [x,y]=xy(k); for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const nx=x+dx, ny=y+dy, nk=cid(nx,ny); if(!inB(nx,ny)||seen.has(nk)||G.plots[nk]||Wt(nx,ny)) continue; seen.add(nk); diamond(nx,ny,TH*.12); ctx.fill(); } } }
+  if(P(ME)&&!P(ME).dead){ const pulse=RM?.6:.5+.5*Math.sin(T/420), seen=new Set(), glow=[];
+    for(const k in G.plots){ if(G.plots[k].o!==ME) continue; const [x,y]=xy(k); for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1]]){ const nx=x+dx, ny=y+dy, nk=cid(nx,ny); if(!inB(nx,ny)||seen.has(nk)||G.plots[nk]||Wt(nx,ny)) continue; seen.add(nk); glow.push([nx,ny]); } }
+    const vis=glow.filter(([x,y])=>{ const [cx,cy]=ctr(x,y); return cx>v.x0-TW&&cx<v.x1+TW&&cy>v.y0-TW&&cy<v.y1+TW; });
+    for(const [x,y] of vis){ diamond(x,y,TH*.05); ctx.fillStyle=`rgba(255,220,80,${.38+.25*pulse})`; ctx.fill(); }
+    glowTop=()=>{
+    const blur=!lowGfx&&vis.length<90; if(blur){ ctx.save(); ctx.shadowColor='rgba(255,200,40,.95)'; ctx.shadowBlur=Math.max(4,10*pulse)*cam.z*mapDpr(); }
+    ctx.lineJoin='round'; ctx.strokeStyle=`rgba(255,209,59,${.65+.35*pulse})`; ctx.lineWidth=Math.max(2/cam.z,TW*.045); for(const [x,y] of vis){ diamond(x,y,TH*.1); ctx.stroke(); }
+    if(blur) ctx.restore();
+    ctx.strokeStyle=`rgba(255,255,230,${.35+.45*pulse})`; ctx.lineWidth=Math.max(1/cam.z,TW*.018); for(const [x,y] of vis){ diamond(x,y,TH*.1); ctx.stroke(); }
+    if(!RM&&DETAIL()) for(const [x,y] of vis){ const [cx,cy]=ctr(x,y); for(let i=0;i<2;i++){ const q=((T/1600)+hash2(x,y,700+i))%1, px=cx+(hash2(x,y,710+i)-.5)*TW*.5, py=cy-q*TW*.5; ctx.globalAlpha=Math.sin(q*Math.PI)*.9; ell(px,py,TW*.022,TW*.022,'#fff6c0',false); } } ctx.globalAlpha=1;
+    if(vis.length&&typeof tutStep==='function'&&tutStep()===0&&camReady){ const h=P(ME).hall||stats(ME).hall, [hx,hy]=h?xy(h):[0,0], [tx,ty]=vis.slice().sort((a,b)=>Math.abs(a[0]-hx)+Math.abs(a[1]-hy)-Math.abs(b[0]-hx)-Math.abs(b[1]-hy))[0], [cx,cy]=ctr(tx,ty), bob=RM?0:Math.abs(Math.sin(T/260))*TW*.15, ay=cy-TW*.6-bob, aw=TW*.22;
+      ctx.beginPath(); ctx.moveTo(cx,ay+aw*1.4); ctx.lineTo(cx-aw,ay); ctx.lineTo(cx-aw*.45,ay); ctx.lineTo(cx-aw*.45,ay-aw*1.2); ctx.lineTo(cx+aw*.45,ay-aw*1.2); ctx.lineTo(cx+aw*.45,ay); ctx.lineTo(cx+aw,ay); ctx.closePath(); ctx.fillStyle='#ffd13b'; ctx.fill(); ctx.lineWidth=Math.max(2/cam.z,TW*.03); ctx.strokeStyle='#3b2412'; ctx.stroke(); } }; }
   if(hover&&hover!==sel){ const [x,y]=xy(hover); diamond(x,y); ctx.strokeStyle='rgba(255,255,255,.55)'; ctx.lineWidth=Math.max(1.5/cam.z,LW); ctx.stroke(); }
   { const sp=sel&&G.plots[sel]; if(sp&&sp.b==='tower'&&sp.lvl){ const r=towerR(sp.lvl), [x,y]=xy(sel), [t1x,t1y]=topOf(x-r,y-r), [t2x,t2y]=topOf(x+r,y-r), [t3x,t3y]=topOf(x+r,y+r), [t4x,t4y]=topOf(x-r,y+r);
     ctx.beginPath(); ctx.moveTo(t1x,t1y); ctx.lineTo(t2x+TW/2,t2y+TH/2); ctx.lineTo(t3x,t3y+TH); ctx.lineTo(t4x-TW/2,t4y+TH/2); ctx.closePath(); ctx.fillStyle='rgba(255,209,59,.12)'; ctx.fill();
@@ -1704,6 +1756,7 @@ function drawInner(tm){
   // objects back to front
   overDraw=[]; eachVisible((x,y)=>drawCell(x,y,t),6);
   overDraw.sort((a,b)=>a[0]-b[0]).forEach(o=>{ try{ o[1](); }catch(e){} }); overDraw=[];
+  if(glowTop){ try{ glowTop(); }catch(e){} glowTop=null; }
   drawCaravans(v);
   // butterflies by day, fireflies at night
   if(!RM&&!lowGfx&&cam.z>=.7){ const dk=darkness(), cs=TW*3, gx0=Math.floor(v.x0/cs), gx1=Math.ceil(v.x1/cs), gy0=Math.floor(v.y0/cs), gy1=Math.ceil(v.y1/cs);
@@ -1731,11 +1784,12 @@ function drawInner(tm){
         ctx.strokeStyle='rgba(20,30,20,.18)'; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(bx-6,by+40-fl*.4); ctx.lineTo(bx,by+42); ctx.lineTo(bx+6,by+40-fl*.4); ctx.stroke();
         ctx.strokeStyle='#2e2a26'; ctx.lineWidth=1.8; ctx.beginPath(); ctx.moveTo(bx-7,by-fl); ctx.quadraticCurveTo(bx-3,by-2,bx,by); ctx.quadraticCurveTo(bx+3,by-2,bx+7,by-fl); ctx.stroke(); } } }
   drawNight(); if(!lowGfx) drawWeather();
-  if(!lowGfx){ const vg=ctx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.75); vg.addColorStop(0,'rgba(255,240,200,0)'); vg.addColorStop(1,'rgba(10,30,20,.32)'); ctx.fillStyle=vg; ctx.fillRect(0,0,VW,VH); }
+  { const vg=ctx.createRadialGradient(VW/2,VH/2,Math.min(VW,VH)*.35,VW/2,VH/2,Math.max(VW,VH)*.75); vg.addColorStop(0,'rgba(255,240,200,0)'); vg.addColorStop(1,'rgba(10,30,20,.32)'); ctx.fillStyle=vg; ctx.fillRect(0,0,VW,VH); }
   if(!RM&&!lowGfx){ const dk2=darkness(); if(dk2<.4){ ctx.save(); ctx.globalCompositeOperation='lighter'; for(let i=0;i<4;i++){ const ph=T/18000+i*.27, x0=((ph%1.2)-.1)*VW*1.4-VW*.2, w=VW*(.06+.04*(i%2)), a=(.035+.02*Math.sin(T/2600+i*2))*(1-dk2/.4);
       const rg3=ctx.createLinearGradient(x0,0,x0+w,0); rg3.addColorStop(0,'rgba(255,240,190,0)'); rg3.addColorStop(.5,`rgba(255,240,190,${a})`); rg3.addColorStop(1,'rgba(255,240,190,0)'); ctx.fillStyle=rg3;
       ctx.beginPath(); ctx.moveTo(x0,0); ctx.lineTo(x0+w,0); ctx.lineTo(x0+w+VH*.55,VH); ctx.lineTo(x0+VH*.55,VH); ctx.closePath(); ctx.fill(); } ctx.restore(); } }
   if(!lowGfx){ const sun=ctx.createLinearGradient(0,0,VW,VH); sun.addColorStop(0,'rgba(255,225,150,.1)'); sun.addColorStop(.6,'rgba(255,225,150,0)'); ctx.fillStyle=sun; ctx.fillRect(0,0,VW,VH); }
+  grain(ctx,VW,VH,.55);
   drawMini();
 }
 
@@ -1850,13 +1904,13 @@ function areaSnap(cell,defId){ const [x,y]=xy(cell), out=[];
     out.push([dx,dy,q.b,q.lvl||1,q.o==='npc'?'#c4402f':colorOf(q.o),q.o===defId?1:0,q.sprung?1:0]); }
   return out; }
 /* ================= character art: detailed chibi fighters, horses and catapults ================= */
-const CH_OL='rgba(36,22,10,.92)';
+let CH_OL=REAL?'rgba(30,22,14,.55)':'rgba(36,22,10,.92)';
 const SKINS=['#f2c79a','#e8b07a','#c98e5e','#a8703f','#f6d3b0','#7a4a2a'], HAIRS=['#5a3418','#2b1a0c','#d9a13a','#8a3a1a','#3b2412','#c9c2b4'];
 /* Draws one fighter standing at (x,y) (feet), s = full height in pixels.
    o: body, skin, pants, boots, belt, armor, fur, sash, helmet('knight'|'horned'|'crown'|'cap'|null), helmCol, plume, hair, beard,
       weapon('sword'|'club'|'axe'|'spear'|'none'), wcol, glow, shield(color), emblem, cape, dir(1|-1), fight, walk, ph, slow, big, mounted */
 function chibi(c,x,y,s,o,t){
-  const ph=o.ph||0, dir=o.dir||1, fight=!!o.fight, walk=!!o.walk&&!fight, lw=Math.max(.8,s*.024), vi=Math.floor((ph*997)%6);
+  const ph=o.ph||0, dir=o.dir||1, fight=!!o.fight, walk=!!o.walk&&!fight, lw=Math.max(.6,s*.024*(REAL?.62:1)), vi=Math.floor((ph*997)%6);
   if(!o.skin&&o.vary!==false) o={...o,skin:SKINS[vi],hair:o.hair||HAIRS[(vi+2)%6]};
   const sk=o.skin||'#f2c79a', body=o.body||'#c4402f', pants=o.pants||'#5a4632', boots=o.boots||'#3b2412';
   const wt=t/115+ph, step=walk?Math.sin(wt):0, bob=walk?Math.abs(Math.sin(wt))*s*.035:fight?Math.abs(Math.sin(t/180+ph))*s*.012:Math.sin(t/700+ph)*s*.008;
@@ -2237,6 +2291,7 @@ function playBattle(rp){ return new Promise(resolve=>{
       g.setTransform(dpr,0,0,dpr,0,0);
       if(rp.rage&&!RM&&t>1500&&t<7300){ const rg2=g.createRadialGradient(W/2,H/2,H*.35,W/2,H/2,W*.75); rg2.addColorStop(0,'rgba(255,40,90,0)'); rg2.addColorStop(1,`rgba(255,40,90,${.16+.06*Math.sin(t/200)})`); g.fillStyle=rg2; g.fillRect(0,0,W,H); }
       { const lg2=g.createLinearGradient(0,0,W*.6,H); lg2.addColorStop(0,'rgba(255,236,170,.16)'); lg2.addColorStop(1,'rgba(255,236,170,0)'); g.fillStyle=lg2; g.fillRect(0,0,W,H); }
+      grain(g,W,H,.5);
       const banner=(txt,col,a,sc)=>{ g.globalAlpha=a; { const rw=W*.62*sc, rh=W/9*sc, ry=H*.5-rh*.72; g.fillStyle='rgba(0,0,0,.25)'; g.fillRect(W/2-rw/2+4,ry+5,rw,rh); const rgb=g.createLinearGradient(0,ry,0,ry+rh); rgb.addColorStop(0,col===('#ff7a5c')?'#6a2a2a':'#7a4a1c'); rgb.addColorStop(1,col===('#ff7a5c')?'#3a1414':'#4a2a0c'); g.fillStyle=rgb;
           g.beginPath(); g.moveTo(W/2-rw/2-rh*.5,ry); g.lineTo(W/2+rw/2+rh*.5,ry); g.lineTo(W/2+rw/2+rh*.2,ry+rh/2); g.lineTo(W/2+rw/2+rh*.5,ry+rh); g.lineTo(W/2-rw/2-rh*.5,ry+rh); g.lineTo(W/2-rw/2-rh*.2,ry+rh/2); g.closePath(); g.fill(); g.strokeStyle='#ffd13b'; g.lineWidth=2.5; g.stroke(); } g.font=`${Math.round(W/11*sc)}px "Lilita One",sans-serif`; g.textAlign='center'; g.lineJoin='round'; g.lineWidth=8; g.strokeStyle='#3b2412'; g.strokeText(txt,W/2,H*.5); g.fillStyle=col; g.fillText(txt,W/2,H*.5); g.globalAlpha=1; };
       if(t<1100&&!rp.deploy){ const q3=t/1100; banner('BATTLE!','#ffd13b',q3<.7?1:1-(q3-.7)/.3,.8+Math.min(1,q3*4)*.3); }
@@ -2357,10 +2412,17 @@ let musicOn=false, mStep=0; try{ musicOn=localStorage.getItem('iron-acre-music')
 function note(freq,t,dur,type,vol){ const o=AC.createOscillator(), g2=AC.createGain(), lp=AC.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1800;
   o.type=type; o.frequency.value=freq; g2.gain.setValueAtTime(.0001,t); g2.gain.exponentialRampToValueAtTime(vol,t+(type==='sine'?.6:.02)); g2.gain.exponentialRampToValueAtTime(.0001,t+dur);
   o.connect(lp).connect(g2).connect(AC.destination); o.start(t); o.stop(t+dur+.05); }
+let mBus=null; const DOR=[0,2,3,5,7,9,10,12,14,15,17,19], PHR=[[7,5,3,2,0],[0,2,3,5,7,5],[9,7,5,7,3,2],[12,10,9,7,5,7],[3,5,7,9,10,9,7,5]];
+let mPhrase=null, mPi=0;
 setInterval(()=>{ if(!musicOn||document.hidden) return; try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') return;
-  const prog=[0,5,7,3], root=196*Math.pow(2,prog[Math.floor(mStep/8)%4]/12), t=AC.currentTime+.05, sc=[0,2,4,7,9,12,14];
-  if(mStep%8===0){ note(root/2,t,3.8,'sine',.03); note(root*.75,t,3.8,'sine',.018); }
-  if(mStep%2===0||Math.random()<.4) note(root*Math.pow(2,pick(sc)/12),t,.7,'triangle',.028);
+  if(!mBus){ mBus=AC.createGain(); mBus.gain.value=.55; mBus.connect(sndBus()); }
+  const bar=Math.floor(mStep/8), chord=[0,-2,3,0][bar%4], t=AC.currentTime+.05, beat=mStep%8;
+  if(beat===0){ iHorn(NT(chord)/2,t,3.9,.012,mBus); iHorn(NT(chord+7)/2,t,3.9,.008,mBus); }
+  if(beat%2===0) iPluck(NT(12+chord+[0,7,12,7][beat/2]),t,1.4,.035,mBus); else if(Math.random()<.5) iPluck(NT(12+chord+[3,10][Math.random()<.5?0:1]),t,1,.022,mBus);
+  if(beat===0&&Math.random()<.18) iDrum(t,.08,140,mBus);
+  if(!mPhrase&&beat===0&&Math.random()<.45){ mPhrase=pick(PHR); mPi=0; }
+  if(mPhrase&&beat%2===0){ const n=mPhrase[mPi++]; const o=AC.createOscillator(), g=AC.createGain(), lfo=AC.createOscillator(), lg=AC.createGain(); o.type='triangle'; o.frequency.value=NT(24+n); lfo.frequency.value=5.5; lg.gain.value=3; lfo.connect(lg).connect(o.frequency);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.025,t+.08); g.gain.exponentialRampToValueAtTime(.0001,t+.95); o.connect(g).connect(mBus); o.start(t); lfo.start(t); o.stop(t+1); lfo.stop(t+1); if(mPi>=mPhrase.length) mPhrase=null; }
   mStep++; }catch(e){} },500);
 function toggleMusic(){ musicOn=!musicOn; try{ localStorage.setItem('iron-acre-music',musicOn?'1':'0'); }catch(e){} try{ AC=AC||new (window.AudioContext||window.webkitAudioContext)(); if(AC.state==='suspended') AC.resume(); }catch(e){} tickUI(); }
 
@@ -2464,7 +2526,7 @@ function spellRowOld(m){ const sp=m.sp||{}, opts=Object.keys(SPELLS).filter(k=>(
   return `<div class="label">Cast spells in this battle</div><div class="row">${opts.map(k=>`<button type="button" class="gemb${castSel[k]?' sel':''}" data-act="cast:${k}">${castSel[k]?'✓ ':''}${SPELLS[k].name}<span class="c">${sp[k]} ready</span></button>`).join('')}</div>`; }
 function renderPanel(force){
   const el=$('panel'), m=P(ME), sp0=sel&&G.plots[sel], so=sp0&&P(sp0.o);
-  const key=JSON.stringify([sel,sp0,m&&[m.pets,m.petOn,m.tmap,m.decoInv,m.friends,m.sol,m.arc,m.giant,m.cav,m.cat,m.brk,m.heal,m.bossClaims,m.sp,m.gems,m.dead,m.clan,m.armB,(m.inv||[]).length],busy,castSel,so&&[so.shield,so.sol,so.arc,so.giant,so.cav,so.cat,so.cc,so.clan],stats(ME).hallLvl]);
+  const key=JSON.stringify([sel,sp0,m&&[m.pets,m.petOn,m.tmap,m.decoInv,m.friends,m.frOut,m.sol,m.arc,m.giant,m.cav,m.cat,m.brk,m.heal,m.bossClaims,m.sp,m.gems,m.dead,m.clan,m.armB,(m.inv||[]).length],busy,castSel,so&&[so.shield,so.sol,so.arc,so.giant,so.cav,so.cat,so.cc,so.clan],stats(ME).hallLvl]);
   if(!force&&key===panelKey){ refreshButtons(); return; } panelKey=key;
   if(!sel||!m||m.dead){ setTimeout(sheetState,0); el.innerHTML='<h2>Select a tile</h2><p class="desc">Tap anywhere on the map to see what is there. Glowing tiles touch your borders and can be bought.</p>'; return; }
   const [x,y]=xy(sel), p=G.plots[sel], s=stats(ME); let h=`<div class="label">Tile ${(x+1).toLocaleString()}, ${(y+1).toLocaleString()}</div>`;
@@ -2518,13 +2580,13 @@ function renderPanel(force){
   } else { const v=P(p.o); if(!v){ el.innerHTML=h+'<h2>Unclaimed ruins</h2>'; return; }
     const mate=isClanmate(p.o), ct=v.clan&&G.clans[v.clan], A=atkOf(m,false,rage), D=defOf(v,sel,p,m.cat||0), tr=treaty(v), sh=tr||(v.shield||0)>now(), what=p.b&&p.b!=='trap'?(p.b==='deco'?(DECOS[p.d]?.name||'Decoration'):B[p.b].name):'land';
     h+=`<h2>${esc(cleanText(v.name))}'s ${what}</h2>${ct?`<p class="desc">Clan: [${esc(ct.tag)}] ${esc(ct.name)}</p>`:''}${achDone(v).length?`<p class="desc">Badges: ${ACH.filter(a=>achDone(v).includes(a.id)).map(a=>`<span title="${a.name}">${a.ic}</span>`).join(' ')}</p>`:''}`;
-    h+=`${myPet(v)?`<div class="stat"><span>Guard pet</span><span>🐾 ${esc(cleanText(myPet(v).name))} the ${PETS[myPet(v).k].name}</span></div>`:''}<div class="stat"><span>Kingdom level</span><span>${lvlOfXp(xpOf(v))}</span></div>${(m.friends||[]).includes(p.o)?'<p class="desc">⭐ Your friend</p>':btn('⭐ Add friend',null,'fr:add:'+p.o,'soft')}`;
+    h+=`${myPet(v)?`<div class="stat"><span>Guard pet</span><span>🐾 ${esc(cleanText(myPet(v).name))} the ${PETS[myPet(v).k].name}</span></div>`:''}<div class="stat"><span>Kingdom level</span><span>${lvlOfXp(xpOf(v))}</span></div>${(m.friends||[]).includes(p.o)?'<p class="desc">⭐ Your friend</p>':(m.frOut||[]).includes(p.o)?'<p class="desc">⭐ Friend request sent</p>':btn('⭐ Add friend',null,'fr:add:'+p.o,'soft')}`;
     if(mate) h+='<p class="desc">This kingdom is in your clan. Clanmates cannot attack each other, but you can send them troops from the Clan panel.</p>';
     else { h+=`<p class="desc">${p.b==='hall'?'Capture this to take their whole kingdom.':'Capture it to steal 35% of their resources and keep the tile.'} Watch out for hidden traps.</p>
     <div class="stat"><span>Player</span><span>${online(v)?'Online now':afkDays(v)>=1?'Offline '+Math.floor(afkDays(v))+'d':'Offline'} · ${f(v.tr||0)} trophies</span></div>${tr?'<div class="stat"><span>Peace treaty</span><span>Protected while offline</span></div>':inClan(v)&&afkDays(v)>=TREATY_AFK_DAYS?'<div class="stat"><span>Peace treaty</span><span>Lost: inactive over a week</span></div>':''}
     
     <div class="stat"><span>Their army</span><span>Unknown</span></div>${isNewbie(v)?`<div class="stat"><span>Newcomer protection</span><span>${fmtT(newbieLeft(v)*60)} left</span></div>`:''}<div class="stat"><span>Distance</span><span>${range} tiles</span></div>
-    <p class="desc">${tr?'Their clan\'s peace treaty protects them while they are offline. Come back when they are online.':sh?'Protected by a peace shield for '+fmtT((v.shield-now())/1000)+'.':far?`Too far. Your army can march ${MARCH_RANGE} tiles from your borders.`:'No scouts can get close to a real kingdom. You will only find out how strong they are by attacking!'}</p>${sh||far||isNewbie(v)?'':spellRow(m)+btn('Attack with your army',null,'attack','war')}`; } }
+    <p class="desc">${!exposedTile(sel,p.o)?`🛡️ This tile is surrounded by ${esc(cleanText(v.name))}'s land. Capture a tile on the edge of their kingdom first to open a path${p.b==='hall'?' to their Town Hall':''}.`:sh?shieldTxt(v):far?`Too far. Your army can march ${MARCH_RANGE} tiles from your borders.`:'No scouts can get close to a real kingdom. You will only find out how strong they are by attacking!'}</p>${sh||far||isNewbie(v)||!exposedTile(sel,p.o)?'':spellRow(m)+btn('Attack with your army',null,'attack','war')}${!online(v)&&!sh?'<p class="desc">They are offline: you can attack them once, then they are protected until they come back.</p>':''}`; } }
   el.innerHTML=(isPhone()?'<button class="soft sheetX" data-act="desel" aria-label="Close">✕</button>':'')+h; refreshButtons(); sheetState();
 }
 const isPhone=()=>window.innerWidth<=900;
@@ -2544,8 +2606,8 @@ function renderArmy(){
     if(!ok) return `<p class="desc locked"><b>${U.name}:</b> needs Town Hall ${U.th} and barracks level ${U.bar} in total.</p>`;
     const c5={gold:U.cost.gold*5,stone:(U.cost.stone||0)*5};
     return `<div class="unit"><div class="label">${U.name} lv ${unitLvl(m,u)} · ${costTxt(U.cost)} · ${U.sp} space</div><p class="desc">${U.desc}</p><div class="row">${btn('Train 1',U.cost,'t:'+u+':1')}${btn('Train 5',c5,'t:'+u+':5')}</div></div>`; }).join('');
-  if(isNewbie(m)) h+=`<div class="stat"><span>Newcomer protection</span><span>${fmtT(newbieLeft(m)*60)} of play left</span></div><p class="desc">Nobody can attack you or raid you while you are new. Attacking another player ends it early.</p>`;
-  h+=`<div class="stat"><span>Peace shield</span><span id="shd">Off</span></div><div class="stat"><span>Clan peace treaty</span><span>${inClan(m)?'Protects you while offline':'Join a clan to get it'}</span></div>`;
+  if(isNewbie(m)) h+=`<div class="stat"><span>Newcomer protection</span><span>${fmtT(newbieLeft(m)*60)} left</span></div><p class="desc">Nobody can attack you or raid you while you are new. Attacking another player ends it early.</p>`;
+  h+=`<div class="stat"><span>Peace shield</span><span id="shd">Off</span></div><div class="stat"><span>While offline</span><span>Players can attack you once, then you are safe until 15 minutes after you come back</span></div>`;
   el.innerHTML=h; refreshButtons();
 }
 
@@ -2824,11 +2886,12 @@ function helpDialog(){ const sec=(t,b)=>`<details class="help"><summary>${t}</su
   ${sec('⚔️ Army and battles','<p>Build <b>Barracks</b> to train troops. Soldiers, Giants, Cavalry, Catapults, Wall Breakers and Healers attack; Archers stay home and defend. Tap a barbarian camp or another kingdom and press Attack. Then place your troops: attacking from more sides gives bonus attack. The <b>Armory</b> boosts attack and sells gear, the <b>Lab</b> upgrades troops, the <b>Spell Tower</b> brews Rage and Heal.</p>')}
   ${sec('🐾 Pets','<p>Open a <b>Pet Crate</b> in the Shop to hatch a pet. Your guardian pet sits by your Town Hall and fights every attacker and barbarian raid, but pets never go on attacks. Press <b>Grow up</b> to level your pet from a baby to a legend, and tap Rename to give it any (friendly) name.</p>')}
   ${sec('👑 Kingdom level, quests and more','<p>Tap <b>Kingdom</b> for your daily quests (3 a day), the free monthly season pass, skill points from your kingdom level, the collection book and your friends list. Crates sometimes hold a <b>treasure map</b>: dig up the red X! Look out for limited-time <b>events</b> with their own shop, and get <b>revenge</b> on players who beat you from the War report.</p>')}
-  ${sec('🛡️ Defending','<p>Archers, <b>Guard Towers</b>, <b>Cannons</b>, <b>Walls</b> and hidden <b>Spike Traps</b> protect you. Towers and cannons protect everything in their range. Barbarian camps near you sometimes raid you, more often as your Town Hall grows. New players are protected for their first 2.5 hours of play.</p>')}
-  ${sec('🤝 Clans and wars','<p>Join or found a clan (Town Hall 2). Clanmates cannot attack each other, share troops, chat, and are protected while offline. Every <b>Friday to Sunday</b> your clan is matched against another clan in a <b>clan war</b>: each member has 2 war attacks and the clan with more stars wins gems and a trophy banner.</p>')}
+  ${sec('🛡️ Defending','<p>Archers, <b>Guard Towers</b>, <b>Cannons</b>, <b>Walls</b> and hidden <b>Spike Traps</b> protect you. Towers and cannons protect everything in their range. Barbarian camps near you sometimes raid you, more often as your Town Hall grows. New kingdoms are protected for their first 2.5 hours. While you are offline, others can attack you once: after that you are safe until 15 minutes after you come back. Attackers must start at the edge of your kingdom, so surround your Town Hall with land and walls!</p>')}
+  ${sec('🤝 Clans and wars','<p>Join or found a clan (Town Hall 2). Clanmates cannot attack each other, share troops and caravans, chat, and build a clan castle together. Every <b>Friday to Sunday</b> your clan is matched against another clan in a <b>clan war</b>: each member has 2 war attacks and the clan with more stars wins gems and a trophy banner.</p>')}
   ${sec('🐉 Barbarian Fortresses','<p>Sometimes a huge fortress appears. It is too strong for one player: every attack chips away at its health. Bring it down with your clan and everyone who helped claims a Legendary Chest.</p>')}
   ${sec('🎁 Rewards','<p>Claim <b>daily rewards</b>, spin the <b>wheel</b> every hour you play, open <b>crates</b> in the Shop, earn <b>badges</b>, and climb the leaderboards and leagues for end-of-season gems.</p>')}
   <button class="prime" id="helpClose">Got it</button></div></div>`; $('helpClose').onclick=()=>$('ov').innerHTML=''; }
+document.body.classList.toggle('real',REAL); styleBtn(); $('bStyle').onclick=()=>setStyle(!REAL);
 $('bGfx').onclick=()=>setGfx(gfxPref==='auto'?'low':gfxPref==='low'?'high':'auto'); gfxBtn();
 document.querySelectorAll('#boardTabs button').forEach(b=>b.onclick=()=>{ boardTab=b.dataset.bt; renderBoard(); });
 
@@ -2863,7 +2926,7 @@ function renderClan(){
   if(c){ const mem=(c.members||[]).map(id=>P(id)).filter(Boolean).sort((a,b)=>(b.tr||0)-(a.tr||0));
     const reqs=Object.entries(c.requests||{}), myR=rankOf(c,ME);
     el.innerHTML=`<h2>[${esc(c.tag)}] ${esc(c.name)}</h2>${c.desc?`<p class="cdesc">“${esc(cleanText(c.desc))}”</p>`:''}<p class="desc">${mem.length} of ${CLAN_MAX} members · ${f(clanTr(c))} trophies · ${CLAN_TYPES[c.type||'open']}${c.minTr?` · needs ${f(c.minTr)} trophies`:''} · You are <b>${RANKS[myR].ic} ${RANKS[myR].name}</b></p>
-      <p class="desc">Clanmates cannot attack each other, and everyone in the clan is under a peace treaty while offline (unless inactive for over a week). Send troops to help defend a clanmate's kingdom.</p>
+      <p class="desc">Clanmates cannot attack each other, and you can send troops to help defend a clanmate's kingdom.</p>
       ${canManage(c)?`<details class="csets"><summary>Clan settings</summary><div class="mkform"><label>Who can join <select id="csType">${Object.entries(CLAN_TYPES).map(([k,v])=>`<option value="${k}"${(c.type||'open')===k?' selected':''}>${v}</option>`).join('')}</select></label>
         <label>Trophies needed <input id="csMin" type="number" min="0" max="5000" step="10" value="${c.minTr||0}"></label><input id="csDesc" maxlength="120" placeholder="Clan description (what your clan is about)" value="${esc(c.desc||'')}" style="flex-basis:100%"><button class="prime" type="button" id="csSave">Save settings</button></div></details>`:''}
       ${reqs.length&&canAccept(c)?`<div class="label">Join requests (${reqs.length})</div><div class="board">${reqs.map(([uid,r])=>`<div><span class="sw" style="background:${P(uid)?.color||'#888'}"></span><span>${esc(cleanText(r.name))}</span><span>${f(P(uid)?.tr??r.tr)} trophies</span><span class="row">${btn('Accept',null,'cr:accept:'+uid,'prime')}${btn('Deny',null,'cr:deny:'+uid,'soft')}</span></div>`).join('')}</div>`:''}
@@ -2874,7 +2937,7 @@ function renderClan(){
         ${p.id!==ME&&!p.dead?`<div class="row donate">${btn('Send 5 archers',null,'don:'+p.id+':arc:5','soft')}${btn('Send 5 soldiers',null,'don:'+p.id+':sol:5','soft')}${m.giant?btn('Send a giant',null,'don:'+p.id+':giant:1','soft'):''}</div>`:''}`; }).join('')}</div>
       ${castleHtml(c)}${caravanHtml(c,m)}${warHtml(c)}${btn('Leave clan',null,'clan:leave','war')}`; }
   else { const top=topClans();
-    el.innerHTML=`<p class="desc">Join a clan to chat with other players, protect each other and share troops. Clan members get a <b>peace treaty</b>: nobody can attack you while you are offline, unless you have been inactive for over a week.</p>
+    el.innerHTML=`<p class="desc">Join a clan to chat with other players, protect each other and share troops. Clanmates can never attack each other, and you can send each other troops, caravans and help build your clan castle.</p>
       <div class="label">Top clans</div><div class="board">${top.length?top.map((x,i)=>`<div><span class="sw" style="background:#ffd13b"></span><span>${i+1}. [${esc(x.tag)}] ${esc(x.name)}</span><span>${(x.members||[]).length}/${CLAN_MAX}</span><span>${(()=>{ const why=clanCanJoin(x,m); const asked=(x.requests||{})[ME], ok=(x.accepted||{})[ME]; return why?`<small class="desc">${why}</small>`:asked?'<small class="desc">Request sent</small>':btn(x.type==='request'&&!ok?'Ask to join':'Join',null,'clan:join:'+x.id,'prime'); })()}</span></div>${x.desc||x.minTr||x.type&&x.type!=='open'?`<p class="desc cinfo">${x.type&&x.type!=='open'?CLAN_TYPES[x.type]+' · ':''}${x.minTr?f(x.minTr)+'+ trophies · ':''}${esc(cleanText(x.desc||''))}</p>`:''}`).join(''):'<p class="desc">No clans yet. Start the first one!</p>'}</div>`; }
   const sv=$('csSave'); if(sv) sv.onclick=clanSettings;
   const cf=$('carF'); if(cf) cf.onsubmit=e=>{ e.preventDefault(); sendCaravan($('carTo').value,$('carG').value,$('carS').value); };
@@ -3005,7 +3068,7 @@ function tickUI(){ try{ featButtons(); }catch(e){} const m=P(ME); const alive=Ob
   $('cg').classList.toggle('full',c.gold>=s.cap); $('cs').classList.toggle('full',c.stone>=s.cap);
   $('rm').textContent=f(m.gems||0); $('rt').textContent=armySp(m); $('rtc').textContent='/ '+s.troopCap;
   $('rtr').textContent=f(m.tr||0); $('rlg').textContent=LEAGUES[leagueIdx(m.tr||0)][0]; $('rb').textContent=(s.builders-s.busy)+'/'+s.builders; $('rl').textContent=s.count;
-  const sh=$('shd'); if(sh){ const left=(m.shield||0)-now(); sh.textContent=left>0?fmtT(left/1000):'Off'; }
+  const sh=$('shd'); if(sh){ const left=(m.shield||0)-now(); sh.textContent=offLocked(m)?'Until you come back':left>0?fmtT(left/1000):'Off'; }
   $('bSound').firstChild.textContent='Sound: '+(G.muted?'off':'on'); $('bMusic').firstChild.textContent='Music: '+(musicOn?'on':'off'); renderTut();
   { const r=m.research; if(r&&$('rleft')){ $('rleft').textContent=fmtT((r.done-now())/1000); $('rprog').style.width=Math.min(100,(now()-r.start)/(r.done-r.start)*100)+'%'; } const hs=$('hstat'); if(hs){ const hr=hRec(m,heroKey(m)); if(hr) hs.textContent=heroResting(m)?'Resting '+fmtT((hr.rest-now())/1000):'Ready'; } }
   $('bCollect').hidden=!Object.values(G.plots).some(p=>p.o===ME&&stored(p)>=1);
@@ -3040,7 +3103,7 @@ document.addEventListener('click',e=>{ const b=e.target.closest('[data-act]'); i
   else if(a.startsWith('pet:renamenew:')){ petView=a.slice(14); petRename=petView; petsDialog(); }
   else if(a.startsWith('king:')) kingDialog(a.slice(5)); else if(a.startsWith('dq:')) dqClaim(+a.slice(3)); else if(a.startsWith('pass:')) passClaim(+a.slice(5));
   else if(a==='skill:reset') resetSkills(); else if(a.startsWith('skill:')) learnSkill(a.slice(6)); else if(a.startsWith('book:')) bookClaim(a.slice(5));
-  else if(a.startsWith('fr:add:')) addFriend(a.slice(7)); else if(a.startsWith('fr:del:')) removeFriend(a.slice(7)); else if(a.startsWith('fr:visit:')) visitFriend(a.slice(9));
+  else if(a.startsWith('fr:add:')) addFriend(a.slice(7)); else if(a.startsWith('fr:yes:')) answerFriend(+a.slice(7),true); else if(a.startsWith('fr:no:')) answerFriend(+a.slice(6),false); else if(a.startsWith('fr:del:')) removeFriend(a.slice(7)); else if(a.startsWith('fr:visit:')) visitFriend(a.slice(9));
   else if(a==='tmap:show'){ if(m&&tmapOn(m)){ $('ov').innerHTML=''; setTab('map'); if(cam.z<1) cam.z=1; centerOn(m.tmap.cell); sel=m.tmap.cell; renderPanel(true); draw(); } }
   else if(a==='dig') digTreasure(sel); else if(a==='deco:rm') removeDeco(sel); else if(a.startsWith('deco:')) placeDeco(sel,a.slice(5));
   else if(a.startsWith('ev:buy:')) evBuy(a.slice(7)); else if(a.startsWith('castle:')){ const [,r,n]=a.split(':'); castleDonate(r,+n); } else if(a.startsWith('rev:')) revenge(+a.slice(4));
@@ -3093,11 +3156,11 @@ const petGrowHall=l=>Math.min(HALL_MAX,l+1);           // town hall needed to gr
 /* Draws a pet standing at (x,y) (feet), s = adult height in pixels. o: {lvl, dir, act (0..1 attack lunge), ph, sleep} */
 function petArt(c,x,y,s,k,t,o={}){
   const P2=PETS[k]||PETS.fox, lvl=o.lvl||1, gq=Math.min(1,(lvl-1)/8), dir=o.dir||1, ph=o.ph||0, act=o.act||0;
-  const sz=s*(.62+.38*gq), hr=1.32-.36*gq, lw=Math.max(.8,s*.022), OL2='rgba(40,22,10,.9)', T=t||0, still=typeof RM!=='undefined'&&RM;
+  const sz=s*(.62+.38*gq), hr=(REAL?1.12:1.32)-(REAL?.2:.36)*gq, lw=Math.max(.6,s*.022*(REAL?.62:1)), OL2=(()=>{ const n=parseInt((P2.dark||'#28160a').slice(1),16); return `rgba(${Math.round((n>>16)*.42)},${Math.round(((n>>8)&255)*.42)},${Math.round((n&255)*.42)},${REAL?.62:.93})`; })(), T=t||0, still=typeof RM!=='undefined'&&RM;
   const sh=(hex,a)=>{ const n=parseInt(hex.slice(1),16); let r=n>>16,g2=(n>>8)&255,b=n&255; const q=a<0?0:255,p=Math.abs(a); r=Math.round(r+(q-r)*p); g2=Math.round(g2+(q-g2)*p); b=Math.round(b+(q-b)*p); return `rgb(${r},${g2},${b})`; };
   const E=(cx,cy,rx,ry,fill,stroke=true,rot=0)=>{ c.beginPath(); c.ellipse(cx,cy,Math.max(.01,rx),Math.max(.01,ry),rot,0,7); if(fill){ c.fillStyle=fill; c.fill(); } if(stroke){ c.lineWidth=lw; c.strokeStyle=OL2; c.stroke(); } };
   const rg=(cx,cy,r,c0,c1)=>{ const g2=c.createRadialGradient(cx-r*.35,cy-r*.45,r*.1,cx,cy,r*1.15); g2.addColorStop(0,c0); g2.addColorStop(1,c1); return g2; };
-  const fur=(cx,cy,r)=>rg(cx,cy,r,sh(P2.body,.35),sh(P2.body,-.18));
+  const fur=(cx,cy,r)=>rg(cx,cy,r,sh(P2.body,REAL?.14:.35),sh(P2.body,REAL?-.24:-.18));
   const breath=still?0:Math.sin(T/520+ph)*.025, blink=!still&&((T/1000+ph*1.7)%3.6)<.13, bob=P2.ghost||P2.flame?(still?0:Math.sin(T/420+ph)*sz*.05)-sz*.08:0;
   c.save(); c.translate(x,y);
   // shadow and the level aura
@@ -3108,20 +3171,20 @@ function petArt(c,x,y,s,k,t,o={}){
     c.restore(); }
   c.translate(act*sz*.18*dir,bob-act*sz*.04); c.scale(dir,1);
   if(P2.ghost) c.globalAlpha=.86;
-  const eye=(ex,ey,r,big)=>{ if(o.sleep||blink){ c.strokeStyle=OL2; c.lineWidth=lw*1.3; c.beginPath(); c.arc(ex,ey,r*.8,.2,Math.PI-.2); c.stroke(); return; }
+  const eye=(ex,ey,r,big)=>{ if(REAL) r*=.72; if(o.sleep||blink){ c.strokeStyle=OL2; c.lineWidth=lw*1.3; c.beginPath(); c.arc(ex,ey,r*.8,.2,Math.PI-.2); c.stroke(); return; }
     E(ex,ey,r*.82,r,'#1b1020'); const ig=c.createRadialGradient(ex,ey+r*.3,r*.1,ex,ey+r*.2,r*.9); ig.addColorStop(0,sh(P2.eye,.45)); ig.addColorStop(1,P2.eye); E(ex,ey+r*.18,r*.6,r*.66,ig,false); E(ex+r*.05,ey+r*.2,r*.3,r*.36,'#0b0610',false);
     E(ex-r*.28,ey-r*.38,r*.3,r*.3,'#ffffff',false); E(ex+r*.28,ey+r*.38,r*.13,r*.13,'rgba(255,255,255,.9)',false); if(big) E(ex+r*.35,ey-r*.1,r*.08,r*.08,'#ffffff',false); };
-  const blush=(bx,by,r)=>{ c.globalAlpha=(P2.ghost?.86:1)*.45; E(bx,by,r*1.2,r*.7,'#ff6b8a',false); c.globalAlpha=P2.ghost?.86:1; };
+  const blush=(bx,by,r)=>{ if(REAL) return; c.globalAlpha=(P2.ghost?.86:1)*.45; E(bx,by,r*1.2,r*.7,'#ff6b8a',false); c.globalAlpha=P2.ghost?.86:1; };
   // a tapered leg with a round paw; far legs are darker and drawn behind the body
   const leg=(lx,top,len,w,col,far,i)=>{ const sw=still?0:Math.sin(T/260+ph+i*1.7)*(act?.28:.035); c.save(); c.translate(lx,top); c.rotate(sw); const lc=col;
-    c.beginPath(); c.moveTo(-w*.58,-w*.2); c.bezierCurveTo(-w*.75,len*.35,-w*.38,len*.6,-w*.44,len-w*.15); c.lineTo(w*.44,len-w*.15); c.bezierCurveTo(w*.42,len*.6,w*.72,len*.35,w*.55,-w*.2); c.closePath();
+    c.beginPath(); c.moveTo(-w*.62,-w*.3); c.bezierCurveTo(-w*.8,len*.3,-w*.34,len*.55,-w*.36,len-w*.18); c.lineTo(w*.36,len-w*.18); c.bezierCurveTo(w*.34,len*.55,w*.8,len*.3,w*.62,-w*.3); c.closePath();
     const lg=c.createLinearGradient(-w*.6,0,w*.6,0); lg.addColorStop(0,sh(lc,-.12)); lg.addColorStop(.45,sh(lc,.12)); lg.addColorStop(1,sh(lc,-.18)); c.fillStyle=lg; c.fill(); if(far){ c.fillStyle='rgba(30,15,5,.22)'; c.fill(); } c.lineWidth=lw; c.strokeStyle=OL2; c.stroke();
-    const pc=far?sh(P2.paw||P2.belly,-.2):(P2.paw||P2.belly); E(w*.14,len-w*.1,w*.74,w*.42,pc); c.strokeStyle='rgba(40,22,10,.55)'; c.lineWidth=lw*.7; c.beginPath(); c.moveTo(w*.02,len-w*.3); c.lineTo(w*.06,len+w*.05); c.moveTo(w*.38,len-w*.28); c.lineTo(w*.42,len+w*.02); c.stroke(); c.restore(); };
+    const pc=far?sh(P2.paw||P2.belly,-.2):(P2.paw||P2.belly); E(w*.12,len-w*.1,w*.66,w*.4,pc); c.strokeStyle='rgba(40,22,10,.55)'; c.lineWidth=lw*.7; c.beginPath(); c.moveTo(w*.02,len-w*.3); c.lineTo(w*.06,len+w*.05); c.moveTo(w*.38,len-w*.28); c.lineTo(w*.42,len+w*.02); c.stroke(); c.restore(); };
   const legs=(top,xs,len,w,col,far)=>xs.forEach((lx,i)=>leg(lx,top,len,w,col,far,i));
   // fur strokes and a rim of light on a body ellipse
   const furTex=(cx,cy,rx,ry)=>{ c.save(); c.beginPath(); c.ellipse(cx,cy,rx,ry,0,0,7); c.clip(); c.strokeStyle=sh(P2.body,-.3); c.globalAlpha*=.35; c.lineWidth=lw*.8; c.lineCap='round';
     for(let i=0;i<9;i++){ const a=hash01(i,7)*Math.PI*2, rr=Math.sqrt(hash01(i,9))*.75, px=cx+Math.cos(a)*rx*rr, py=cy+Math.sin(a)*ry*rr*.8-ry*.15; if(py>cy+ry*.2) continue; c.beginPath(); c.moveTo(px,py); c.quadraticCurveTo(px-rx*.06,py+ry*.08,px-rx*.12,py+ry*.06); c.stroke(); }
-    c.globalAlpha/= .35; c.strokeStyle='rgba(255,255,255,.55)'; c.lineWidth=lw*1.6; c.beginPath(); c.ellipse(cx,cy+ry*.06,rx*.86,ry*.86,0,Math.PI*1.15,Math.PI*1.75); c.stroke(); c.restore(); };
+    c.globalAlpha/= .35; c.strokeStyle=REAL?'rgba(255,255,255,.18)':'rgba(255,255,255,.55)'; c.lineWidth=lw*1.6; c.beginPath(); c.ellipse(cx,cy+ry*.06,rx*.86,ry*.86,0,Math.PI*1.15,Math.PI*1.75); c.stroke(); c.restore(); };
   function hash01(a,b){ const v=Math.sin(a*127.1+b*311.7+(k.length*17))*43758.5453; return v-Math.floor(v); }
   const wings=(wx,wy,span,back)=>{ const flap=still?.25:Math.sin(T/(P2.shape==='bird'?170:280)+ph)*.22+(act?.45:0);
     c.save(); c.translate(wx,wy); c.rotate(-.15-flap); if(back) c.scale(.8,.9);
@@ -3166,7 +3229,7 @@ function petArt(c,x,y,s,k,t,o={}){
       if(k==='wolf'){ E(bx-brx*.1,bodyY-bry*.8,brx*.85,bry*.42,sh(P2.body,-.2),false); }
       if(k==='dragon'){ c.strokeStyle=sh(P2.belly,-.25); c.lineWidth=lw; for(let i=0;i<4;i++){ c.beginPath(); c.arc(bx+brx*.38,bodyY+bry*(.05+i*.24),brx*.42,.3,Math.PI-.3); c.stroke(); } c.fillStyle='rgba(80,0,10,.16)'; for(let i=0;i<12;i++){ c.beginPath(); c.arc(bx-brx*.75+i*brx*.12,bodyY-bry*.35+((i%2)*bry*.22),sz*.022,0,Math.PI); c.fill(); } }
       if(k==='sunlion'||k==='griffin'||k==='fox'){ for(let i=0;i<3;i++) E(bx-brx*.55+i*brx*.28,bodyY-bry*.55,brx*.07,bry*.32,'rgba(120,60,10,.13)',false); }
-      c.restore(); furTex(bx,bodyY,brx,bry); c.lineWidth=lw; c.strokeStyle=OL2; c.beginPath(); c.ellipse(bx,bodyY,brx,bry,0,0,7); c.stroke();
+      c.restore(); furTex(bx,bodyY,brx,bry); c.save(); c.beginPath(); c.ellipse(bx,bodyY,brx,bry,0,0,7); c.clip(); c.fillStyle='rgba(30,10,0,.14)'; c.beginPath(); c.ellipse(bx,bodyY+bry*.95,brx*1.15,bry*.5,0,0,7); c.fill(); c.restore(); c.lineWidth=lw; c.strokeStyle=OL2; c.beginPath(); c.ellipse(bx,bodyY,brx,bry,0,0,7); c.stroke();
       // the near back thigh
       E(bx-brx*.55,bodyY+bry*.1,brx*.4,bry*.78,rg(bx-brx*.55,bodyY,brx*.4,sh(P2.body,.22),sh(P2.body,-.12))); }
     if(P2.spikes){ for(let i=0;i<5;i++){ const sx=bx-brx*.7+i*brx*.32, sy=bodyY-bry*Math.sqrt(Math.max(0,1-Math.pow((sx-bx)/brx,2)))+lw; c.beginPath(); c.moveTo(sx-sz*.035,sy+sz*.012); c.quadraticCurveTo(sx-sz*.01,sy-sz*.04,sx+sz*.01,sy-sz*.075*(1+gq*.5)); c.quadraticCurveTo(sx+sz*.015,sy-sz*.02,sx+sz*.035,sy+sz*.012); c.closePath(); c.fillStyle=P2.spikes; c.fill(); c.lineWidth=lw*.8; c.strokeStyle=OL2; c.stroke(); } }
@@ -3186,8 +3249,10 @@ function petArt(c,x,y,s,k,t,o={}){
     const hc=P2.head==='eagle'?'#f6f2ea':P2.body;
     // cheek fluff
     if(P2.ears==='point'||k==='sunlion'){ c.fillStyle=k==='fox'||k==='wolf'?P2.belly:hc; c.beginPath(); c.moveTo(hx-headR*.75,hy+headR*.1); for(let i=0;i<4;i++){ const a=2.2+i*.35; c.lineTo(hx+Math.cos(a)*headR*1.22,hy+Math.sin(a)*headR*1.05); c.lineTo(hx+Math.cos(a+.17)*headR*.9,hy+Math.sin(a+.17)*headR*.8); } c.closePath(); c.fill(); c.lineWidth=lw; c.strokeStyle=OL2; c.stroke(); }
-    E(hx,hy,headR,headR*.92,rg(hx,hy,headR,sh(hc,.4),sh(hc,-.15)));
-    c.save(); c.strokeStyle='rgba(255,255,255,.6)'; c.lineWidth=lw*1.5; c.beginPath(); c.ellipse(hx,hy,headR*.82,headR*.75,0,Math.PI*1.12,Math.PI*1.6); c.stroke(); c.restore();
+    if(k!=='dragon'&&P2.head!=='eagle'&&!P2.sunmane){ const fx=hx-headR*.2, fy=hy+headR*.78; c.beginPath(); c.moveTo(fx-headR*.42,fy-headR*.1); for(let i=0;i<4;i++){ const x0=fx-headR*.42+i*headR*.21; c.quadraticCurveTo(x0+headR*.105,fy+headR*(.55+(i%2?.04:.12)),x0+headR*.21,fy+headR*.3); } c.lineTo(fx+headR*.42,fy-headR*.1); c.closePath(); c.fillStyle=P2.belly; c.fill(); c.lineWidth=lw*.9; c.strokeStyle=OL2; c.stroke(); }
+    E(hx,hy,headR,headR*.92,rg(hx,hy,headR,sh(hc,REAL?.16:.4),sh(hc,REAL?-.2:-.15)));
+    c.save(); c.beginPath(); c.ellipse(hx,hy,headR,headR*.92,0,0,7); c.clip(); c.fillStyle='rgba(30,10,0,.12)'; c.beginPath(); c.ellipse(hx-headR*.25,hy+headR*1.0,headR*1.1,headR*.45,0,0,7); c.fill(); c.restore();
+    if(!REAL){ c.save(); c.strokeStyle='rgba(255,255,255,.6)'; c.lineWidth=lw*1.5; c.beginPath(); c.ellipse(hx,hy,headR*.82,headR*.75,0,Math.PI*1.12,Math.PI*1.6); c.stroke(); c.restore(); }
     if(P2.head==='eagle'){ c.beginPath(); c.moveTo(hx+headR*.6,hy-headR*.2); c.quadraticCurveTo(hx+headR*1.5,hy-headR*.15,hx+headR*1.28,hy+headR*.55); c.quadraticCurveTo(hx+headR*1.0,hy+headR*.3,hx+headR*.55,hy+headR*.38); c.closePath(); const bg=c.createLinearGradient(hx,hy-headR*.2,hx,hy+headR*.5); bg.addColorStop(0,'#ffe14a'); bg.addColorStop(1,'#e8801a'); c.fillStyle=bg; c.fill(); c.lineWidth=lw; c.strokeStyle=OL2; c.stroke(); E(hx+headR*.95,hy-headR*.04,headR*.07,headR*.04,'#3b2412',false);
       c.fillStyle=sh(hc,-.1); for(let i=0;i<4;i++){ c.beginPath(); c.moveTo(hx-headR*(.92-i*.1),hy+headR*(.1+i*.15)); c.lineTo(hx-headR*(1.3-i*.05),hy+headR*(.28+i*.18)); c.lineTo(hx-headR*(.82-i*.1),hy+headR*(.38+i*.15)); c.closePath(); c.fill(); c.lineWidth=lw*.7; c.strokeStyle=OL2; c.stroke(); }
       c.strokeStyle=OL2; c.lineWidth=lw*1.4; c.beginPath(); c.moveTo(hx+headR*.05,hy-headR*.48); c.lineTo(hx+headR*.55,hy-headR*.35); c.stroke(); eye(hx+headR*.3,hy-headR*.1,headR*.27,1); }
@@ -3223,14 +3288,15 @@ function petArt(c,x,y,s,k,t,o={}){
     if(P2.tufts){ c.strokeStyle=OL2; c.lineWidth=lw*1.3; c.beginPath(); c.moveTo(-brx*.42,hy-brx*.38); c.quadraticCurveTo(-brx*.1,hy-brx*.5,brx*.12,hy-brx*.32); c.moveTo(brx*.2,hy-brx*.34); c.quadraticCurveTo(brx*.5,hy-brx*.52,brx*.78,hy-brx*.36); c.stroke(); }
     c.beginPath(); c.moveTo(brx*.1,hy+brx*.12); c.quadraticCurveTo(brx*.3,hy+brx*.08,brx*.4,hy+brx*.16); c.quadraticCurveTo(brx*.34,hy+brx*.36,brx*.22,hy+brx*.46); c.closePath(); const bkg=c.createLinearGradient(0,hy,0,hy+brx*.45); bkg.addColorStop(0,'#ffd13b'); bkg.addColorStop(1,'#e8801a'); c.fillStyle=bkg; c.fill(); c.lineWidth=lw; c.strokeStyle=OL2; c.stroke();
     blush(brx*.62,hy+brx*.28,brx*.1);
-    // folded front wing on the body's side
-    { const flap=still?0:(act?.5:.06*Math.sin(T/600+ph)); c.save(); c.translate(brx*.05,by-bry*.42); c.rotate(-flap); const wc=P2.wingCol||P2.body;
-      const tipX=-brx*1.05, tipY=bry*1.35; c.beginPath(); c.moveTo(brx*.05,0); c.bezierCurveTo(brx*.35,bry*.5,brx*.05,bry*1.05,tipX*.55,tipY*.92);
-      for(let i=0;i<4;i++){ const q0=i/4, q1=(i+1)/4, x1=tipX*.55+(tipX-tipX*.55)*q1, y1=tipY*.92+(tipY-tipY*.92)*q1; c.quadraticCurveTo(x1+brx*.12,y1+bry*.08,x1,y1); }
-      c.bezierCurveTo(-brx*.95,bry*.6,-brx*.75,-bry*.05,brx*.05,0); c.closePath();
-      const wg=c.createLinearGradient(0,0,tipX,tipY); wg.addColorStop(0,sh(wc,.18)); wg.addColorStop(.7,sh(wc,-.06)); wg.addColorStop(1,P2.flame?'#ffe14a':sh(wc,-.25)); c.fillStyle=wg; c.fill(); c.lineWidth=lw; c.strokeStyle=OL2; c.stroke();
-      c.strokeStyle='rgba(40,22,10,.35)'; c.lineWidth=lw*.8; for(let i=1;i<4;i++){ const q=i/4, x1=tipX*.55+(tipX-tipX*.55)*q, y1=tipY*.92+(tipY-tipY*.92)*q; c.beginPath(); c.moveTo(x1,y1); c.quadraticCurveTo(-brx*.35,bry*.45,-brx*.05,bry*.2); c.stroke(); }
-      c.fillStyle='rgba(255,255,255,.18)'; c.beginPath(); c.ellipse(-brx*.1,bry*.25,brx*.22,bry*.22,0,0,7); c.fill(); c.restore(); }
+    // folded front wing covering the side of the body, with layered feathers
+    { const flap=still?0:(act?.5:.05*Math.sin(T/600+ph)); c.save(); c.translate(-brx*.05,by-bry*.35); c.rotate(-flap); const wc=P2.wingCol||P2.body;
+      const path=()=>{ c.beginPath(); c.moveTo(brx*.3,-bry*.05); c.bezierCurveTo(brx*.55,bry*.45,brx*.25,bry*.95,-brx*.15,bry*1.22);
+        const pts=[[-brx*.15,bry*1.22],[-brx*.42,bry*1.12],[-brx*.66,bry*.95],[-brx*.86,bry*.72]]; for(let i=1;i<pts.length;i++){ const p0=pts[i-1], p1=pts[i]; c.quadraticCurveTo((p0[0]+p1[0])/2-brx*.06,(p0[1]+p1[1])/2+bry*.1,p1[0],p1[1]); }
+        c.bezierCurveTo(-brx*.95,bry*.3,-brx*.6,-bry*.25,brx*.3,-bry*.05); c.closePath(); };
+      path(); const wg=c.createLinearGradient(brx*.2,-bry*.1,-brx*.6,bry*1.1); wg.addColorStop(0,sh(wc,.22)); wg.addColorStop(.55,wc); wg.addColorStop(1,P2.flame?'#ffe14a':sh(wc,-.22)); c.fillStyle=wg; c.fill(); c.lineWidth=lw; c.strokeStyle=OL2; c.stroke();
+      c.save(); path(); c.clip(); c.strokeStyle='rgba(40,20,5,.28)'; c.lineWidth=lw*.8;
+      for(let r=0;r<3;r++) for(let i=0;i<4;i++){ const x=brx*(.15-i*.26)-r*brx*.05, y=bry*(.2+r*.3+i*.08); c.beginPath(); c.arc(x,y,brx*.17,.15,Math.PI-.15); c.stroke(); }
+      c.fillStyle='rgba(255,255,255,.22)'; c.beginPath(); c.ellipse(brx*.05,bry*.15,brx*.25,bry*.2,-.4,0,7); c.fill(); c.restore(); c.restore(); }
   }
   else if(P2.shape==='turtle'){
     const by=-sz*.3;
@@ -3302,7 +3368,7 @@ function petScene(c,w,h,big){ const sky=c.createLinearGradient(0,0,0,h); sky.add
   c.fillStyle='rgba(60,120,30,.35)'; c.beginPath(); c.ellipse(w/2,h*.83,w*.3,h*.07,0,0,7); c.fill();
   for(let i=0;i<14;i++){ const x=(i*97%100)/100*w, y=h*(.76+((i*53)%20)/100); c.fillStyle=['#ffffff','#ffd13b','#ff9ec4'][i%3]; c.beginPath(); c.arc(x,y,Math.max(1.5,w*.006),0,7); c.fill(); } }
 function petLoop(){ const cvs=[...document.querySelectorAll('canvas[data-pet]')]; if(!cvs.length){ petLoopOn=false; return; } const T=performance.now(), dpr=Math.min(2,window.devicePixelRatio||1);
-  for(const cv of cvs){ const w=cv.clientWidth||cv.width, h=cv.clientHeight||cv.height; if(!w||!h) continue; if(cv.width!==Math.round(w*dpr)){ cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); }
+  for(const cv of cvs){ const w=cv.clientWidth||cv.width, h=cv.clientHeight||cv.height; if(!w||!h) continue; const iv=cv.dataset.big==='1'?(lowGfx?33:0):(lowGfx?100:50); if(T-(+cv.dataset.lt||0)<iv) continue; cv.dataset.lt=T; if(cv.width!==Math.round(w*dpr)){ cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr); }
     const c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); c.clearRect(0,0,w,h); const big=cv.dataset.big==='1', k=cv.dataset.pet, lvl=+cv.dataset.lvl||1;
     petScene(c,w,h,big);
     if(k==='egg'){ const t0=+cv.dataset.t0||T, q=Math.min(1,(T-t0)/1300); eggArt(c,w/2,h*.84,h*.62,T,q>.25?q:0,cv.dataset.gold==='1'); }
@@ -3547,7 +3613,18 @@ function revenge(i){ const e=inbox[i], m=P(ME); if(!canRevenge(e,m)) return toas
 
 /* ----- friends ----- */
 const FRIEND_MAX=50;
-function addFriend(uid){ act([],me=>{ if(uid===ME) fail('That is you!'); me.friends=me.friends||[]; if(me.friends.includes(uid)) fail('Already your friend.'); if(me.friends.length>=FRIEND_MAX) fail('Your friends list is full.'); me.friends.push(uid); return {n:P(uid)?.name||'them'}; },r=>{ snd('coin'); toast(`⭐ Added ${r.n} as a friend.`); if($('kingOv')) kingDialog('friends'); }); }
+/* friends need to accept: a request goes to their war report, and they become friends only when they press Accept */
+function addFriend(uid){ const v=P(uid); act([],me=>{ if(uid===ME) fail('That is you!'); me.friends=me.friends||[]; if(me.friends.includes(uid)) fail('Already your friend.'); if(me.friends.length>=FRIEND_MAX) fail('Your friends list is full.');
+    me.frOut=(me.frOut||[]).filter(x=>x!==uid); if(me.frOut.length>=30) fail('You have too many requests waiting. Wait for some answers first.'); me.frOut.push(uid); return {n:v?.name||'them'}; },
+  r=>{ snd('coin'); report(uid,`${P(ME).name} wants to be your friend.`,'friend',null,null,{freq:1}); toast(`⭐ Friend request sent to ${r.n}. You become friends when they accept.`); if($('kingOv')) kingDialog('friends'); }); }
+const frReqs=m=>inbox.filter(e=>e&&e.freq&&e.from&&e.from!==ME&&P(e.from)&&!P(e.from).dead&&!((m&&m.friends)||[]).includes(e.from)&&!((m&&m.frDone)||[]).includes(e.t)).filter((e,i,a)=>a.findIndex(x=>x.from===e.from)===i);
+function answerFriend(t,yes){ const e=inbox.find(x=>x.t===t&&x.freq); if(!e) return; const from=e.from;
+  act([],me=>{ me.frDone=[...(me.frDone||[]).slice(-39),t]; if(yes){ me.friends=me.friends||[]; if(me.friends.length>=FRIEND_MAX) fail('Your friends list is full.'); if(!me.friends.includes(from)) me.friends.push(from); me.frOut=(me.frOut||[]).filter(x=>x!==from); } return {yes,n:P(from)?.name||'them'}; },
+    r=>{ snd(r.yes?'quest':'click'); if(r.yes){ report(from,`${P(ME).name} accepted your friend request!`,'good',null,null,{facc:1}); toast(`⭐ You and ${r.n} are now friends!`); } else toast('Request declined.'); if($('kingOv')) kingDialog('friends'); }); }
+let frBusy=false;
+setInterval(async()=>{ const m=P(ME); if(!m||m.dead||busy||frBusy||!(m.frOut||[]).length) return; const acc=inbox.filter(e=>e&&e.facc&&(m.frOut||[]).includes(e.from)); if(!acc.length) return; frBusy=true;
+  try{ await DB.tx(async t=>{ const me=await t.getPlayer(ME); if(!me||me.dead) fail('gone'); me.friends=me.friends||[]; for(const e of acc){ if(!me.friends.includes(e.from)&&me.friends.length<FRIEND_MAX) me.friends.push(e.from); } me.frOut=(me.frOut||[]).filter(x=>!acc.some(e=>e.from===x)); t.setPlayer(ME,me); });
+    acc.forEach(e=>toast(`⭐ ${P(e.from)?.name||'Someone'} accepted your friend request!`)); if($('kingOv')&&kingTab==='friends') kingDialog('friends'); }catch(e){} frBusy=false; },4000);
 function removeFriend(uid){ act([],me=>{ me.friends=(me.friends||[]).filter(x=>x!==uid); },()=>{ snd('click'); kingDialog('friends'); }); }
 function visitFriend(uid){ const v=P(uid); if(!v||v.dead||!v.hall) return toast('That kingdom cannot be found right now.',true); $('ov').innerHTML=''; setTab('map'); if(cam.z<1) cam.z=1; centerOn(v.hall); sel=v.hall; syncRegions(); renderPanel(true); draw(); }
 let friendsOnline=null;
@@ -3610,15 +3687,18 @@ function kingDialog(tab){ if(tab) kingTab=tab; const m=P(ME); if(!m||m.dead) ret
     body=`<p class="desc">Collect everything! Finish a page for gems and a bonus that lasts forever.</p>`+BOOK.map(pg=>{ const ls=pg.list(), have=ls.filter(k=>pg.has(m,k)), done=have.length===ls.length, cl=c.includes(pg.id);
       return `<details class="help book"${!done&&have.length?' open':''}><summary>${pg.ic} ${pg.name} · ${have.length} / ${ls.length}${cl?' ✓':''}</summary><div><div class="bar"><i style="width:${have.length/ls.length*100}%"></i></div><div class="bookGrid">${ls.map(k=>`<span class="bk${pg.has(m,k)?' on':''}">${pg.has(m,k)?esc(pg.lbl(k)):'?'}</span>`).join('')}</div>
         <p class="desc">Reward: ${pg.gems} gems and ${pg.bonus}.</p>${cl?'<p class="desc"><b>Claimed!</b></p>':done?btn('Claim page reward',null,'book:'+pg.id,'prime'):''}</div></details>`; }).join(''); }
-  else if(kingTab==='friends'){ const fr=(m.friends||[]).map(P).filter(Boolean);
-    body=`<p class="desc">Add friends to see when they are online and visit their kingdoms. Tap any kingdom on the map and press <b>Add friend</b>, or type a kingdom name here.</p>
-      <form class="row" id="frF"><input id="frIn" maxlength="24" placeholder="Kingdom name" autocomplete="off" style="flex:1;min-width:0"><button class="prime" type="submit">Add friend</button></form>
+  else if(kingTab==='friends'){ const fr=(m.friends||[]).map(P).filter(Boolean), rq=frReqs(m), out=(m.frOut||[]).map(P).filter(p=>p&&!(m.friends||[]).includes(p.id));
+    body=`<p class="desc">Send a friend request to see when someone is online and visit their kingdom. You only become friends when they <b>accept</b>. Tap any kingdom on the map and press <b>Add friend</b>, or type a kingdom name here.</p>
+      <form class="row" id="frF"><input id="frIn" maxlength="24" placeholder="Kingdom name" autocomplete="off" style="flex:1;min-width:0"><button class="prime" type="submit">Send request</button></form>
+      ${rq.length?`<div class="label">Friend requests (${rq.length})</div><div class="board">${rq.map(e=>{ const p=P(e.from); return `<div class="me"><span class="sw" style="background:${p.color}"></span><span>${tagOf(p.id)}${esc(cleanText(p.name))} wants to be your friend</span><span>${f(p.tr||0)} 🏆</span><span class="row">${btn('Accept',null,'fr:yes:'+e.t,'prime')}${btn('Decline',null,'fr:no:'+e.t,'soft')}</span></div>`; }).join('')}</div>`:''}
+      ${out.length?`<p class="desc">Waiting for an answer from: ${out.map(p=>esc(cleanText(p.name))).join(', ')}</p>`:''}
+      <div class="label">Friends (${fr.length})</div>
       <div class="board">${fr.length?fr.sort((a,b)=>online(b)-online(a)).map(p=>`<div><span class="sw" style="background:${p.color}"></span><span>${tagOf(p.id)}${esc(cleanText(p.name))}${online(p)?' <span class="on">● online</span>':p.dead?' (fallen)':' <small class="desc">offline</small>'}</span><span>${f(p.tr||0)} 🏆 · Lv ${lvlOfXp(xpOf(p))}</span><span class="row">${p.dead?'':btn('Visit',null,'fr:visit:'+p.id,'prime')}${btn('Remove',null,'fr:del:'+p.id,'soft')}</span></div>`).join(''):'<p class="desc">No friends yet.</p>'}</div>`; }
-  const tabs=[['quests','📜 Daily quests'+(dqFresh(m)&&m.dq.ids.some((_,i)=>!m.dq.got[i]&&dqProg(m,i)[0]>=dqProg(m,i)[1])?' •':'')],['pass','🎟️ Season pass'+(passTier(m)>((m.pass&&m.pass.got)||[]).length?' •':'')],['skills','✨ Skills'+(pts>0?' •':'')],['book','📖 Collection'],['friends','⭐ Friends']];
+  const tabs=[['quests','📜 Daily quests'+(dqFresh(m)&&m.dq.ids.some((_,i)=>!m.dq.got[i]&&dqProg(m,i)[0]>=dqProg(m,i)[1])?' •':'')],['pass','🎟️ Season pass'+(passTier(m)>((m.pass&&m.pass.got)||[]).length?' •':'')],['skills','✨ Skills'+(pts>0?' •':'')],['book','📖 Collection'],['friends','⭐ Friends'+(frReqs(m).length?' •':'')]];
   $('ov').innerHTML=`<div class="overlay" id="kingOv"><div class="dialog wide"><h2>👑 Kingdom level ${L}</h2><div class="row tabs">${tabs.map(([k,l])=>`<button class="${kingTab===k?'prime':'soft'}" data-act="king:${k}">${l}</button>`).join('')}</div>${body}<button class="soft" data-act="ov:close">Close</button></div></div>`;
   const ff=$('frF'); if(ff) ff.onsubmit=e=>{ e.preventDefault(); const q=nameKey($('frIn').value||''); const p=Object.values(G.players).find(x=>!x.dead&&nameKey(x.name||'')===q); if(!p) return toast('No kingdom with that name.',true); addFriend(p.id); };
   refreshButtons(); }
-function kingBadge(){ const m=P(ME), b=$('bKing'); if(!b||!m||m.dead) return; const on=skillPts(m)>0||passTier(m)>(((m.pass&&m.pass.m===seasonId()&&m.pass.got)||[]).length)||(dqFresh(m)&&m.dq.ids.some((_,i)=>!m.dq.got[i]&&dqProg(m,i)[0]>=dqProg(m,i)[1]));
+function kingBadge(){ const m=P(ME), b=$('bKing'); if(!b||!m||m.dead) return; const on=frReqs(m).length>0||skillPts(m)>0||passTier(m)>(((m.pass&&m.pass.m===seasonId()&&m.pass.got)||[]).length)||(dqFresh(m)&&m.dq.ids.some((_,i)=>!m.dq.got[i]&&dqProg(m,i)[0]>=dqProg(m,i)[1]));
   b.classList.toggle('dot',on); b.textContent='👑 Lv '+lvlOfXp(xpOf(m)); const ev=evNow(), eb=$('bEvent'); if(eb){ eb.hidden=!ev; if(ev) eb.textContent=ev.e.emo+' Event'; } const pb=$('bPet'); if(pb) pb.textContent=myPet(m)?'🐾 '+cleanText(myPet(m).name):'🐾 Pets'; }
 setInterval(()=>{ try{ dqEnsure(); }catch(e){} },8000);
 
@@ -3650,8 +3730,12 @@ async function resumeOnline(){ const m=P(ME); if(!DB||!m||m.dead||resuming) retu
       t.setPlayer(ME,me); });
     if(gap>10*60000) toast(`Welcome back! Your kingdom rested while you were away ${fmtT(gap/1000)}, so no resources were made.`); }
   catch(e){ DB.touch(ME); } busy=false; resuming=false; }
+let backBusy=false;
+setInterval(async()=>{ const m=P(ME); if(!m||m.dead||busy||backBusy||!offLocked(m)||document.hidden) return; backBusy=true;
+  try{ await DB.tx(async t=>{ const me=await t.getPlayer(ME); if(!me||!offLocked(me)) fail('no'); me.shield=now()+BACK_MIN*60000; me.lastSeen=now(); t.setPlayer(ME,me); }); toast(`You were attacked while you were offline, so you are protected for ${BACK_MIN} more minutes. Check your war report!`); }catch(e){} backBusy=false; },3000);
 setInterval(()=>{ if(DB&&ME&&P(ME)&&!P(ME).dead&&document.visibilityState==='visible'&&Date.now()-lastInput<10*60000){ resumeOnline();
-    if(isNewbie(P(ME))&&!busy) DB.tx(async t=>{ const me=await t.getPlayer(ME); if(!me||me.dead) return; me.played=Math.min(NEWBIE_MIN,(me.played||0)+2); t.setPlayer(ME,me); }).then(()=>{ if(!isNewbie(P(ME))) toast('Your newcomer protection has ended. Other players can attack you now, so keep your defenses strong!',true); }).catch(()=>{}); } },2*60000);
+  } },2*60000);
+let wasNewbie=null; setInterval(()=>{ const m=P(ME); if(!m||m.dead) return; const n=isNewbie(m); if(wasNewbie&&!n) toast('Your newcomer protection has ended. Other players can attack you now, so keep your defenses strong!',true); wasNewbie=n; },20000);
 document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible'&&DB&&ME&&P(ME)&&!P(ME).dead) resumeOnline(); });
 ['pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,()=>{ const m=P(ME); if(m&&!m.dead&&now()-activeEnd(m)>5000&&!resuming) resumeOnline(); },{passive:true}));
 function start(){
