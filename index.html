@@ -376,7 +376,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 35;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
+const GAME_VERSION = 36;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
 const NEW_SHIELD_MIN = 120;     // peace shield for brand new kingdoms
 const DEFEND_SHIELD_MIN = 30;   // peace shield after being attacked
 const CAMP_MAX = 25;            // highest barbarian camp level
@@ -591,6 +591,12 @@ const treaty=p=>inClan(p)&&!online(p)&&afkDays(p)<TREATY_AFK_DAYS;
 const nameKey=n=>encodeURIComponent(String(n).trim().toLowerCase().replace(/\s+/g,' ')).replace(/\./g,'%2E').slice(0,140)||'x';
 
 /* ================= backends ================= */
+function applyLocal(L){ if(!L) return; try{
+  for(const id in L.pw) G.players[id]={...clone(L.pw[id]),id};
+  for(const id in L.cw){ if(L.cw[id]===null) delete G.clans[id]; else G.clans[id]={...clone(L.cw[id]),id}; }
+  for(const rk in L.regs){ const w=L.regs[rk].w; for(const c in w){ if(w[c]===null) delete G.plots[c]; else G.plots[c]=normalize(clone(w[c])); } }
+  G.market=G.market||{}; for(const k in L.mw){ if(L.mw[k]===null) delete G.market[k]; else G.market[k]={...clone(L.mw[k]),id:k}; }
+  statsMemo.clear(); miniDirty=true; }catch(e){} }
 function firebaseBackend(){
   firebase.initializeApp(FIREBASE_CONFIG);
   try{ const pr=firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL); if(pr&&pr.catch) pr.catch(()=>{}); }catch(e){}
@@ -612,8 +618,8 @@ function firebaseBackend(){
     sendChat:(id,msg)=>CL.doc(id).collection('chat').add(msg),
     touch:uid=>PL.doc(uid).update({lastSeen:Date.now()}).catch(()=>{}),
     watchMarket:cb=>MK.orderBy('t','desc').limit(150).onSnapshot(guard(s=>{ const m={}; s.forEach(d=>m[d.id]={...d.data(),id:d.id}); cb(m); },'the market'),()=>{}),
-    tx:fn=>db.runTransaction(async tr=>{
-      const regs={}, pw={}, cw={}, nw={}, mw={};
+    tx:fn=>{ let last=null; return db.runTransaction(async tr=>{
+      const regs={}, pw={}, cw={}, nw={}, mw={}; last={regs,pw,cw,mw};
       const strip=d=>{ const c=clone(d); delete c.id; return c; };
       const t={
         async getPlayer(id){ const d=await tr.get(PL.doc(id)); return d.exists?{...d.data(),id}:null; },
@@ -636,7 +642,7 @@ function firebaseBackend(){
         if(r.exists){ const up={}; ks.forEach(k=>up['p.'+k]=r.w[k]===null?FV.delete():r.w[k]); tr.update(RG.doc(rk),up); }
         else { const p={}; ks.forEach(k=>{ if(r.w[k]!==null) p[k]=r.w[k]; }); tr.set(RG.doc(rk),{p}); } }
       return out;
-    })
+    }).then(out=>{ applyLocal(last); return out; }); }
   };
 }
 const PREVIEW_KEY='iron-acre-device-'+WORLD.id, CUR_KEY='iron-acre-device-current-'+WORLD.id;
@@ -702,9 +708,11 @@ function onRegion(rk,p){
   (regionCells[rk]||[]).forEach(c=>delete G.plots[c]);
   regionCells[rk]=Object.keys(p); for(const c in p) G.plots[c]=normalize(p[c]);
   for(const k of [...chunkCache.keys()]) if(k.endsWith('_0.35')){ const v=chunkCache.get(k); chunkPix-=v.can.width*v.can.height; chunkCache.delete(k); }
-  miniDirty=true; queueRender();
+  miniDirty=true; snapRender();
 }
-function onPlayers(m){ G.players=m; playersReady=true; checkMe(); queueRender(); { const ae=document.activeElement; if($('shopOv')&&!busy&&!(ae&&/INPUT|SELECT/.test(ae.tagName)&&$('shopOv').contains(ae))) shopDialog(); } checkSeasonAndWar(); if($('rewOv')&&!busy&&!spinning) rewardsDialog(); }
+let lastSnapR=0, snapT=null;
+function snapRender(){ const d=Date.now()-lastSnapR; if(d>900){ lastSnapR=Date.now(); queueRender(); } else if(!snapT) snapT=setTimeout(()=>{ snapT=null; lastSnapR=Date.now(); queueRender(); },900-d); }
+function onPlayers(m){ G.players=m; playersReady=true; checkMe(); snapRender(); { const ae=document.activeElement; if($('shopOv')&&!busy&&!(ae&&/INPUT|SELECT/.test(ae.tagName)&&$('shopOv').contains(ae))) shopDialog(); } checkSeasonAndWar(); if($('rewOv')&&!busy&&!spinning) rewardsDialog(); }
 function onInbox(list){
   const fresh=list.filter(e=>e.t>sessionStart&&e.from&&e.from!==ME&&!inbox.some(o=>o.t===e.t&&o.text===e.text));
   inbox=list;
@@ -737,9 +745,9 @@ async function act(cells,fn,after){
   if(busy||!ME||!P(ME)||P(ME).dead) return; busy=true; refreshButtons();
   try{
     const out=await DB.tx(async t=>{
-      const me=await t.getPlayer(ME); if(!me||me.dead) fail('Your kingdom has fallen.');
+      const rks=[...new Set(cells.map(regionOf))], got=await Promise.all([t.getPlayer(ME),...rks.map(rk=>t.getRegion(rk))]), me=got[0]; if(!me||me.dead) fail('Your kingdom has fallen.');
       me.stats=Object.assign(defaultStats(),me.stats||{});
-      const plots={}; for(const c of cells){ const r=await t.getRegion(regionOf(c)); plots[c]=r[c]?normalize(clone(r[c])):null; }
+      const plots={}; for(const c of cells){ const r=got[1+rks.indexOf(regionOf(c))]; plots[c]=r[c]?normalize(clone(r[c])):null; }
       settle(me); const res=fn(me,plots)||{}; me.lastSeen=now();
       t.setPlayer(ME,me); for(const c of cells) t.setPlot(c,plots[c]);
       return res;
@@ -976,7 +984,7 @@ async function join(name){
       t.setPlayer(ME,{name,color:old?.color||colorFor(ME),gold:old?200:300,stone:old?100:150,t:now(),gems:old?(old.gems||0):30,tr:old?(old.tr||0):0,
         sol:old?5:6,arc:0,giant:0,cav:0,cat:0,cc:{},sp:{},inv:old?.inv||[],eq:old?.eq||{},clan:old?.clan||null,pets:old?.pets||[],petOn:old?.petOn||null,hero:old?.hero?{lvl:old.hero.lvl,rest:0}:null,heroes:old?.heroes||{},heroPick:old?.heroPick||null,book:old?.book||{},skills:old?.skills||{},friends:old?.friends||[],pass:old?.pass||null,ev:old?.ev||null,decoInv:old?.decoInv||{},season:old?.season||null,shield:now()+NEW_SHIELD_MIN*60000,dead:false,stats:Object.assign(defaultStats(),old?.stats||{}),quest:old?.quest||0,created:old?.created||now(),lastSeen:now(),hall:spot});
       t.setPlot(spot,{o:ME,b:'hall',lvl:1}); t.setName(key,{uid:ME,name,t:now()}); if(oldHeld&&oldHeld.uid===ME) t.setName(oldKey,null); });
-    $('ov').innerHTML=''; sel=spot; camFor=null; camReady=true; syncRegions(); snd('quest'); toast('Welcome to the realm! Your peace shield lasts '+Math.round(NEW_SHIELD_MIN/60)+' hours.');
+    $('ov').innerHTML=''; sel=spot; camFor=null; camReady=true; try{ localStorage.removeItem(CAM_KEY); }catch(e){} cam.z=1; centerOn(spot); syncRegions(); snd('quest'); toast('Welcome to the realm! Your peace shield lasts '+Math.round(NEW_SHIELD_MIN/60)+' hours.');
   }catch(e){ explain(e); }
   busy=false; renderAll();
 }
@@ -1095,6 +1103,7 @@ const grassCol=(x,y)=>{ const S=G.seed|0, n=vnoise(x/3.5,y/3.5,S+4), m=vnoise(y/
 /* ================= camera ================= */
 let lastIH=0, VW=0,VH=0,TW=46,TH=23,OX=0,OY=0,LW=1,cam={z:1,x:0,y:0},camFor=null;
 const OL='rgba(48,26,10,.85)';
+let camInit=false;
 function layout(){
   const w=cv.clientWidth; if(!w) return false;
   if(w!==VW||lastN!==N||(isPhone()&&window.innerHeight!==lastIH)){ VW=w; lastN=N; lastIH=window.innerHeight; TW=VW<640?40:46; TH=TW/2;
@@ -1102,8 +1111,9 @@ function layout(){
     VH=Math.round(isPhone()?Math.max(320,window.innerHeight-topY-navH-12):Math.max(440,Math.min(700,window.innerHeight*.74)));
     cv.style.height=VH+'px'; OX=N*TW/2+TW*4; OY=TW*3; grassGrads=null; camFor=null; miniDirty=true; clearChunks(); }
   const dpr=mapDpr(); if(cv.width!==Math.round(VW*dpr)||cv.height!==Math.round(VH*dpr)){ cv.width=Math.round(VW*dpr); cv.height=Math.round(VH*dpr); }
-  const key=ME&&P(ME)&&!P(ME).dead?ME+'|'+(P(ME).hall||''):null;
-  if(key&&camFor!==key){ const first=camFor===null, sv=first&&loadCam(); camFor=key; if(sv&&sv.t&&inB(sv.t[0],sv.t[1])){ cam.z=Math.max(.25,Math.min(2.6,sv.z||1)); centerOn(cid(sv.t[0],sv.t[1])); } else { cam.z=1; centerOn(P(ME).hall||stats(ME).hall); } }
+  const hh=ME&&P(ME)&&!P(ME).dead?(P(ME).hall||stats(ME).hall):null, key=hh?ME+'|'+hh:null;
+  if(!key&&!camInit){ camInit=true; cam.z=1; centerOn(cid(Math.floor(N/2),Math.floor(N/2))); }
+  if(key&&camFor!==key){ const first=camFor===null, sv=first&&loadCam(); camFor=key; if(sv&&sv.t&&inB(sv.t[0],sv.t[1])&&dist(cid(sv.t[0],sv.t[1]),hh)<=120){ cam.z=Math.max(.25,Math.min(2.6,sv.z||1)); centerOn(cid(sv.t[0],sv.t[1])); } else { cam.z=1; centerOn(P(ME).hall||stats(ME).hall); } }
   return true;
 }
 const topOf=(x,y)=>[OX+(x-y)*TW/2, OY+(x+y)*TH/2];
@@ -3651,7 +3661,7 @@ function start(){
     if(ME===uid) return; ME=uid; $('ov').innerHTML='';
     DB.watchPlayers(onPlayers); setTimeout(()=>resumeOnline(),1500);
     DB.watchInbox(ME,onInbox);
-    DB.watchClans(m=>{ G.clans=m; queueRender(); });
+    DB.watchClans(m=>{ G.clans=m; snapRender(); });
     DB.watchMarket(m=>{ G.market=m; const ae=document.activeElement; if($('shopOv')&&shopTab==='market'&&!busy&&!(ae&&/INPUT|SELECT/.test(ae.tagName))) shopDialog(); });
   });
 }
