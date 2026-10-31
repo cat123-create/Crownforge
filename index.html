@@ -425,7 +425,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 53;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
+const GAME_VERSION = 54;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
 const NEW_SHIELD_MIN = 120;     // peace shield for brand new kingdoms
 const DEFEND_SHIELD_MIN = 30;   // peace shield after being attacked
 const CAMP_MAX = 25;            // highest barbarian camp level
@@ -3507,6 +3507,10 @@ function petArt(c,x,y,s,k,t,o={}){
 const petHQ={cv:null,g:null,tp:null,tg:null,noise:null};
 function petNoise(){ if(petHQ.noise) return petHQ.noise; const n=document.createElement('canvas'); n.width=n.height=48; const g=n.getContext('2d'); g.lineCap='round'; let sd=11; const R=()=>{ sd=(sd*16807)%2147483647; return sd/2147483647; };
   for(let i=0;i<150;i++){ const x=R()*48,y=R()*48,a=Math.PI*.55+R()*.6,l=2+R()*3.5; g.strokeStyle=R()<.55?'rgba(0,0,0,.6)':'rgba(255,255,255,.55)'; g.lineWidth=.5+R()*.6; g.beginPath(); g.moveTo(x,y); g.lineTo(x+Math.cos(a)*l,y+Math.sin(a)*l); g.stroke(); } return petHQ.noise=n; }
+function petScales(){ if(petHQ.scales) return petHQ.scales; const n=document.createElement('canvas'); n.width=40; n.height=32; const g=n.getContext('2d');
+  for(let r=0;r<3;r++) for(let i=-1;i<4;i++){ const x=i*13.33+(r%2)*6.67, y=r*11; const gr=g.createRadialGradient(x-2,y+1,1,x,y+4,9); gr.addColorStop(0,'rgba(255,255,255,.55)'); gr.addColorStop(.55,'rgba(255,255,255,.05)'); gr.addColorStop(1,'rgba(0,0,0,.55)');
+    g.fillStyle=gr; g.beginPath(); g.moveTo(x-7,y); g.quadraticCurveTo(x-7,y+9,x,y+11); g.quadraticCurveTo(x+7,y+9,x+7,y); g.quadraticCurveTo(x,y-2,x-7,y); g.fill(); g.strokeStyle='rgba(0,0,0,.6)'; g.lineWidth=.8; g.stroke(); }
+  return petHQ.scales=n; }
 function petArtHQ(c,x,y,s,k,t,o){ const m=c.getTransform(), sc=Math.max(1,Math.min(3,Math.hypot(m.a,m.b))), P2=PETS[k]||PETS.fox;
   const W=Math.ceil(s*2.9), H=Math.ceil(s*2.6), ox=W/2, oy=H*.84, pw=Math.ceil(W*sc), ph=Math.ceil(H*sc);
   if(!petHQ.cv){ petHQ.cv=document.createElement('canvas'); petHQ.g=petHQ.cv.getContext('2d'); petHQ.tp=document.createElement('canvas'); petHQ.tg=petHQ.tp.getContext('2d'); }
@@ -3516,14 +3520,20 @@ function petArtHQ(c,x,y,s,k,t,o){ const m=c.getTransform(), sc=Math.max(1,Math.m
   g.setTransform(sc,0,0,sc,0,0); petArt(g,ox,oy,s,k,t,{...o,_in:1}); g.setTransform(1,0,0,1,0,0);
   // a thin crescent along the top-left edge, for the rim light
   const d=Math.max(1,s*sc*.03); tg.setTransform(1,0,0,1,0,0); tg.globalAlpha=1; tg.globalCompositeOperation='source-over'; tg.clearRect(0,0,tp.width,tp.height); tg.drawImage(cv,0,0,pw,ph,0,0,pw,ph);
-  tg.globalCompositeOperation='source-in'; tg.fillStyle=P2.ghost?'#d8c8ff':'#fff1cc'; tg.fillRect(0,0,pw,ph); tg.globalCompositeOperation='destination-out'; tg.drawImage(cv,0,0,pw,ph,d,d*1.1,pw,ph);
+  tg.globalCompositeOperation='source-in'; tg.fillStyle=P2.ghost?'#d8c8ff':'#fff1cc'; tg.fillRect(0,0,pw,ph); tg.globalCompositeOperation='destination-out'; if(k==='dragon'||k==='phoenix') tg.drawImage(cv,0,0,pw,ph,-d*.2,-d*1.2,pw,ph); else tg.drawImage(cv,0,0,pw,ph,d,d*1.1,pw,ph);
   const cx=ox*sc, cy=oy*sc, S=s*sc;
   g.globalCompositeOperation='source-atop';
   const lg=g.createLinearGradient(cx-S*.55,cy-S*1.05,cx+S*.45,cy); lg.addColorStop(0,'rgba(255,246,220,.3)'); lg.addColorStop(.45,'rgba(255,255,255,0)'); lg.addColorStop(1,'rgba(24,10,36,.36)'); g.fillStyle=lg; g.fillRect(0,0,pw,ph);
   const ag=g.createLinearGradient(0,cy-S*.22,0,cy); ag.addColorStop(0,'rgba(0,0,0,0)'); ag.addColorStop(1,'rgba(12,6,0,.32)'); g.fillStyle=ag; g.fillRect(0,0,pw,ph);
+  const fiery=k==='dragon'||k==='phoenix', bst=REAL&&typeof BEAST!=='undefined'&&BEAST[k];
+  if(bst){ const sg2=g.createLinearGradient(cx-S*.6,cy-S*1.1,cx+S*.6,cy); sg2.addColorStop(0,'rgba(0,0,0,0)'); sg2.addColorStop(.55,'rgba(0,0,0,.12)'); sg2.addColorStop(1,'rgba(10,0,10,.42)'); g.fillStyle=sg2; g.fillRect(0,0,pw,ph);
+    if(k==='dragon'){ const sp=g.createPattern(petScales(),'repeat'); if(sp){ const ps2=Math.max(.25,S/520); try{ sp.setTransform(new DOMMatrix([ps2,0,0,ps2,0,0])); }catch(e){} g.globalAlpha=.3; g.fillStyle=sp; g.fillRect(0,0,pw,ph); g.globalAlpha=1; } }
+    if(fiery){ const fg=g.createLinearGradient(0,cy,0,cy-S*.9); fg.addColorStop(0,'rgba(255,140,40,.5)'); fg.addColorStop(.45,'rgba(255,90,20,.14)'); fg.addColorStop(1,'rgba(255,90,20,0)'); g.fillStyle=fg; g.fillRect(0,0,pw,ph); } }
+  g.globalCompositeOperation='source-atop';
   const pat=g.createPattern(petNoise(),'repeat'); if(pat){ const ps=Math.max(.45,S/115); try{ pat.setTransform(new DOMMatrix([ps,0,0,ps,0,0])); }catch(e){} g.globalAlpha=P2.ghost?.04:P2.shape==='turtle'?.07:REAL?.17:.12; g.fillStyle=pat; g.fillRect(0,0,pw,ph); g.globalAlpha=1; }
-  g.globalCompositeOperation='lighter'; g.globalAlpha=REAL?.16:.6; g.drawImage(tp,0,0,pw,ph,0,0,pw,ph); g.globalAlpha=1; g.globalCompositeOperation='source-over';
-  if(REAL){ c.save(); try{ c.filter='saturate(.86) contrast(1.06)'; }catch(e){} c.drawImage(cv,0,0,pw,ph,x-ox,y-oy,W,H); c.restore(); } else c.drawImage(cv,0,0,pw,ph,x-ox,y-oy,W,H); }
+  if(fiery&&bst){ tg.globalCompositeOperation='source-in'; tg.fillStyle='#ffa040'; tg.fillRect(0,0,pw,ph); }
+  g.globalCompositeOperation='lighter'; g.globalAlpha=REAL?(fiery?.32:.22):.6; g.drawImage(tp,0,0,pw,ph,0,0,pw,ph); g.globalAlpha=1; g.globalCompositeOperation='source-over';
+  if(REAL){ c.save(); try{ c.filter=bst?(fiery?'saturate(1.15) contrast(1.22) brightness(1.02)':'saturate(.95) contrast(1.16)'):'saturate(.86) contrast(1.06)'; }catch(e){} c.drawImage(cv,0,0,pw,ph,x-ox,y-oy,W,H); c.restore(); } else c.drawImage(cv,0,0,pw,ph,x-ox,y-oy,W,H); }
 /* A pet's guard attack, drawn in battles: a projectile from the pet to (x1,y1) at progress q (0..1) */
 function petShot(c,k,x0,y0,x1,y1,q,s){ const P2=PETS[k]||PETS.fox, x=x0+(x1-x0)*q, y=y0+(y1-y0)*q-Math.sin(q*Math.PI)*s*.2;
   c.save(); c.globalCompositeOperation='lighter';
@@ -4380,7 +4390,7 @@ function beastArt(c,s,k,T,o,gq){
     const span=sz*(B.wings==='bat'?.7:.62)*(1-baby*.25);
     if(B.wings==='bat'){ const elb=[-span*.22,-span*.48], wr=[-span*.05,-span*.92], tips=[[-span*.42,-span*1.0],[-span*.78,-span*.86],[-span*1.02,-span*.58],[-span*1.08,-span*.2]];
       c.beginPath(); c.moveTo(0,0); c.lineTo(...elb); c.lineTo(...wr); c.lineTo(...tips[0]); for(let i=1;i<tips.length;i++){ const a=tips[i-1], b=tips[i]; c.quadraticCurveTo((a[0]+b[0])/2+span*.12,(a[1]+b[1])/2+span*.1,b[0],b[1]); } c.quadraticCurveTo(-span*.6,span*.0,-span*.28,span*.12); c.closePath();
-      c.fillStyle=lin(wr[0],wr[1],-span*.6,0,[[0,sh(B.memb,.15)],[.6,B.memb],[1,sh(B.memb,-.35)]]); c.globalAlpha=(B.ghost?.82:1)*(far?.85:.93); c.fill(); c.globalAlpha=B.ghost?.82:1; if(far){ c.fillStyle='rgba(20,0,0,.35)'; c.fill(); }
+      c.fillStyle=lin(wr[0],wr[1],-span*.6,span*.1,[[0,sh(B.memb,-.25)],[.45,B.memb],[.8,sh(B.memb,.25)],[1,'#ff9a50']]); c.globalAlpha=(B.ghost?.82:1)*(far?.85:.93); c.fill(); c.globalAlpha=B.ghost?.82:1; if(far){ c.fillStyle='rgba(20,0,0,.35)'; c.fill(); }
       c.save(); c.clip(); c.strokeStyle='rgba(60,10,10,.35)'; c.lineWidth=Math.max(.4,sz*.004); for(const tp2 of tips) for(let j=1;j<4;j++){ c.beginPath(); c.moveTo(wr[0]+(tp2[0]-wr[0])*j/4,wr[1]+(tp2[1]-wr[1])*j/4); c.quadraticCurveTo(-span*.3,-span*.3,-span*.2+j*span*.02,span*.05); c.stroke(); } c.restore();
       c.strokeStyle=far?sh(B.wing,-.3):B.wing; c.lineCap='round'; c.lineWidth=sz*.04; c.beginPath(); c.moveTo(0,0); c.lineTo(...elb); c.lineTo(...wr); c.stroke(); c.lineWidth=sz*.018; for(const tp2 of tips){ c.beginPath(); c.moveTo(...wr); c.lineTo(...tp2); c.stroke(); }
       c.fillStyle=B.horn; c.beginPath(); c.moveTo(wr[0]-sz*.015,wr[1]); c.lineTo(wr[0]+sz*.02,wr[1]-sz*.06); c.lineTo(wr[0]+sz*.025,wr[1]+sz*.01); c.fill(); }
@@ -4403,7 +4413,12 @@ function beastArt(c,s,k,T,o,gq){
     if(B.ears==='long'){ ear(-H*.15,-H*.26,H*.13,H*.62,-.6,sh(hc,-.08)); ear(H*.02,-H*.3,H*.13,H*.66,-.35,hc); }
     if(B.mane){ for(let i=0;i<150;i++){ const a=Math.PI*.55+hsh(i,71)*Math.PI*1.25, r=H*(.4+hsh(i,73)*.45), x0=hx-H*.12+Math.cos(a)*H*.12, y0=hy+H*.05+Math.sin(a)*H*.12; c.strokeStyle=hsh(i,75)<.4?B.maneHi:hsh(i,75)<.8?B.mane:sh(B.mane,-.4); c.lineWidth=Math.max(.8,sz*.02); c.lineCap='round'; c.beginPath(); c.moveTo(x0,y0); c.quadraticCurveTo(x0+Math.cos(a)*r*.5,y0+Math.sin(a)*r*.5+sz*.04,hx-H*.15+Math.cos(a)*r*.9,hy+H*.1+Math.sin(a)*r*.8+sz*.06); c.stroke(); }
       if(B.glowMane&&!still){ c.save(); c.globalCompositeOperation='lighter'; c.globalAlpha=.18+.08*Math.sin(T/400); c.fillStyle='#ffb43a'; c.beginPath(); c.arc(hx-H*.1,hy,H*.75,0,7); c.fill(); c.restore(); } }
-    if(k==='dragon'){ // horns sweeping back
+    if(k==='dragon'){ // a crown of spikes behind the skull and under the jaw
+      c.save(); c.translate(hx,hy); c.rotate(tilt); for(let i=0;i<9;i++){ const a=-2.5+i*.32, r0=H*.3, x0=-H*.12+Math.cos(a)*r0, y0=H*.02+Math.sin(a)*r0*.9, len=H*(.22+.12*Math.sin(i*1.3)), a2=a-.35;
+        c.beginPath(); c.moveTo(x0+Math.cos(a+1.57)*H*.035,y0+Math.sin(a+1.57)*H*.035); c.lineTo(x0+Math.cos(a2)*len,y0+Math.sin(a2)*len); c.lineTo(x0-Math.cos(a+1.57)*H*.035,y0-Math.sin(a+1.57)*H*.035); c.closePath();
+        c.fillStyle=lin(x0,y0,x0+Math.cos(a2)*len,y0+Math.sin(a2)*len,[[0,sh(B.body,-.3)],[.6,sh(B.hi,-.1)],[1,'#f0d8b0']]); c.fill(); c.strokeStyle='rgba(30,0,0,.4)'; c.lineWidth=Math.max(.4,sz*.004); c.stroke(); }
+      for(let i=0;i<5;i++){ const x0=H*(.05+i*.09), y0=H*.27; c.beginPath(); c.moveTo(x0-H*.03,y0); c.lineTo(x0-H*.06,y0+H*(.1+.04*(i%2))); c.lineTo(x0+H*.02,y0); c.closePath(); c.fillStyle=sh(B.body,-.25); c.fill(); } c.restore();
+      // horns sweeping back
       for(const [ox,oy,len,w,col] of [[-H*.05,-H*.24,H*1.0,H*.11,sh(B.horn,-.25)],[H*.06,-H*.26,H*1.15,H*.12,B.horn]]){ c.save(); c.translate(hx,hy); c.rotate(tilt); c.translate(ox,oy); c.beginPath(); c.moveTo(-w,0); c.bezierCurveTo(-len*.4,-w*2,-len*.8,-len*.1,-len,len*.05); c.bezierCurveTo(-len*.7,-len*.02,-len*.3,w*.6,w,0); c.closePath(); c.fillStyle=lin(0,0,-len,0,[[0,sh(col,-.3)],[1,'#fffaf0']]); c.fill(); c.strokeStyle='rgba(40,20,10,.5)'; c.lineWidth=Math.max(.4,sz*.005); c.stroke();
         c.strokeStyle='rgba(60,30,10,.35)'; for(let j=1;j<6;j++){ c.beginPath(); c.moveTo(-len*j*.15,-w*.9+j*w*.05); c.lineTo(-len*j*.15+w*.3,w*.4); c.stroke(); } c.restore(); }
       for(let i=0;i<3;i++){ c.save(); c.translate(hx,hy); c.rotate(tilt); c.beginPath(); const bx=-H*.38-i*H*.02, by=H*(-.05+i*.12); c.moveTo(bx,by-H*.04); c.lineTo(bx-H*.18,by+H*.02); c.lineTo(bx,by+H*.05); c.closePath(); c.fillStyle=sh(B.horn,-.3); c.fill(); c.restore(); } }
@@ -4475,6 +4490,10 @@ function beastArt(c,s,k,T,o,gq){
   if(B.spikes){ for(let i=0;i<6;i++){ const q=(i+.5)/6, x=nb[0]-D*.4+(hx-hl*.35-nb[0]+D*.4)*q, y=nb[1]-D*.2+(hy-hl*.25-nb[1]+D*.2)*q, hgt=sz*.035; c.beginPath(); c.moveTo(x-sz*.02,y+sz*.01); c.lineTo(x-sz*.03,y-hgt); c.lineTo(x+sz*.015,y); c.closePath(); c.fillStyle=lin(x,y,x,y-hgt,[[0,sh(B.horn,-.45)],[1,B.horn]]); c.fill(); } }
   wing(false);
   drawHead();
+  if(k==='dragon'){ const S=B.snout, mx=hx+hl*(.25+.25*S), my=hy+hl*.14; c.save(); c.globalCompositeOperation='lighter'; const pulse=still?.7:.6+.4*Math.sin(T/260+ph);
+    const mg=c.createRadialGradient(mx,my,0,mx,my,hl*(.35+act*.6)); mg.addColorStop(0,`rgba(255,220,120,${.75*pulse})`); mg.addColorStop(.5,`rgba(255,120,30,${.35*pulse})`); mg.addColorStop(1,'rgba(255,80,0,0)'); c.fillStyle=mg; c.beginPath(); c.arc(mx,my,hl*(.35+act*.6),0,7); c.fill();
+    if(!still) for(let i=0;i<16;i++){ const q=((T/2600)+hsh(i,401))%1, ex=-L*.6+hsh(i,403)*L*1.6+Math.sin(T/500+i)*sz*.03, ey=-q*sz*1.15+sz*.05; c.fillStyle=`rgba(255,${150+Math.round(hsh(i,405)*90)},60,${(1-q)*.9})`; c.beginPath(); c.arc(ex,ey,Math.max(.6,sz*.008*(1-q*.5)),0,7); c.fill(); }
+    c.restore(); }
   if(B.ghost&&!still){ c.save(); c.globalCompositeOperation='lighter'; c.globalAlpha=.15+.08*Math.sin(T/500); const g=c.createRadialGradient(0,-legH,0,0,-legH,L); g.addColorStop(0,'rgba(170,140,255,.6)'); g.addColorStop(1,'rgba(170,140,255,0)'); c.fillStyle=g; c.beginPath(); c.arc(0,-legH,L,0,7); c.fill(); c.restore(); }
   c.restore(); }
 /* ----- pets roam the wild land around their kingdom, and rush home (in a puff of magic) when the kingdom is attacked ----- */
