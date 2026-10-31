@@ -425,7 +425,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 54;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
+const GAME_VERSION = 55;          // shown in Settings so you can check the newest file is live   // changing id or seed starts a brand new world
 const NEW_SHIELD_MIN = 120;     // peace shield for brand new kingdoms
 const DEFEND_SHIELD_MIN = 30;   // peace shield after being attacked
 const CAMP_MAX = 25;            // highest barbarian camp level
@@ -3301,7 +3301,14 @@ const petDefOf=pt=>pt?Math.round((45+38*pt.lvl+6*pt.lvl*pt.lvl)*(PETS[pt.k]?.def
 const petGrowCost=l=>({gold:Math.round(900*Math.pow(1.75,l-1)),stone:Math.round(600*Math.pow(1.75,l-1))});
 const petGrowHall=l=>Math.min(HALL_MAX,l+1);           // town hall needed to grow a pet to level l+1
 /* Draws a pet standing at (x,y) (feet), s = adult height in pixels. o: {lvl, dir, act (0..1 attack lunge), ph, sleep} */
+/* Pet pictures: if a file like pets/dragon.png is uploaded next to index.html, the game uses it instead of the drawn pet. */
+var petImgs={};
+function petImg(k){ if(!/^https?:/.test(location.protocol)&&location.protocol!=='file:') return null; let e=petImgs[k]; if(!e){ e=petImgs[k]={ok:false,bad:false,img:new Image()}; e.img.onload=()=>{ e.ok=true; try{ petSprC.clear(); }catch(_){} }; e.img.onerror=()=>{ e.bad=true; }; e.img.src='pets/'+k+'.png'; } return e.ok?e.img:null; }
 function petArt(c,x,y,s,k,t,o={}){
+  { const im=petImg(k); if(im&&!o._in){ const lvl=o.lvl||1, gq=Math.min(1,(lvl-1)/8), h=s*(.68+.37*gq), w=h*im.width/im.height, still=typeof RM!=='undefined'&&RM, T=t||0, ph=o.ph||0, dir=o.dir||1;
+      if(!o.noSh){ c.save(); c.globalAlpha=.3; c.fillStyle='#000'; c.beginPath(); c.ellipse(x,y,w*.38,h*.07,0,0,7); c.fill(); c.restore(); }
+      const sway=still?0:Math.sin(T/(o.walk!=null?180:900)+ph)*(o.walk!=null?.035:.012), lift=o.walk!=null&&!still?Math.abs(Math.sin(T/180+ph))*h*.03:0, act=o.act||0;
+      c.save(); c.translate(x+act*w*.12*dir,y-lift); c.scale(dir,1); c.rotate(sway); c.drawImage(im,-w/2,-h,w,h); c.restore(); return; } }
   if(o.hq&&!o._in&&!o._only){ petArt(c,x,y,s,k,t,{...o,_only:'base'}); petArtHQ(c,x,y,s,k,t,o); return; }
   const P2=REAL&&PREAL[k]?{...PETS[k],...PREAL[k]}:(PETS[k]||PETS.fox), lvl=o.lvl||1, gq=Math.min(1,(lvl-1)/8), dir=o.dir||1, ph=o.ph||0, act=o.act||0;
   const sz=s*(.62+.38*gq), hr=(REAL?.98:1.2)-(REAL?.14:.3)*gq, lw=Math.max(.5,s*.022*(REAL?.45:1)), OL2=(()=>{ const n=parseInt((P2.dark||'#28160a').slice(1),16); return `rgba(${Math.round((n>>16)*.42)},${Math.round(((n>>8)&255)*.42)},${Math.round((n&255)*.42)},${REAL?.26:.93})`; })(), T=t||0, still=typeof RM!=='undefined'&&RM;
