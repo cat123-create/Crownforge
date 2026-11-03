@@ -382,6 +382,18 @@ body.photo .mapbox{position:fixed!important;inset:0!important;width:100vw!import
 .mrSteps{display:flex;gap:4px;margin:6px 0}.mrSteps div{flex:1;text-align:center;padding:6px 0;border-radius:8px;background:#eadbb8;font-weight:800;color:#7a5a32}.mrSteps div.on{background:#7ee04f;color:#1f4a0c}
 .setItem.bmRow div.row{flex-direction:row;flex-wrap:nowrap;gap:4px;flex:0 0 auto}.setItem.bmRow button{margin:0;min-width:0;padding:6px 10px}
 .awayList{display:grid;gap:6px;margin:8px 0}.awayList>div{display:flex;gap:10px;align-items:flex-start;background:#fff4dc;border:2px solid #e2c48a;border-radius:12px;padding:8px 10px}.awayList>div>span{font-size:1.5rem;line-height:1}.awayList small{display:block;opacity:.8;margin-top:2px}
+.bbPost.pb{transform:rotate(1deg);border-color:#a8301c;background:linear-gradient(#f6e0c0,#e8c48c)}.bbPost.pb .bbW{color:#a8301c}.pbSec{margin-bottom:6px}
+
+.dgFloors.dgCave{background:linear-gradient(#2a2333,#15111b);border:3px solid #0c0910;border-radius:14px;padding:8px;box-shadow:inset 0 0 30px rgba(0,0,0,.6)}
+.dgCave .dgF{background:linear-gradient(#4a4256,#332c3d);border:2px solid #1a1420;color:#e8dcff;border-radius:10px;position:relative;overflow:hidden}.dgCave .dgF small{color:#b9aed0}.dgCave .dgF b{color:#fff;font-size:1rem}
+.dgCave .dgF.done{background:linear-gradient(#3e5a3a,#273a24);border-color:#7ee04f}.dgCave .dgF.cur{border-color:#ffb43b;box-shadow:0 0 12px rgba(255,170,60,.75),inset 0 0 14px rgba(255,170,60,.35);animation:dgPulse 1.6s ease-in-out infinite}
+.dgPic{height:44px;display:flex;align-items:flex-end;justify-content:center}.dgPic img{max-height:44px;max-width:100%;object-fit:contain}.dgN{font-weight:700}
+@keyframes dgPulse{50%{box-shadow:0 0 20px rgba(255,170,60,.95),inset 0 0 18px rgba(255,170,60,.5)}}
+.mzTop{display:flex;justify-content:center;gap:14px;font-weight:800;font-size:1.05rem}
+.mzPad{display:grid;grid-template-columns:repeat(3,64px);gap:6px;justify-content:center;margin:4px auto}.mzPad button{margin:0;font-size:1.3rem;padding:6px 0}
+.mzBoard{display:grid;gap:3px;max-width:320px;margin:4px auto}.mzBoard>div{display:flex;justify-content:space-between;gap:8px;background:#fff4dc;border:2px solid #e2c48a;border-radius:10px;padding:4px 10px}
+.mzBump{animation:mzB .18s}@keyframes mzB{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (max-width:600px){.dgPic{height:30px}.dgPic img{max-height:30px}}
 </style>
 </head>
 <body>
@@ -498,7 +510,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 84;
+const GAME_VERSION = 86;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -1177,7 +1189,7 @@ async function attack(cell,opts){
       const vOff=now()-(v.lastSeen||0)>=ONLINE_MIN*60000; v.shield=vOff?now()+OFF_LOCK:now()+DEFEND_SHIELD_MIN*60000; out.vOff=vOff;
       const trA=win?6+stars*6:-10, trD=win?-(4+stars*4):8; out.promo=trophyChange(me,trA); trophyChange(v,trD);
       v.stats=Object.assign(defaultStats(),v.stats||{}); win?v.stats.lost++:v.stats.won++;
-      if(win){ vetGain(me,units); out.card=cardDrop(me,.3); me.stats.captures++; me.stats.looted+=sg+ss; me.wk.wins++; me.wk.loot+=sg+ss; me.wk.stars+=stars;
+      if(win){ vetGain(me,units); out.card=cardDrop(me,.3); me.stats.captures++; { const bt=Object.assign({},me.beat||{}); bt[v.id]=now(); const ks=Object.keys(bt).sort((a,b)=>bt[b]-bt[a]); for(const k of ks.slice(30)) delete bt[k]; me.beat=bt; } me.stats.looted+=sg+ss; me.wk.wins++; me.wk.loot+=sg+ss; me.wk.stars+=stars;
         if(isHall){ for(const [rk,rp] of vRegs) for(const k in rp){ const q=rp[k]; if(q.o!==v.id) continue; const np=normalize(clone(q)); t.setPlot(k, np.b==='hall'||np.b==='wonder'||!np.lvl?{o:ME,b:null,lvl:0}:{o:ME,b:np.b,lvl:Math.min(np.lvl,BLD_MAX),...(np.d?{d:np.d}:{}),...(np.ct?{ct:np.ct}:{})}); }
           me.sol=(me.sol||0)+Math.floor((v.sol||0)/2); VICU.forEach(u=>v[u]=0); v.cc={}; v.dead=true; me.gems=(me.gems||0)+25; me.stats.conquers++; me.fw={t:now(),why:'conquer'}; giveStatue(me,'vconq',`Conquered ${v.name}'s kingdom · ${new Date().toLocaleDateString()}`); diaryAdd(me,'👑',`Conquered ${v.name}'s kingdom`); }
         else t.setPlot(cell, tg.lvl&&tg.b!=='trap'&&tg.b!=='wonder'?{o:ME,b:tg.b,lvl:tg.lvl,...(tg.d?{d:tg.d}:{}),...(PROD[tg.b]?{ct:now()}:{})}:{o:ME,b:null,lvl:0});
@@ -2359,7 +2371,7 @@ function playBattle(rp){ return new Promise(resolve=>{
       else { gg.strokeStyle=hv<.6?'rgba(30,80,18,.35)':'rgba(200,240,140,.3)'; gg.lineWidth=1; gg.beginPath(); gg.moveTo(px,py); gg.lineTo(px-1.5,py-4); gg.moveTo(px+1,py); gg.lineTo(px+2,py-5); gg.stroke(); } }
     const sun=gg.createLinearGradient(0,0,W,H); sun.addColorStop(0,'rgba(255,240,190,.18)'); sun.addColorStop(.5,'rgba(255,240,190,0)'); sun.addColorStop(1,'rgba(20,40,60,.14)'); gg.fillStyle=sun; gg.fillRect(0,0,W,H);
     const vg=gg.createRadialGradient(W/2,H*.55,H*.3,W/2,H*.55,W*.75); vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(10,25,8,.55)'); gg.fillStyle=vg; gg.fillRect(0,0,W,H); }
-  if(rp.wb&&rp.cave){ const gg=ground.getContext('2d'); gg.setTransform(dpr,0,0,dpr,0,0); gg.fillStyle='rgba(12,14,34,.72)'; gg.fillRect(0,0,W,H); const [ox,oy]=pos(3,3);
+  if(rp.wb&&rp.cave){ const gg=ground.getContext('2d'); gg.setTransform(dpr,0,0,dpr,0,0); try{ caveGround(gg,W,H,pos,bT); }catch(e){ gg.fillStyle='rgba(12,14,34,.72)'; gg.fillRect(0,0,W,H); } const [ox,oy]=pos(3,3);
     for(let i=0;i<14;i++){ const px=hash2(i,3,211)*W, py=H*(.25+hash2(i,4,211)*.7), r=bT*(.08+hash2(i,5,211)*.12), c2=['150,110,255','90,200,255','255,120,220'][i%3]; const cg=gg.createRadialGradient(px,py,0,px,py,r*3); cg.addColorStop(0,`rgba(${c2},.35)`); cg.addColorStop(1,`rgba(${c2},0)`); gg.fillStyle=cg; gg.fillRect(px-r*3,py-r*3,r*6,r*6);
       gg.fillStyle=`rgb(${c2})`; gg.strokeStyle='rgba(20,10,40,.8)'; gg.lineWidth=1.2; gg.beginPath(); gg.moveTo(px,py-r*1.6); gg.lineTo(px+r*.5,py); gg.lineTo(px-r*.5,py); gg.closePath(); gg.fill(); gg.stroke(); }
     const tg2=gg.createRadialGradient(ox,oy+bT*.3,0,ox,oy+bT*.3,bT*2.4); tg2.addColorStop(0,'rgba(255,200,120,.22)'); tg2.addColorStop(1,'rgba(255,200,120,0)'); gg.fillStyle=tg2; gg.fillRect(0,0,W,H); }
@@ -5476,14 +5488,13 @@ function readyList(){ const m=P(ME); if(!m||m.dead) return []; const L=[], add=(
   try{ if(calState(m).can) add('📅','Claim today\'s calendar square','tour:month'); }catch(e){}
   try{ if(m.adv&&!m.adv.got&&m.adv.end<=now()) add('🗺️',`${cleanText(m.adv.name)} is back from an adventure`,'pet:open'); }catch(e){}
   try{ if(merlinHere()&&!(m.merlin&&m.merlin.day===dayNum())) add('🧙','Merlin is here with a riddle','mr:open'); }catch(e){}
-  try{ const z=pzOf(m); if(!z.found&&z.taps.length<PZ_TRIES) add('🧩','Today\'s treasure hunt is waiting','pz:open'); }catch(e){}
+  try{ const z=pzOf(m); if(!z.found&&z.taps.length<PZ_TRIES) add('🧩','Today\'s hedge maze is waiting','pz:open'); }catch(e){}
   try{ const d=dgOf(m); if(d.f<DG_FLOORS&&now()-(d.last||0)>=DG_CD&&attackers(m)>0) add('🕳️',`Dungeon floor ${d.f+1} is ready`,'dg:open'); }catch(e){}
   try{ if(m.bb&&m.bb.day===dayNum()&&m.bb.list.some((x,i)=>m.bb.done[i]&&!(m.bb.got||[])[i])) add('📜','A bounty reward is waiting','bb:open'); else if(!m.bb||m.bb.day!==dayNum()) add('📜','New WANTED posters today','bb:open'); }catch(e){}
   try{ const c=myClan(); if(c&&giftsFor(c,m).length) add('🎁',`${giftsFor(c,m).length} clan gift${giftsFor(c,m).length>1?'s':''} to claim`,'tour:clan'); }catch(e){}
   try{ if(beastSt&&beastSt.wk===weekId()&&!beastSt.down){ const bc=beastCell(); if(bc&&distFromMe(bc)<=MARCH_RANGE) add('🐲','The legendary beast is close to your kingdom!','beast:find'); } }catch(e){}
   try{ if(wbOpen()&&wbState&&!wbState.down&&now()-((wbState.last||{})[ME]||0)>=WB_CD) add('👹','The World Boss can be attacked','wb:open'); }catch(e){}
   try{ for(const p of Object.values(G.players)) if(p.id!==ME&&festOn(p)&&!(m.festGot||[]).includes(p.fest.id)){ add('🎪',`${cleanText(p.name)} is throwing a festival: free gift!`,'fest:find:'+p.id); break; } }catch(e){}
-  try{ if(freeBuilder()&&stats(ME).count>1) add('🔨','A builder is free','tour:build'); }catch(e){}
   try{ let full=0; for(const k in G.plots){ const q=G.plots[k]; if(q.o===ME&&PROD[q.b]&&q.lvl&&!q.bt&&stored(q)>=collCap(q)-.5) full++; } if(full) add('💰',`${full} building${full>1?'s are':' is'} full: collect!`,'tour:collect'); }catch(e){}
   try{ const c=cur(m); if(c.food<=0&&c.net<0) add('😫','Your kingdom is starving! Build Farms','tour:build'); }catch(e){}
   try{ const C=cardList(); for(const s2 of Object.keys(CARD_SETS)){ const ids=Object.keys(C).filter(id=>C[id].set===s2); if(!(m.cardSets||[]).includes(s2)&&ids.every(id=>(m.cards||{})[id])){ add('🃏','A card set is complete: claim it!','cards:'+s2); break; } } }catch(e){}
@@ -5889,7 +5900,7 @@ try{ askMount(); }catch(e){}
 
 /* ===== v82: menu buttons ===== */
 (function(){ const hh=$('hbHidden'); if(!hh) return; const add=(id,cls,act,txt)=>{ if($(id)) return; const b=document.createElement('button'); b.id=id; b.className=cls+' hbtn'; b.dataset.act=act; b.textContent=txt; hh.appendChild(b); };
-  add('bCourse','prime','v82:pc:open','🏁 Pet course'); add('bPhoto','soft','v82:photo:on','📸 Photo mode'); add('bWsp','gemb','v82:wsp:open','🌦️ Weather spells');
+  add('bCourse','prime','v82:pc:open','🏁 Pet course'); add('bPhoto','soft','v82:photo:on','🖼️ Photo mode'); add('bWsp','gemb','v82:wsp:open','🌦️ Weather spells');
   try{ HB_GROUPS.gFun.push('bCourse'); HB_GROUPS.gKing.push('bPhoto','bWsp'); }catch(e){} })();
 
 /* ===== v82: panel extras and actions ===== */
@@ -6109,7 +6120,7 @@ function v84Act(r){ const a=r.split(':');
   else if(a[0]==='mr'){ if(a[1]==='open') mrDialog(); else mrUp(); } else if(a[0]==='bm'){ if(a[1]==='open') bmDialog(); else if(a[1]==='tog') bmToggle(sel); else if(a[1]==='go'){ const c=a.slice(2).join(':'); $('ov').innerHTML=''; setTab('map'); sel=c; centerOn(c); renderPanel(true); draw(); } else if(a[1]==='del') bmToggle(a.slice(2).join(':')); else if(a[1]==='ren'){ const c=a.slice(2).join(':'), b=((P(ME)||{}).bm||[]).find(x=>x.c===c); const n=window.prompt('New name for this bookmark:',b?b.n:''); if(n!=null) bmRename(c,n); } }
   else if(a[0]==='stkopen') stickerPick(a[1]); else if(a[0]==='stk') stickerSend(a[1],a[2]); else if(a[0]==='vr'){ if(a[1]==='give') vrGive(); else vrSkip(); } else if(a[0]==='ex'){ if(a[1]==='open') exDialog(); else exClaim(); }
   else if(a[0]==='ghtest'){ try{ localStorage.setItem('cf-ghtest',Date.now()+GH_MIN*60000); }catch(e){} toast('Golden hour preview on for 10 minutes (only you).'); } }
-v84add('bMount','prime','v84:mount:open','🐴 Mounts','gKing'); v84add('bMarch','war','v84:mr:open','🗺️ March range','gBattle'); v84add('bBm','soft','v84:bm:open','📍 Bookmarks','gKing'); v84add('bExplore','gemb','v84:ex:open','🧭 Daily explorer','gFun');
+v84add('bMount','prime','v84:mount:open','🏇 Mounts','gKing'); v84add('bMarch','war','v84:mr:open','🥾 March range','gBattle'); v84add('bBm','soft','v84:bm:open','📍 Bookmarks','gKing'); v84add('bExplore','gemb','v84:ex:open','🔭 Daily explorer','gFun');
 try{ const g=TOUR.find(x=>/kingdom/i.test(x[0]))||TOUR[TOUR.length-1]; g[1].push(['🐴','Hero mounts','Faster marches and stronger heroes.','v84:mount:open'],['🗺️','March range','Let your armies march farther.','v84:mr:open'],['📍','Bookmarks','Jump to your favourite places.','v84:bm:open'],['🔨','The Forge','Merge two of the same gear into a buffed one.','tab:gear']); const fg=TOUR.find(x=>/fun/i.test(x[0])); if(fg) fg[1].push(['🧭','Daily explorer','Find the hidden place before 10 others do.','v84:ex:open']); }catch(e){}
 try{ FAQ.push(['What is the Forge?','forge merge gear buffed combine','Open Gear and press 🔨 Forge on a piece you have two of. They become one <b>buffed</b> piece (marked +). Buffed gear is stronger than its rarity but weaker than the next rarity, and can\'t be forged again.'],
   ['How do I change crops?','crop crops wheat carrot pumpkin farm grow','Tap one of your Farms and pick Wheat, Carrots (Town Hall 2) or Pumpkins (Town Hall 4). Carrots make more food but fill up sooner. Pumpkins also give gold.'],
@@ -6121,6 +6132,166 @@ try{ FAQ.push(['What is the Forge?','forge merge gear buffed combine','Open Gear
   ['What are villager requests?','villager request help !','When a villager with a red ! stands by your Town Hall, tap your Town Hall to see what they need. Help them for gems!'],
   ['What is the daily explorer?','explorer hidden place secret clue','Open 🎉 Fun ▾ → 🧭 Daily explorer for today\'s clue. Find the twinkling tile and tap it. The first 10 explorers win gems.'],
   ['How do I change the music?','song music change adventure spooky','⚙️ Settings → Sound → Song.']); }catch(e){}
+
+/* ===== v85: a cleaner volcano ===== */
+drawVolcano=function(v){ if(cam.z<.25) return; const c=volcCell(); if(!c) return; const [x,y]=xy(c); if(!seenTile(x,y)) return; const [cx,cy]=ctr(x,y), u=TW, T=NOWT||0; if(cx<v.x0-u*4||cx>v.x1+u*4||cy<v.y0-u*5||cy>v.y1+u*3) return;
+  const top=cy-u*1.5, bw=u*1.3, rw=u*.34; ctx.save(); ctx.lineJoin='round'; ctx.lineCap='round';
+  /* soft ground shadow and rocks */
+  ell(cx+u*.08,cy+u*.16,bw*1.05,u*.42,'rgba(0,0,0,.22)',false);
+  /* cone with gently curved slopes, lit on the left */
+  const cone=()=>{ ctx.beginPath(); ctx.moveTo(cx-bw,cy+u*.12); ctx.quadraticCurveTo(cx-u*.55,cy-u*.35,cx-rw,top); ctx.quadraticCurveTo(cx,top+u*.07,cx+rw,top); ctx.quadraticCurveTo(cx+u*.55,cy-u*.35,cx+bw,cy+u*.12); ctx.quadraticCurveTo(cx,cy+u*.42,cx-bw,cy+u*.12); ctx.closePath(); };
+  const g=ctx.createLinearGradient(cx-bw,0,cx+bw,0); g.addColorStop(0,'#8a6043'); g.addColorStop(.42,'#6b4630'); g.addColorStop(.62,'#4a2f20'); g.addColorStop(1,'#2c1a12'); cone(); ctx.fillStyle=g; ctx.fill();
+  ctx.save(); cone(); ctx.clip(); const sh=ctx.createLinearGradient(0,top,0,cy+u*.3); sh.addColorStop(0,'rgba(0,0,0,.05)'); sh.addColorStop(1,'rgba(0,0,0,.28)'); ctx.fillStyle=sh; ctx.fillRect(cx-bw,top,bw*2,u*2);
+  /* faint rock ridges */
+  ctx.strokeStyle='rgba(30,16,8,.28)'; ctx.lineWidth=Math.max(1/cam.z,u*.02); for(const k of [-.62,-.3,.32,.66]){ ctx.beginPath(); ctx.moveTo(cx+k*rw*.9,top+u*.06); ctx.quadraticCurveTo(cx+k*u*.55,cy-u*.55,cx+k*bw*.92,cy+u*.15); ctx.stroke(); }
+  /* one lava river with a bright core */
+  const lava=(w,col)=>{ ctx.strokeStyle=col; ctx.lineWidth=w; ctx.beginPath(); ctx.moveTo(cx+u*.05,top+u*.08); ctx.bezierCurveTo(cx+u*.22,cy-u*1.0,cx-u*.18,cy-u*.62,cx+u*.06,cy-u*.28); ctx.quadraticCurveTo(cx+u*.2,cy-u*.05,cx+u*.12,cy+u*.2); ctx.stroke(); };
+  lava(u*.13,'#b8361a'); lava(u*.08,'#ff7a1e'); lava(u*.03,'#ffd36b'); ctx.restore();
+  ctx.lineWidth=Math.max(LW,1/cam.z); ctx.strokeStyle=OL; cone(); ctx.stroke();
+  /* crater */
+  ell(cx,top+u*.02,rw*1.02,u*.1,'#2a1810'); const cg=ctx.createRadialGradient(cx,top+u*.03,0,cx,top+u*.03,rw); cg.addColorStop(0,'#fff2a0'); cg.addColorStop(.45,'#ffae35'); cg.addColorStop(1,'#d8471a'); ctx.fillStyle=cg; ctx.beginPath(); ctx.ellipse(cx,top+u*.035,rw*.82,u*.065,0,0,7); ctx.fill();
+  for(const [dx,s] of [[-1.05,.13],[-.8,.09],[.95,.12],[1.15,.08],[.1,.07]]) ell(cx+dx*bw*.8,cy+u*.22+(dx>0?.02:0)*u,u*s,u*s*.65,dx>0?'#5c5049':'#7a6d63');
+  if(!RM){ ctx.globalCompositeOperation='lighter'; const gl=ctx.createRadialGradient(cx,top,0,cx,top,u*.75); gl.addColorStop(0,`rgba(255,140,40,${.38+.12*Math.sin(T/320)})`); gl.addColorStop(1,'rgba(255,120,30,0)'); ctx.fillStyle=gl; ctx.beginPath(); ctx.arc(cx,top,u*.75,0,7); ctx.fill(); ctx.globalCompositeOperation='source-over';
+    for(let i=0;i<4;i++){ const q=((T/3200)+i/4)%1, sx=cx+Math.sin(q*2.6+i*1.3)*u*.22, sy=top-u*.12-q*u*1.15, r=u*(.12+q*.32); const sg=ctx.createRadialGradient(sx,sy,0,sx,sy,r); sg.addColorStop(0,`rgba(150,145,140,${.42*(1-q)})`); sg.addColorStop(1,'rgba(150,145,140,0)'); ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(sx,sy,r,0,7); ctx.fill(); }
+    if(Math.sin(T/700)>.7){ for(let i=0;i<3;i++){ const q=((T/600)+i/3)%1, ex=cx+(i-1)*u*.1*q*3, ey=top-q*u*.5+q*q*u*.7; ell(ex,ey,u*.025,u*.025,'#ffcc4a',false); } } startLoop(); }
+  if(volcState&&volcState.wk===weekId()&&volcState.by){ strokeLine([[cx+u*.05,top+u*.02],[cx+u*.05,top-u*.5]],u*.022,'#5a3a1c'); ctx.fillStyle=volcState.col||'#c4402f'; ctx.beginPath(); ctx.moveTo(cx+u*.05,top-u*.5); ctx.lineTo(cx+u*.32,top-u*.43+(RM?0:Math.sin(T/250)*u*.02)); ctx.lineTo(cx+u*.05,top-u*.35); ctx.closePath(); ctx.fill(); ctx.lineWidth=Math.max(1/cam.z,u*.012); ctx.strokeStyle=OL; ctx.stroke(); }
+  /* clean name tag */
+  const t2=volcState&&volcState.by?`🚩 ${cleanText(volcState.byName||'')}'s volcano`:'🌋 Volcano race', fs=Math.max(u*.15,10/cam.z); ctx.font=`${fs}px "Lilita One",sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; const tw=ctx.measureText(t2).width, ty=cy+u*.55, ph=fs*1.5;
+  ctx.fillStyle='rgba(43,26,14,.82)'; ctx.beginPath(); if(ctx.roundRect) ctx.roundRect(cx-tw/2-fs*.6,ty-ph/2,tw+fs*1.2,ph,ph/2); else ctx.rect(cx-tw/2-fs*.6,ty-ph/2,tw+fs*1.2,ph); ctx.fill(); ctx.fillStyle='#ffd36b'; ctx.fillText(t2,cx,ty+fs*.04); ctx.textBaseline='alphabetic'; ctx.restore();
+  for(const p of Object.values(G.players)){ const vv=p.volc; if(!vv||vv.done||vv.wk!==weekId()||now()>vv.arr||!vv.from) continue; const q=Math.min(1,(now()-vv.t0)/(vv.arr-vv.t0)), [ax,ay]=ctr(...xy(vv.from)), px=ax+(cx-ax)*q, py=ay+(cy-ay)*q; ell(px,py,u*.12,u*.04,'rgba(0,0,0,.25)',false); for(let i=0;i<3;i++){ try{ chibi(ctx,px+(i-1)*u*.1,py,u*.22,{dir:cx>=ax?1:-1,walk:true,ph:i,body:p.color,weapon:i===1?'staff':'none',helmet:'cap',helmCol:p.color},NOWT); }catch(e){} } } };
+
+/* ===== v85: player bounties (players make their own WANTED posters) ===== */
+var BTY_CELL=cid(-45,-40), BTY_MIN=2000, BTY_MAX=500000, BTY_DAYS=3, BTY_MINE=2, BTY_ON=3, BTY_TH=3;
+var BTY_WHY={raid:'⚔️ They raided me',strong:'💪 Too strong to beat alone',fun:'🎉 Just for fun',dare:'🏆 I dare you!'};
+var btySt=null;
+async function btyLoad(){ try{ await DB.tx(async t=>{ const r=await t.getRegion(regionOf(BTY_CELL)); let b=r[BTY_CELL]; if(!b||!Array.isArray(b.l)){ b={o:'npc',b:'bty',l:[]}; t.setPlot(BTY_CELL,b); } btySt=clone(b); }); }catch(e){} }
+setTimeout(()=>{ btyLoad(); },7000); setInterval(()=>{ btyLoad(); },2*60000);
+var btyLive=()=>((btySt&&btySt.l)||[]).filter(b=>b&&b.exp>now()&&!b.claimed&&P(b.on)&&!P(b.on).dead&&!isBlocked(b.by)&&!isBlocked(b.on));
+var btyOn=uid=>btyLive().filter(b=>b.on===uid);
+var btyCan=b=>{ const m=P(ME); return !!(m&&b.by!==ME&&b.on!==ME&&(m.beat||{})[b.on]>b.t); };
+function btyPostDialog(uid){ const m=P(ME); if(!m) return; if(hlMe()<BTY_TH) return toast(`You can post bounties at Town Hall ${BTY_TH}.`,true);
+  const opts=Object.values(G.players).filter(p=>p&&p.id!==ME&&!p.dead&&!p.banned&&p.hall&&!isBlocked(p.id)).sort((a,b)=>cleanText(a.name).localeCompare(cleanText(b.name)));
+  if(!opts.length) return toast('There is nobody to put a bounty on yet.',true);
+  $('ov').innerHTML=`<div class="overlay"><div class="dialog"><h2>📜 Post a bounty</h2><p class="desc">Put a WANTED poster on another kingdom. The first player who beats them in battle can claim your gold. If nobody does in ${BTY_DAYS} days, you get it back from the Bounty Board.</p>
+    <label class="label">Who is wanted?</label><select id="btyWho">${opts.map(p=>`<option value="${p.id}"${p.id===uid?' selected':''}>${esc(cleanText(p.name))}</option>`).join('')}</select>
+    <label class="label">Reward (gold)</label><input id="btyGold" type="number" min="${BTY_MIN}" max="${BTY_MAX}" step="500" value="${Math.max(BTY_MIN,Math.min(BTY_MAX,Math.round((m.gold||0)*.1/500)*500))}">
+    <label class="label">Why?</label><select id="btyWhy">${Object.entries(BTY_WHY).map(([k,t])=>`<option value="${k}">${t}</option>`).join('')}</select>
+    <p class="desc">Between ${f(BTY_MIN)} and ${f(BTY_MAX)} gold. You can have ${BTY_MINE} bounties up at a time.</p><div class="row"><button class="war" data-act="v85:bty:post">📜 Post it</button><button class="soft" data-act="v85:bty:board">Back</button></div></div></div>`; }
+function btyPost(){ const uid=$('btyWho').value, gold=Math.round(+$('btyGold').value||0), why=$('btyWhy').value, v=P(uid); if(!v) return toast('That player is gone.',true); if(!(gold>=BTY_MIN&&gold<=BTY_MAX)) return toast(`Pick between ${f(BTY_MIN)} and ${f(BTY_MAX)} gold.`,true);
+  act([BTY_CELL],(me,pl)=>{ if((stats(ME).hallLvl||1)<BTY_TH) fail(`You need Town Hall ${BTY_TH}.`); if(uid===ME) fail('You cannot put a bounty on yourself!'); const b=pl[BTY_CELL]; if(!b||!Array.isArray(b.l)) fail('The Bounty Board is still loading. Try again in a moment.');
+    const live=b.l.filter(x=>x&&x.exp>now()&&!x.claimed); if(live.filter(x=>x.by===ME).length>=BTY_MINE) fail(`You already have ${BTY_MINE} bounties up.`); if(live.some(x=>x.by===ME&&x.on===uid)) fail('You already have a bounty on them.'); if(live.filter(x=>x.on===uid).length>=BTY_ON) fail(`${cleanText(v.name)} already has ${BTY_ON} bounties. That is plenty!`);
+    settle(me); pay(me,{gold}); b.l=b.l.filter(x=>x&&(x.exp>now()-14*864e5)&&!(x.claimed&&x.claimed<now()-3*864e5)).slice(-60); const id='b'+Math.random().toString(36).slice(2,9); b.l.push({id,by:ME,byName:me.name,on:uid,onName:v.name,gold,why:BTY_WHY[why]?why:'fun',t:now(),exp:now()+BTY_DAYS*864e5}); return {id,name:v.name,gold}; },
+    r=>{ snd('quest'); toast(`📜 WANTED poster up! ${f(r.gold)} gold for beating ${cleanText(r.name)}.`); try{ report(uid,`📜 ${P(ME).name} put a ${f(r.gold)} gold bounty on your kingdom! Get your defenses ready.`,'info'); }catch(e){} btyLoad().then(()=>bbDialog()); }); }
+function btyClaim(id){ act([BTY_CELL],(me,pl)=>{ const b=pl[BTY_CELL], x=b&&(b.l||[]).find(y=>y.id===id); if(!x||x.claimed) fail('Someone already claimed this bounty.'); if(x.exp<=now()) fail('This bounty ran out.'); if(x.by===ME) fail('You cannot claim your own bounty.'); if(x.on===ME) fail('Nice try! You cannot claim a bounty on yourself.'); if(!((me.beat||{})[x.on]>x.t)) fail(`Beat ${cleanText(x.onName)} in battle first.`);
+    x.claimed=now(); x.cby=ME; x.cbyName=me.name; me.gold=(me.gold||0)+x.gold; me.stats.bounties=(me.stats.bounties||0)+1; diaryAdd(me,'📜',`Claimed a ${f(x.gold)} gold bounty on ${cleanText(x.onName)}`); return {...x}; },
+    r=>{ snd('coin'); confetti(); toast(`💰 Bounty claimed! +${f(r.gold)} gold for beating ${cleanText(r.onName)}.`); try{ report(r.by,`💰 ${P(ME).name} claimed your bounty on ${cleanText(r.onName)}!`,'info'); }catch(e){} btyLoad().then(()=>{ if($('bbOv')) bbDialog(); else renderPanel(true); }); }); }
+function btyBack(id){ act([BTY_CELL],(me,pl)=>{ const b=pl[BTY_CELL], x=b&&(b.l||[]).find(y=>y.id===id); if(!x||x.by!==ME) fail('That bounty is gone.'); if(x.claimed) fail('Someone already claimed it.'); const early=x.exp>now(), back=early?Math.floor(x.gold*.8):x.gold; b.l=b.l.filter(y=>y.id!==id); me.gold=(me.gold||0)+back; return {back,early}; },
+    r=>{ snd('coin'); toast(r.early?`Bounty taken down. You got ${f(r.back)} gold back (the town crier keeps 20%).`:`Bounty ran out. You got your ${f(r.back)} gold back.`); btyLoad().then(()=>bbDialog()); }); }
+function btyHtml(){ const m=P(ME); if(!m) return ''; const live=btyLive(), mine=((btySt&&btySt.l)||[]).filter(b=>b&&b.by===ME&&!b.claimed);
+  const card=b=>{ const can=btyCan(b), left=b.exp-now(); return `<div class="bbPost pb"><div class="bbW">WANTED</div><div class="bbIc">🏰</div><b>${esc(cleanText(b.onName))}</b><small>${esc(BTY_WHY[b.why]||'')}</small><div class="bbR">💰 ${f(b.gold)} gold</div><small>Posted by ${esc(cleanText(b.byName))} · ${fmtT(left/1000)} left</small>
+    ${b.by===ME?btn('Take it down (80% back)',null,'v85:bty:back:'+b.id,'soft'):b.on===ME?'<b>😬 That is you!</b>':can?btn('💰 Claim reward',null,'v85:bty:claim:'+b.id,'prime'):btn('📍 Find them',null,'v85:bty:find:'+b.on,'soft')}</div>`; };
+  const old=mine.filter(b=>b.exp<=now());
+  return `<div class="label">🎯 Player bounties</div><p class="desc">WANTED posters made by players. Beat the wanted kingdom in battle, then come back and claim the gold!</p>
+    ${old.length?`<div class="v82box">⏳ ${old.length===1?'One of your bounties':'Some of your bounties'} ran out. ${old.map(b=>btn(`Get ${f(b.gold)} gold back`,null,'v85:bty:back:'+b.id,'prime')).join(' ')}</div>`:''}
+    <div class="bbWrap">${live.length?live.sort((a,b)=>b.gold-a.gold).map(card).join(''):'<p class="desc"><i>No player bounties right now.</i></p>'}</div>
+    <div class="row">${btn('📜 Post a bounty',null,'v85:bty:new','war')}</div><div class="label">📜 Today's posters</div>`; }
+(function(){ const bb0=bbDialog; bbDialog=function(){ bb0(); try{ const d=document.querySelector('#bbOv .dialog'); if(!d||d.querySelector('.pbSec')) return; const box=document.createElement('div'); box.className='pbSec'; box.innerHTML=btyHtml(); const p=d.querySelector('p.desc'); if(p) p.after(box); else d.prepend(box); refreshButtons(); }catch(e){} if(!btySt) btyLoad().then(()=>{ if($('bbOv')&&!$('bbOv').querySelector('.pbSec .bbPost')&&btyLive().length) bbDialog(); }); }; })();
+function drawBty(v){ if(cam.z<.3) return; const live=btyLive(); if(!live.length) return; const u=TW, T=NOWT||0, seen=new Set();
+  for(const b of live){ if(seen.has(b.on)) continue; seen.add(b.on); const p=P(b.on); if(!p||!p.hall) continue; const [hx,hy]=ctr(...xy(p.hall)); if(hx<v.x0-TW*2||hx>v.x1+TW*2||hy<v.y0-TW*3||hy>v.y1+TW*2) continue; const tot=live.filter(x=>x.on===b.on).reduce((a,x)=>a+x.gold,0);
+    const px=hx-TW*1.05, py=hy-TW*.75+(RM?0:Math.sin(T/400)*TW*.03); ctx.save(); ctx.translate(px,py); ctx.rotate(-.06); ctx.scale(1.6,1.6); ctx.fillStyle='#f0dcae'; ctx.strokeStyle='#7a4a22'; ctx.lineWidth=Math.max(1/cam.z,u*.018); ctx.fillRect(-u*.2,-u*.24,u*.4,u*.44); ctx.strokeRect(-u*.2,-u*.24,u*.4,u*.44);
+    ctx.fillStyle='#8a2a1a'; ctx.font=`900 ${u*.085}px system-ui`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('WANTED',0,-u*.15); ctx.font=`${u*.15}px system-ui`; ctx.fillText('💰',0,0); ctx.fillStyle='#3b2412'; ctx.font=`800 ${u*.075}px system-ui`; ctx.fillText(tot>=1e6?(tot/1e6).toFixed(1)+'M':tot>=1e3?Math.round(tot/1e3)+'k':tot,0,u*.13); ctx.textBaseline='alphabetic'; ctx.restore(); } }
+(function(){ const pe=panelExtras; panelExtras=function(sel,p,m){ let h=pe(sel,p,m); try{ if(p&&p.o&&p.o!=='npc'&&P(p.o)&&p.o!==ME){ const L=btyOn(p.o), v=P(p.o); if(L.length&&p.b==='hall'){ const tot=L.reduce((a,x)=>a+x.gold,0), c=L.find(btyCan); h+=`<div class="tmapBox">📜 <b>WANTED!</b> ${esc(cleanText(v.name))} has ${L.length} bount${L.length===1?'y':'ies'} worth <b>${f(tot)} gold</b>. Beat them in battle to claim it! ${c?btn('💰 Claim bounty',null,'v85:bty:claim:'+c.id,'prime'):''}</div>`; }
+    if(p.b==='hall'&&hlMe()>=BTY_TH) h+=`<div class="row" style="margin:0 0 6px">${btn('📜 Put a bounty on them',null,'v85:bty:new:'+p.o,'soft')}</div>`; } }catch(e){} return h; }; })();
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v85:')) return va(a,b); const r=a.slice(4).split(':');
+  if(r[0]==='bty'){ if(r[1]==='new') btyPostDialog(r[2]); else if(r[1]==='post') btyPost(); else if(r[1]==='claim') btyClaim(r[2]); else if(r[1]==='back') btyBack(r[2]); else if(r[1]==='board') bbDialog(); else if(r[1]==='find'){ const p=P(r.slice(2).join(':')); if(p&&p.hall){ $('ov').innerHTML=''; setTab('map'); sel=p.hall; centerOn(p.hall); renderPanel(true); draw(); } } } return true; }; })();
+(function(){ const dv=drawV82; drawV82=function(v){ dv(v); try{ drawBty(v); }catch(e){} }; const vk=v82Key; v82Key=function(){ return [vk(),btySt&&btySt.l&&btySt.l.length,(P(ME)||{}).beat]; }; })();
+try{ FAQ.push(['How do player bounties work?','bounty bounties wanted poster reward','Open the 📜 Bounty Board and press Post a bounty (Town Hall 3). Pick a kingdom and some gold. The first player who beats that kingdom in battle can claim the gold. If nobody does in 3 days, you get it back.']); }catch(e){}
+
+/* ===== v86: a real cave for dungeon battles ===== */
+function caveGround(gg,W,H,pos,bT){
+  const base=gg.createRadialGradient(W/2,H*.58,H*.1,W/2,H*.58,W*.8); base.addColorStop(0,'#4a4256'); base.addColorStop(.6,'#2a2433'); base.addColorStop(1,'#120e17'); gg.fillStyle=base; gg.fillRect(0,0,W,H);
+  /* flagstone floor */
+  for(let ty=-3;ty<=10;ty++) for(let tx=-3;tx<=10;tx++){ const [x,y]=pos(tx,ty), cy=y+bT/4; if(x<-bT||x>W+bT||cy<-bT||cy>H+bT) continue; const h=hash2(tx+20,ty+20,311), sh=Math.round(62+h*26), hw=bT/2-1.5, hh=bT/4-1;
+    gg.fillStyle=`rgb(${sh},${sh-6},${sh+8})`; gg.beginPath(); gg.moveTo(x,cy-hh); gg.lineTo(x+hw,cy); gg.lineTo(x,cy+hh); gg.lineTo(x-hw,cy); gg.closePath(); gg.fill(); gg.strokeStyle='rgba(15,10,22,.55)'; gg.lineWidth=1.2; gg.stroke();
+    gg.strokeStyle='rgba(255,255,255,.06)'; gg.beginPath(); gg.moveTo(x-hw+2,cy); gg.lineTo(x,cy-hh+1); gg.stroke();
+    if(h>.78){ gg.strokeStyle='rgba(10,6,14,.5)'; gg.lineWidth=1; gg.beginPath(); gg.moveTo(x-hw*.4,cy-hh*.2); gg.lineTo(x-hw*.05,cy+hh*.15); gg.lineTo(x+hw*.3,cy+hh*.05); gg.stroke(); }
+    if(h<.06){ gg.fillStyle='rgba(80,140,90,.35)'; gg.beginPath(); gg.ellipse(x+hw*.2,cy,hw*.35,hh*.35,0,0,7); gg.fill(); } }
+  /* back wall with rocks and hanging stalactites */
+  const wallH=H*.2, wg=gg.createLinearGradient(0,0,0,wallH*1.3); wg.addColorStop(0,'#0c0910'); wg.addColorStop(1,'#2b2333'); gg.fillStyle=wg; gg.beginPath(); gg.moveTo(0,0); gg.lineTo(W,0); gg.lineTo(W,wallH*.8);
+  for(let i=24;i>=0;i--){ const x=W*i/24, y=wallH*(.75+hash2(i,2,312)*.5); gg.lineTo(x,y); } gg.closePath(); gg.fill();
+  for(let i=0;i<10;i++){ const x=W*(.04+hash2(i,4,313)*.92), L=wallH*(.35+hash2(i,5,313)*.55), w=bT*(.08+hash2(i,6,313)*.1); const sg=gg.createLinearGradient(x,0,x,wallH+L); sg.addColorStop(0,'#2b2333'); sg.addColorStop(1,'#5a5068'); gg.fillStyle=sg; gg.beginPath(); gg.moveTo(x-w,wallH*.7); gg.lineTo(x+w,wallH*.7); gg.lineTo(x,wallH*.7+L); gg.closePath(); gg.fill(); }
+  for(const side of [0,1]){ const sg=gg.createLinearGradient(side?W:0,0,side?W-W*.18:W*.18,0); sg.addColorStop(0,'rgba(8,6,12,.85)'); sg.addColorStop(1,'rgba(8,6,12,0)'); gg.fillStyle=sg; gg.fillRect(side?W-W*.18:0,0,W*.18,H); }
+  /* torches on the wall */
+  for(const fx of [.18,.5,.82]){ const x=W*fx, y=wallH*.85; const gl=gg.createRadialGradient(x,y-bT*.15,0,x,y-bT*.15,bT*1.6); gl.addColorStop(0,'rgba(255,170,70,.45)'); gl.addColorStop(1,'rgba(255,140,40,0)'); gg.fillStyle=gl; gg.fillRect(x-bT*1.6,y-bT*1.8,bT*3.2,bT*3.2);
+    gg.fillStyle='#4a3424'; gg.fillRect(x-bT*.03,y-bT*.05,bT*.06,bT*.22); gg.fillStyle='#2a1c12'; gg.fillRect(x-bT*.08,y-bT*.08,bT*.16,bT*.05);
+    gg.fillStyle='#ff9a2a'; gg.beginPath(); gg.moveTo(x,y-bT*.32); gg.quadraticCurveTo(x+bT*.09,y-bT*.15,x,y-bT*.08); gg.quadraticCurveTo(x-bT*.09,y-bT*.15,x,y-bT*.32); gg.fill(); gg.fillStyle='#ffe28a'; gg.beginPath(); gg.ellipse(x,y-bT*.14,bT*.03,bT*.06,0,0,7); gg.fill(); }
+  /* puddles and bones */
+  for(let i=0;i<3;i++){ const x=W*(.15+hash2(i,8,314)*.7), y=H*(.55+hash2(i,9,314)*.35), r=bT*(.25+hash2(i,10,314)*.2); gg.fillStyle='rgba(70,110,160,.35)'; gg.beginPath(); gg.ellipse(x,y,r,r*.4,0,0,7); gg.fill(); gg.strokeStyle='rgba(180,210,255,.25)'; gg.lineWidth=1; gg.beginPath(); gg.ellipse(x-r*.2,y-r*.08,r*.4,r*.1,0,0,Math.PI); gg.stroke(); }
+  for(let i=0;i<4;i++){ const x=W*(.08+hash2(i,11,315)*.84), y=H*(.45+hash2(i,12,315)*.5), s=bT*.12, a=hash2(i,13,315)*3; gg.save(); gg.translate(x,y); gg.rotate(a); gg.fillStyle='rgba(230,222,205,.75)'; gg.fillRect(-s,-s*.12,s*2,s*.24); for(const e of [-1,1]){ gg.beginPath(); gg.arc(e*s,-s*.12,s*.16,0,7); gg.arc(e*s,s*.12,s*.16,0,7); gg.fill(); } gg.restore(); }
+  /* warm light in the middle and dark edges */
+  const lp=gg.createRadialGradient(W/2,H*.6,0,W/2,H*.6,W*.45); lp.addColorStop(0,'rgba(255,190,120,.16)'); lp.addColorStop(1,'rgba(255,190,120,0)'); gg.fillStyle=lp; gg.fillRect(0,0,W,H);
+  const vg=gg.createRadialGradient(W/2,H*.55,H*.35,W/2,H*.55,W*.75); vg.addColorStop(0,'rgba(0,0,0,0)'); vg.addColorStop(1,'rgba(4,2,8,.6)'); gg.fillStyle=vg; gg.fillRect(0,0,W,H); }
+
+/* ===== v86: a nicer dungeon window ===== */
+(function(){ const d0=dgDialog; dgDialog=function(){ d0(); try{ const ov=$('dgOv'); if(!ov) return; const box=ov.querySelector('.dgFloors'); if(!box) return; box.classList.add('dgCave');
+  box.querySelectorAll('.dgF').forEach((el,i)=>{ const M=DG_MON[i]; if(!M) return; const done=el.classList.contains('done'), cur=el.classList.contains('cur'); el.innerHTML=`<div class="dgPic"><img src="pets/${M.pic}.webp" alt="" style="filter:${done||cur?M.f:'brightness(0) opacity(.55)'}" onerror="this.remove()"></div><b>${i+1}</b><small>${done?'✅ Cleared':cur?'⚔️ Next':'🔒 ???'}</small><small class="dgN">${done||cur?esc(M.n):'???'}</small>`; }); }catch(e){} }; })();
+
+/* ===== v86: the daily hedge maze (replaces the dig-and-find puzzle) ===== */
+var MZ=9;
+function mzRand(seed){ let a=seed>>>0; return ()=>{ a=(a+0x6D2B79F5)>>>0; let t=a; t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61); return ((t^(t>>>14))>>>0)/4294967296; }; }
+function mzMake(day){ const R=mzRand(day*7919+13), N=MZ, wall=[]; for(let i=0;i<N*N;i++) wall.push([1,1,1,1]); /* N E S W */
+  const D=[[0,-1,0,2],[1,0,1,3],[0,1,2,0],[-1,0,3,1]], seen=new Array(N*N).fill(0), st=[0]; seen[0]=1;
+  while(st.length){ const c=st[st.length-1], x=c%N, y=Math.floor(c/N), nb=D.map(([dx,dy,a,b])=>[x+dx,y+dy,a,b]).filter(([nx,ny])=>nx>=0&&ny>=0&&nx<N&&ny<N&&!seen[ny*N+nx]); if(!nb.length){ st.pop(); continue; } const [nx,ny,a,b]=nb[Math.floor(R()*nb.length)], n=ny*N+nx; wall[c][a]=0; wall[n][b]=0; seen[n]=1; st.push(n); }
+  for(let k=0;k<9;k++){ const c=Math.floor(R()*N*N), x=c%N, y=Math.floor(c/N), d=Math.floor(R()*4), [dx,dy,a,b]=D[d], nx=x+dx, ny=y+dy; if(nx<0||ny<0||nx>=N||ny>=N) continue; wall[c][a]=0; wall[ny*N+nx][b]=0; }
+  const dist=new Array(N*N).fill(-1), q=[0]; dist[0]=0; while(q.length){ const c=q.shift(), x=c%N, y=Math.floor(c/N); D.forEach(([dx,dy,a],i)=>{ if(wall[c][a]) return; const n=(y+dy)*N+(x+dx); if(dist[n]<0){ dist[n]=dist[c]+1; q.push(n); } }); }
+  let chest=0; for(let i=0;i<N*N;i++) if(dist[i]>dist[chest]) chest=i;
+  const free=[...Array(N*N).keys()].filter(i=>i!==0&&i!==chest&&dist[i]>=4).sort(()=>R()-.5), keys=free.slice(0,3), coins=free.slice(3,10);
+  return {wall,chest,keys,coins,dist}; }
+var mzSt=null;
+function mzBoard(){ const d=pzDay(), l=Object.values(G.players).filter(p=>p&&!p.banned&&p.pz&&p.pz.day===d&&p.pz.found&&p.pz.time).sort((a,b)=>a.pz.time-b.pz.time).slice(0,5); return l.length?`<div class="label">⏱️ Fastest today</div><div class="mzBoard">${l.map((p,i)=>`<div><span>${['🥇','🥈','🥉','4.','5.'][i]}</span><b>${esc(cleanText(p.name))}${p.id===ME?' (you)':''}</b><span>${p.pz.time.toFixed(1)}s</span></div>`).join('')}</div>`:''; }
+pzDialog=function(){ if(lockGate('bPuzzle')) return; const m=P(ME); if(!m) return; const z=pzOf(m), done=!!z.found, d=pzDay(), M=mzMake(d);
+  mzSt={M,d,x:0,y:0,ax:0,ay:0,keys:[],coins:[],seen:new Set([0]),t0:0,moves:0,done:false,practice:done,anim:0};
+  $('ov').innerHTML=`<div class="overlay" id="mzOv"><div class="dialog" style="text-align:center"><h2>🌿 Daily hedge maze</h2><p class="desc">Find the <b>3 golden keys 🗝️</b> hidden in the maze, then open the <b>treasure chest</b>! You can only see a little way through the hedges. Grab coins on the way. Everyone gets the same maze today, so try to be the fastest!</p>
+    ${done?`<p class="desc">✅ <b>You beat today's maze in ${(z.time||0).toFixed(1)}s!</b> Play again just for fun (no prizes), or come back tomorrow.${m.pzStreak?` 🔥 ${m.pzStreak}-day streak`:''}</p>`:`<p class="desc">Prize: 15 gems + gold, and a bonus for every coin.${m.pzStreak?` 🔥 ${m.pzStreak}-day streak`:''}</p>`}
+    <div class="mzTop"><span id="mzKeys">🗝️ 0/3</span><span id="mzCoins">🪙 0</span><span id="mzTime">⏱️ 0.0s</span></div>
+    <canvas id="mzCv" style="width:min(360px,100%);aspect-ratio:1;border-radius:14px;border:3px solid #2f4a1a;display:block;margin:6px auto;touch-action:none"></canvas>
+    <div class="mzPad"><span></span><button class="soft" data-mz="0,-1">⬆️</button><span></span><button class="soft" data-mz="-1,0">⬅️</button><button class="soft" data-mz="0,1">⬇️</button><button class="soft" data-mz="1,0">➡️</button></div>
+    <p class="desc" id="mzMsg">Use the arrows, your arrow keys or swipe on the maze.</p>${mzBoard()}<button class="soft" data-act="ov:close">Close</button></div></div>`;
+  const cv=$('mzCv'); let sx=0, sy=0; cv.onpointerdown=e=>{ sx=e.clientX; sy=e.clientY; }; cv.onpointerup=e=>{ const dx=e.clientX-sx, dy=e.clientY-sy; if(Math.max(Math.abs(dx),Math.abs(dy))<18) return; if(Math.abs(dx)>Math.abs(dy)) mzMove(dx>0?1:-1,0); else mzMove(0,dy>0?1:-1); };
+  document.querySelectorAll('#mzOv [data-mz]').forEach(b=>{ b.onclick=e=>{ e.preventDefault(); const [dx,dy]=b.dataset.mz.split(',').map(Number); mzMove(dx,dy); }; });
+  requestAnimationFrame(mzFrame); };
+document.addEventListener('keydown',e=>{ if(!mzSt||!$('mzCv')||mzSt.done) return; const k={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0],W:[0,-1],S:[0,1],A:[-1,0],D:[1,0]}[e.key]; if(!k) return; if(document.activeElement&&/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return; e.preventDefault(); mzMove(k[0],k[1]); });
+function mzMove(dx,dy){ const s=mzSt; if(!s||s.done) return; const c=s.y*MZ+s.x, side=dx===1?1:dx===-1?3:dy===1?2:0; if(s.M.wall[c][side]){ snd('click'); const cv=$('mzCv'); if(cv){ cv.classList.remove('mzBump'); void cv.offsetWidth; cv.classList.add('mzBump'); } return; }
+  if(!s.t0) s.t0=performance.now(); s.x+=dx; s.y+=dy; s.moves++; const n=s.y*MZ+s.x; for(let yy=-1;yy<=1;yy++) for(let xx=-1;xx<=1;xx++){ const X=s.x+xx, Y=s.y+yy; if(X>=0&&Y>=0&&X<MZ&&Y<MZ) s.seen.add(Y*MZ+X); }
+  if(s.M.keys.includes(n)&&!s.keys.includes(n)){ s.keys.push(n); snd('gem'); $('mzMsg').textContent=s.keys.length<3?`🗝️ A golden key! ${3-s.keys.length} to go.`:'🗝️ All 3 keys! Now find the treasure chest!'; }
+  if(s.M.coins.includes(n)&&!s.coins.includes(n)){ s.coins.push(n); snd('coin'); }
+  $('mzKeys').textContent=`🗝️ ${s.keys.length}/3`; $('mzCoins').textContent=`🪙 ${s.coins.length}`;
+  if(n===s.M.chest){ if(s.keys.length<3){ $('mzMsg').textContent=`🔒 The chest is locked! Find ${3-s.keys.length} more key${3-s.keys.length>1?'s':''}.`; snd('click'); } else mzWin(); } }
+function mzWin(){ const s=mzSt; s.done=true; const time=+((performance.now()-s.t0)/1000).toFixed(1), coins=s.coins.length; snd('win'); try{ confetti(); }catch(e){}
+  if(s.practice){ $('mzMsg').innerHTML=`🎉 Done in <b>${time}s</b>! (practice run)`; return; }
+  act([],me=>{ const z={...pzOf(me)}; if(z.found) fail('You already beat today\'s maze!'); z.found=1; z.time=time; z.coins=coins; z.taps=[]; const hl=stats(ME).hallLvl||1; settle(me); me.gems=(me.gems||0)+15; me.gold+=1000*hl+coins*150*hl; me.pzStreak=(me.pzLast===pzDay()-1?(me.pzStreak||0):0)+1; me.pzLast=pzDay(); me.pz=z; return {time,coins,gold:1000*hl+coins*150*hl}; },
+    r=>{ const el=$('mzMsg'); if(el) el.innerHTML=`🎉 <b>Treasure!</b> You beat the maze in <b>${r.time}s</b>: +15 gems and +${f(r.gold)} gold (${r.coins} coin${r.coins===1?'':'s'}).`; const b=document.querySelector('#mzOv .mzBoard'); if(b&&b.parentElement){ b.previousElementSibling&&b.previousElementSibling.remove(); b.outerHTML=mzBoard(); } else { const d=document.querySelector('#mzOv .dialog'); if(d){ const x=document.createElement('div'); x.innerHTML=mzBoard(); d.insertBefore(x,d.lastElementChild); } } }); }
+function mzFrame(T){ const s=mzSt, cv=$('mzCv'); if(!s||!cv) return; const dpr=Math.min(2,window.devicePixelRatio||1), W=cv.clientWidth; if(!W){ requestAnimationFrame(mzFrame); return; } if(cv.width!==Math.round(W*dpr)){ cv.width=cv.height=Math.round(W*dpr); } const c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0);
+  const cs=W/MZ, M=s.M; s.ax+=(s.x-s.ax)*.35; s.ay+=(s.y-s.ay)*.35; if(s.t0&&!s.done){ const tm=$('mzTime'); if(tm) tm.textContent=`⏱️ ${((performance.now()-s.t0)/1000).toFixed(1)}s`; }
+  c.fillStyle='#d9c48e'; c.fillRect(0,0,W,W);
+  for(let i=0;i<MZ*MZ;i++){ const x=i%MZ, y=Math.floor(i/MZ), h=hash2(x,y,401); c.fillStyle=h>.5?'#d6bf88':'#ccb47c'; c.fillRect(x*cs,y*cs,cs,cs); if(h>.8){ c.fillStyle='rgba(120,90,50,.35)'; c.beginPath(); c.arc(x*cs+cs*h*.8,y*cs+cs*(1-h)*.9+cs*.1,cs*.04,0,7); c.fill(); } }
+  /* items */
+  const tt=T/1000; for(const k of M.keys){ if(s.keys.includes(k)) continue; const x=(k%MZ+.5)*cs, y=(Math.floor(k/MZ)+.5)*cs+Math.sin(tt*3+k)*cs*.05; c.save(); c.translate(x,y); c.rotate(-.6); c.fillStyle='#ffd13b'; c.strokeStyle='#7a5200'; c.lineWidth=Math.max(1,cs*.04); c.beginPath(); c.arc(-cs*.14,0,cs*.11,0,7); c.fill(); c.stroke(); c.fillRect(-cs*.04,-cs*.035,cs*.3,cs*.07); c.strokeRect(-cs*.04,-cs*.035,cs*.3,cs*.07); c.fillRect(cs*.16,0,cs*.05,cs*.09); c.restore(); c.fillStyle=`rgba(255,240,150,${.5+.5*Math.sin(tt*5+k)})`; c.fillRect(x+cs*.18,y-cs*.22,2,2); }
+  for(const k of M.coins){ if(s.coins.includes(k)) continue; const x=(k%MZ+.5)*cs, y=(Math.floor(k/MZ)+.5)*cs, sq=Math.abs(Math.cos(tt*3+k)); c.fillStyle='#ffc21a'; c.strokeStyle='#8a5a00'; c.lineWidth=1.2; c.beginPath(); c.ellipse(x,y,cs*.13*sq+1,cs*.13,0,0,7); c.fill(); c.stroke(); }
+  { const k=M.chest, x=(k%MZ+.5)*cs, y=(Math.floor(k/MZ)+.55)*cs, w=cs*.56, h=cs*.4, open=s.done; c.fillStyle='rgba(0,0,0,.2)'; c.beginPath(); c.ellipse(x,y+h*.55,w*.55,h*.2,0,0,7); c.fill(); c.fillStyle='#8a4f22'; c.strokeStyle='#3b2412'; c.lineWidth=Math.max(1,cs*.04); c.fillRect(x-w/2,y-h*.1,w,h*.6); c.strokeRect(x-w/2,y-h*.1,w,h*.6); c.fillStyle=open?'#5a3214':'#a8642a'; c.beginPath(); c.moveTo(x-w/2,y-h*.1); c.quadraticCurveTo(x,y-h*(open?1.2:.75),x+w/2,y-h*.1); c.closePath(); c.fill(); c.stroke(); c.fillStyle='#ffd13b'; c.fillRect(x-w*.08,y-h*.12,w*.16,h*.22); if(open){ c.fillStyle='rgba(255,220,90,.6)'; c.beginPath(); c.arc(x,y-h*.3,cs*.35,0,7); c.fill(); } }
+  /* hedges */
+  const hw=Math.max(4,cs*.22); c.lineCap='round';
+  for(const pass of [0,1]){ c.strokeStyle=pass?'#4f8f2c':'#2f5a1a'; c.lineWidth=pass?hw*.62:hw; c.beginPath(); for(let i=0;i<MZ*MZ;i++){ const x=(i%MZ)*cs, y=Math.floor(i/MZ)*cs, w=M.wall[i]; if(w[0]){ c.moveTo(x,y); c.lineTo(x+cs,y); } if(w[3]){ c.moveTo(x,y); c.lineTo(x,y+cs); } if(w[1]&&i%MZ===MZ-1){ c.moveTo(x+cs,y); c.lineTo(x+cs,y+cs); } if(w[2]&&Math.floor(i/MZ)===MZ-1){ c.moveTo(x,y+cs); c.lineTo(x+cs,y+cs); } } c.stroke(); }
+  c.fillStyle='rgba(140,210,90,.5)'; for(let i=0;i<MZ*MZ;i+=2){ const x=(i%MZ)*cs, y=Math.floor(i/MZ)*cs; if(M.wall[i][0]){ c.beginPath(); c.arc(x+cs*.5,y-hw*.12,hw*.14,0,7); c.fill(); } }
+  /* hero */
+  const hx=(s.ax+.5)*cs, hy=(s.ay+.5)*cs; const m=P(ME)||{}; try{ chibi(c,hx,hy+cs*.32,cs*.62,{dir:1,walk:false,body:m.color||'#3a86e8',weapon:'sword',helmet:'cap',helmCol:m.color||'#3a86e8'},T); }catch(e){ c.fillStyle=m.color||'#3a86e8'; c.beginPath(); c.arc(hx,hy,cs*.25,0,7); c.fill(); }
+  /* fog of the hedges: you only see near you */
+  if(!s.done){ c.save(); const fog=c.createRadialGradient(hx,hy,cs*1.2,hx,hy,cs*2.6); fog.addColorStop(0,'rgba(18,40,12,0)'); fog.addColorStop(1,'rgba(18,40,12,.93)'); c.fillStyle=fog; c.fillRect(0,0,W,W); c.fillStyle='rgba(18,40,12,.45)';
+    for(let i=0;i<MZ*MZ;i++){ if(s.seen.has(i)) continue; const x=(i%MZ)*cs, y=Math.floor(i/MZ)*cs; if(Math.hypot(x+cs/2-hx,y+cs/2-hy)<cs*1.3) continue; c.fillRect(x,y,cs,cs); } c.restore(); }
+  requestAnimationFrame(mzFrame); }
+try{ const g=TOUR.find(x=>/fun/i.test(x[0])); if(g){ const it=g[1].find(x=>x[3]==='pz:open'); if(it){ it[0]='🌿'; it[1]='Daily hedge maze'; it[2]='Find 3 keys and the treasure. Race the clock!'; } } }catch(e){}
+try{ const b=$('bPuzzle'); if(b) b.textContent='🌿 Daily maze'; }catch(e){}
+try{ FAQ.push(['What is the daily maze?','maze hedge daily puzzle keys','Open 🎉 Fun ▾ → 🌿 Daily maze. Find 3 golden keys, then open the treasure chest. Everyone gets the same maze each day, and the fastest players show on the board.']); }catch(e){}
 
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
@@ -6264,7 +6435,7 @@ function wonLastWar(p){ const c=p&&p.clan&&G.clans[p.clan]; return !!(c&&c.cw&&c
 function drawVictory(cx,cy){ const u=TW, wv=RM?0:Math.sin(NOWT/300)*u*.03, x=cx+u*.42, y=cy-u*.2; strokeLine([[x,y],[x,y-u*.7]],u*.025,'#5a3a1c'); ctx.fillStyle='#ffd13b'; ctx.beginPath(); ctx.moveTo(x,y-u*.7); ctx.lineTo(x+u*.28,y-u*.62+wv); ctx.lineTo(x+u*.28,y-u*.42+wv); ctx.lineTo(x,y-u*.48); ctx.closePath(); ctx.fill(); ctx.strokeStyle=OL; ctx.lineWidth=Math.max(LW,.5/cam.z); ctx.stroke(); ctx.font=`${u*.14}px serif`; ctx.textAlign='center'; ctx.fillText('🏆',x+u*.14,y-u*.5+wv); }
 
 /* ===== v65: grouped top menus ===== */
-const HB_GROUPS={gBattle:['bCamp','bWB','bDungeon','bBounty','bBeast','bSiege','bVolc'],gFun:['bStory','bGames','bPuzzle','bMerlin','bFest','bHol','bEvent','bMerch'],gKing:['bDiary','bTrophy','bCards','bNews','bSkins','bSnap','bCaravan','bTerr'],gMore:['bTour','bGuide','bBadge','bHelp','bSet','bNew','bInstall']};
+const HB_GROUPS={gBattle:['bCamp','bWB','bDungeon','bBounty','bBeast','bSiege','bVolc','bMarch'],gFun:['bStory','bGames','bPuzzle','bCourse','bExplore','bMerlin','bFest','bHol','bEvent','bMerch'],gKing:['bDiary','bTrophy','bCards','bNews','bSkins','bSnap','bCaravan','bTerr','bMount','bBm','bWsp','bPhoto'],gMore:['bTour','bGuide','bBadge','bHelp','bSet','bNew','bInstall']};
 function hbMenu(gid,btn){ const old=$('hbPop'); if(old){ const same=old.dataset.g===gid; old.remove(); if(same) return; }
   const items=HB_GROUPS[gid].map(id=>$(id)).filter(b=>b&&!b.hidden); if(!items.length) return toast('Nothing here right now.');
   const pop=document.createElement('div'); pop.id='hbPop'; pop.dataset.g=gid;
@@ -6314,6 +6485,8 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  86:['🕳️ The Dungeon looks like a real cave now: stone floors, torches and monster portraits','🌿 New daily game: the hedge maze! Find 3 keys and the treasure, and race the clock','🔔 "A builder is free" no longer shows in your notifications','🔧 Fixed: Pet course, Photo mode, Weather spells, Mounts, March range, Bookmarks and Daily explorer now show up in the menus'],
+  85:['🌋 A cleaner, nicer-looking volcano','📜 Player bounties: make your own WANTED posters and claim other players\' bounties by beating the wanted kingdom'],
   84:['🔨 The Forge: two of the same gear make a buffed one','🎽 New pet outfits: pirate, chef and cowboy hats, plus sunglasses, bow ties, scarves and more','🌱 Choose crops for your farms','✨ Golden hour: double resources for 10 minutes, a few times a week','🐴 Hero mounts','🗺️ March range upgrade: march up to 36 tiles','📍 Map bookmarks','😀 Chat stickers','🧑‍🌾 Villager requests','🎼 Pick your background song','🏰 New castle styles: Ice, Royal Gold and Volcano','📬 While-you-were-away report','🧭 Daily explorer','🏅 Titles now show without your username'],
   83:['🧹 A second big check of the whole game: every button in every window was tested on phone and computer','💬 Pop-up messages are wider and no longer block buttons','📜 Daily quests appear right away for new players','🏆 The newspaper shows the Pet Cup champion (pet levels stay secret)','✏️ Small text and layout fixes'],
   82:['🦃 Harvest Feast event (late November): cook dishes and visit other feasts','⛄ Winter: build a snowman and have snowball fights','🧩 Torn treasure map pieces lead to great treasures in the wild','🎉 A celebration every time your Town Hall levels up','📸 Photo mode','🌦️ Weather spells for faster farms or gold','🏁 Pet obstacle course and the Pet Cup','🐾 Pets can now grow all the way to level 100','🔊 Volume sliders','🏮 Kingdoms light up at night as they grow','❓ Ask-a-question bar at the top'],
