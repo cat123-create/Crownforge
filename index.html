@@ -536,7 +536,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 92;
+const GAME_VERSION = 93;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -851,7 +851,7 @@ function firebaseBackend(){
     sendMsg:async(id,m,up)=>{ await W.collection('convos').doc(id).collection('msgs').add(m); await W.collection('convos').doc(id).update(up).catch(()=>{}); },
     watchMarket:cb=>MK.orderBy('t','desc').limit(150).onSnapshot(guard(s=>{ const m={}; s.forEach(d=>m[d.id]={...d.data(),id:d.id}); cb(m); },'the market'),()=>{}),
     tx:fn=>{ let last=null; return db.runTransaction(async tr=>{
-      const regs={}, pw={}, cw={}, nw={}, mw={}, po={}; last={regs,pw,cw,mw};
+      const regs={}, pw={}, cw={}, nw={}, mw={}, po={}; last={regs,pw,cw,mw,po};
       const strip=d=>{ const c=clone(d); delete c.id; return c; };
       const t={
         async getPlayer(id){ const d=await tr.get(PL.doc(id)); if(d.exists) po[id]=d.data(); return d.exists?{...d.data(),id}:null; },
@@ -867,7 +867,7 @@ function firebaseBackend(){
       };
       const out=await fn(t);
       const same=(a,b)=>{ try{ return JSON.stringify(a)===JSON.stringify(b); }catch(e){ return false; } };
-      for(const id in pw){ const o=po[id]; if(id===ME||!o){ tr.set(PL.doc(id),pw[id]); continue; }
+      for(const id in pw){ const o=po[id]; if(id!==ME&&TX_SKIP_OTHER) continue; try{ pw[id]=rulesFix(id,pw[id],o); }catch(e){} if(id===ME||!o){ tr.set(PL.doc(id),pw[id]); continue; }
         const up={}; for(const k of new Set([...Object.keys(o),...Object.keys(pw[id])])){ if(k==='id') continue; if(!(k in pw[id])) up[k]=FV.delete(); else if(!same(o[k],pw[id][k])) up[k]=pw[id][k]; }
         if(Object.keys(up).length) tr.update(PL.doc(id),up); }
       for(const id in cw) cw[id]===null?tr.delete(CL.doc(id)):tr.set(CL.doc(id),cw[id]);
@@ -877,7 +877,7 @@ function firebaseBackend(){
         if(r.exists){ const up={}; ks.forEach(k=>up['p.'+k]=r.w[k]===null?FV.delete():r.w[k]); tr.update(RG.doc(rk),up); }
         else { const p={}; ks.forEach(k=>{ if(r.w[k]!==null) p[k]=r.w[k]; }); tr.set(RG.doc(rk),{p}); } }
       return out;
-    }).then(out=>{ applyLocal(last); return out; }); }
+    }).then(out=>{ applyLocal(last); return out; },e=>{ try{ if(/permission/i.test(String((e&&e.code)||'')+String((e&&e.message)||''))){ e.cfDiag=txDiag(last); console.warn('refused',e.cfDiag); if(!TX_SKIP_OTHER&&last&&Object.keys(last.pw||{}).some(id=>id!==ME)){ TX_SKIP_OTHER=true; return DB.tx(fn).finally(()=>{ TX_SKIP_OTHER=false; }); } } }catch(x){} throw e; }); }
   };
 }
 const PREVIEW_KEY='iron-acre-device-'+WORLD.id, CUR_KEY='iron-acre-device-current-'+WORLD.id;
@@ -993,7 +993,7 @@ class UErr extends Error{}
 const fail=m=>{ throw new UErr(m); };
 function pay(p,c){ if((p.gold||0)<(c.gold||0)||(p.stone||0)<(c.stone||0)) fail('Not enough resources yet.'); if((p.gems||0)<(c.gems||0)) fail('Not enough gems.'); if((p.food||0)<(c.food||0)) fail('Not enough food. Build or upgrade Farms and collect them.'); p.gold-=c.gold||0; p.stone-=c.stone||0; p.gems=(p.gems||0)-(c.gems||0); if(c.food) p.food=(p.food||0)-c.food; }
 function explain(e){ if(e instanceof UErr) return toast(e.message,true); console.error(e); const c=String((e&&e.code)||''), msg=String((e&&e.message)||e||'');
-  if(/permission/i.test(c+msg)) toast(`The server refused that move. Your game may be out of date: reload the page to get the newest version. (Game version ${GAME_VERSION}, error: permission-denied)`,true);
+  if(/permission/i.test(c+msg)) toast(`The server refused that move. Your game may be out of date: reload the page to get the newest version. (Game version ${GAME_VERSION}, error: permission-denied${e&&e.cfDiag?' · '+e.cfDiag:''})`,true);
   else if(/aborted|failed-precondition|contention/i.test(c+msg)) toast('Lots of things changed at the same moment. Please try again.',true);
   else if(/unavailable|deadline|network|offline|fetch/i.test(c+msg)||!navigator.onLine) toast('Could not reach the server. Check your connection and try again.',true);
   else toast(`Something went wrong: ${msg.slice(0,120)}${c?` (${c})`:''}`,true); }
@@ -2173,7 +2173,7 @@ $('bCollect').onclick=()=>collectAll();
 
 /* ================= hero and troop research ================= */
 const HERO={name:'Warlord',cost:{gold:2500,stone:1500},th:3,rest:10};
-const HSLOT_MAX=6, HSLOT_COST=[0,0,150,300,600,1000,1600];   // gems for slot 2 and slot 3
+const HSLOT_MAX=3, HSLOT_COST=[0,0,150,300,600,1000,1600];   // gems for slot 2 and slot 3
 const heroSlots=p=>Math.min(HSLOT_MAX,(p&&p.heroSlots)||1);
 const hOk=(p,k)=>{ const r=hRec(p,k); return !!(r&&!((r.rest||0)>now())); };
 function heroTeam(p){ if(!p) return []; const lead=heroKey(p); let t=Array.isArray(p.heroTeam)?p.heroTeam.filter(k=>HEROES[k]&&hRec(p,k)):[]; if(hRec(p,lead)&&!t.includes(lead)) t=[lead,...t]; return [...new Set(t)].slice(0,heroSlots(p)); }
@@ -3886,9 +3886,9 @@ let petSellOk=null;
 function sellPet(id){ if(petSellOk!==id){ petSellOk=id; petsDialog(); return; } petSellOk=null;
   act([],me=>{ const i=(me.pets||[]).findIndex(x=>x.id===id); if(i<0) fail('That pet is gone.'); if(me.petOn===id) fail('Pick a different guardian before selling this pet.'); const pt=me.pets[i], g=petPrice(pt); me.pets.splice(i,1); me.gold+=g.gold; me.gems=(me.gems||0)+g.gems; return {name:pt.name,g}; },
     r=>{ snd('coin'); toast(`Sold ${r.name} for ${f(r.g.gold)} gold${r.g.gems?` and ${r.g.gems} gems`:''}. Goodbye, ${r.name}!`); petView=null; petsDialog(); }); }
-function mergePets(id){ act([],me=>{ const a=(me.pets||[]).find(x=>x.id===id); if(!a) fail('That pet is gone.'); const others=me.pets.filter(x=>x.k===a.k&&x.id!==a.id).sort((x,y)=>y.lvl-x.lvl); if(!others.length) fail(`You need two ${PETS[a.k].name}s to merge.`);
-    const b=others[0], keep=a.lvl>=b.lvl?a:b, gone=keep===a?b:a; if(keep.lvl>=PET_MAX) fail(`${keep.name} is already fully grown. Sell the extra one instead!`);
-    keep.lvl=Math.min(PET_MAX,Math.max(a.lvl,b.lvl)+1); me.pets=me.pets.filter(x=>x.id!==gone.id); if(me.petOn===gone.id) me.petOn=keep.id; return {keep,gone}; },
+function mergePets(id){ act([],me=>{ const a=(me.pets||[]).find(x=>x.id===id); if(!a) fail('That pet is gone.'); const others=me.pets.filter(x=>x.k===a.k&&x.id!==a.id&&(x.lvl||1)===(a.lvl||1)); if(!others.length) fail(`To merge, you need another ${PETS[a.k].name} that is also level ${a.lvl||1}.`);
+    const b=others[0], keep=a, gone=b; if((keep.lvl||1)>=PET_MAX) fail(`${keep.name} is already fully grown. Sell the extra one instead!`);
+    keep.lvl=Math.min(PET_MAX,(a.lvl||1)+1); me.pets=me.pets.filter(x=>x.id!==gone.id); if(me.petOn===gone.id) me.petOn=keep.id; return {keep,gone}; },
     r=>{ snd('quest'); petFx[r.keep.id]=performance.now(); petView=r.keep.id; toast(`🔀 ${r.gone.name} and ${r.keep.name} merged! ${r.keep.name} is now level ${r.keep.lvl}.`); confetti(); if(r.keep.lvl===10) addNews(`🐾 ${P(ME).name}'s pet ${cleanText(r.keep.name)} grew into a Legend!`,'good'); petsDialog(); }); }
 function petPower(p){ const pt=myPet(p); return pt?(p&&p.id&&typeof wHas==='function'&&wHas(p.id,'temple')?1.2:1)*petDefOf(pt)*(1+.08*skl(p,'pets'))*(1+bookB(p,'pets'))*(typeof petHappy==='function'&&petHappy(p,pt)?1.05:1):0; }
 function growPet(id){ act([],me=>{ const pt=(me.pets||[]).find(x=>x.id===id); if(!pt) fail('That pet is gone.'); if(pt.lvl>=PET_MAX) fail(`${pt.name} is already fully grown!`);
@@ -3937,10 +3937,10 @@ function petsDialog(){ const m=P(ME); if(!m||m.dead) return; const pets=m.pets||
       <div class="stat"><span>Guard power</span><span>+${f(petPower({...m,petOn:on.id}))} defense${nd?` · +${f(nd)} at level ${on.lvl+1}`:''}</span></div>
       <div class="stat"><span>Special power</span><span>${P2.power}</span></div>${careHtml(m,on)}${advHtml(m)}
       <p class="desc">${esc(cleanText(on.name))} stays home and protects your whole kingdom. In every battle at your kingdom you will see ${esc(cleanText(on.name))} fighting the attackers. Pets don't march into battle, but when you attack you can tap its <b>special power</b> once per battle for extra attack (it recharges in 20 minutes).</p>
-      ${(()=>{ const tw=pets.filter(x=>x.k===on.k&&x.id!==on.id).sort((a,b)=>b.lvl-a.lvl)[0], pr=petPrice(on), res=[];
-        if(tw&&Math.max(on.lvl,tw.lvl)<PET_MAX) res.push(btn(`🔀 Merge with ${esc(cleanText(tw.name))} (Lv ${tw.lvl}) → level ${Math.min(PET_MAX,Math.max(on.lvl,tw.lvl)+1)}`,null,'pet:merge:'+on.id,'gemb'));
+      ${(()=>{ const tw=pets.find(x=>x.k===on.k&&x.id!==on.id&&(x.lvl||1)===(on.lvl||1)), twOther=!tw&&pets.find(x=>x.k===on.k&&x.id!==on.id), pr=petPrice(on), res=[];
+        if(tw&&(on.lvl||1)<PET_MAX) res.push(btn(`🔀 Merge with ${esc(cleanText(tw.name))} (Lv ${tw.lvl}) → level ${Math.min(PET_MAX,(on.lvl||1)+1)}`,null,'pet:merge:'+on.id,'gemb')); else if(twOther) res.push(`<p class="desc">🔀 To merge, both pets must be the same level. ${esc(cleanText(twOther.name))} is level ${twOther.lvl||1}.</p>`);
         if(on.id!==m.petOn) res.push(btn(petSellOk===on.id?`Tap again to sell ${esc(cleanText(on.name))} for good`:`Sell ${esc(cleanText(on.name))}`,{gold:0},'pet:sell:'+on.id,petSellOk===on.id?'war':'soft').replace('<span class="c">','<span class="c">'+f(pr.gold)+' gold'+(pr.gems?' + '+pr.gems+' gems':'')+'</span><span hidden>'));
-        return res.length?`<div class="row">${res.join('')}</div>${tw?'<p class="desc">Merging two of the same pet makes one pet a level higher than the strongest of the two.</p>':''}`:''; })()}
+        return res.length?`<div class="row">${res.join('')}</div>${tw?'<p class="desc">Merging two of the same pet at the same level makes one pet just one level higher.</p>':''}`:''; })()}
       ${on.id!==m.petOn?btn(`Make ${esc(cleanText(on.name))} your guardian`,null,'pet:on:'+on.id,'prime'):''}
       ${on.lvl>=PET_MAX?`<p class="desc"><b>${esc(cleanText(on.name))} is fully grown: a true Legend!</b></p>`:on.lvl>=mx?`<p class="desc">Upgrade your Town Hall to grow ${esc(cleanText(on.name))} further (Town Hall ${Math.ceil((on.lvl+1)/2)} needed).</p>`
         :btn(`Grow ${esc(cleanText(on.name))} up`,petGrowCost(on.lvl),'pet:grow:'+on.id,'prime big')}
@@ -5136,7 +5136,7 @@ function raceGame(){ const m=P(ME); if(mgRec(m,'race').plays>=MG_PLAYS) return t
   const cv=$('mgCv'), dpr=Math.min(2,window.devicePixelRatio||1), W=cv.clientWidth, H=320; cv.width=W*dpr; cv.height=H*dpr; const g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
   const C=m.color||'#4fb6ff', names=['Thunder','Blaze','Comet'], cols=['#c4402f','#7a4ad0','#2f9a4a'], coats=['#6b4a2e','#3b2a1c','#d8c8a8'];
   const H4=[0,1,2].map(i=>({n:names[i],col:cols[i],coat:coats[i],x:0,v:1/(16+Math.random()*3),surge:0,fin:0})); const me={n:m.name,col:C,coat:'#a8733f',x:0,v:1/17.5,boost:0,slow:0,fin:0,me:1}; const all=[...H4,me];
-  let t0=null, last=null, over=false, cool=0, msg='', msgT=0, countdown=3; const zone=()=>{ const T=performance.now(); return (Math.sin(T/260)+1)/2; };
+  let t0=null, last=null, over=false, cool=0, msg='', msgT=0, countdown=3; const zoneJ=mkJit(260), zone=()=>zoneJ(performance.now());
   const go=()=>{ if(over||countdown>0) return; const T=performance.now(); if(T<cool) return; cool=T+350; const z=zone(), d=Math.abs(z-.5); if(d<.08){ me.boost=T+1100; msg='PERFECT!'; snd('coin'); } else if(d<.2){ me.boost=T+500; msg='Good!'; snd('click'); } else { me.slow=T+800; msg='Stumble!'; snd('thud'); } msgT=T; };
   $('mgShoot').onclick=go; cv.onpointerdown=e=>{ e.preventDefault(); go(); }; const kd=e=>{ if(e.code==='Space'&&$('mgOv')){ e.preventDefault(); go(); } }; document.addEventListener('keydown',kd);
   const start=performance.now(); let place=0;
@@ -5890,7 +5890,7 @@ var FAQ=[
  ['Why can\'t I attack someone\'s Town Hall?','town hall locked capture land first','You have to capture all of a kingdom\'s other land before you can attack their Town Hall.'],
  ['How do I train troops?','troops train army soldiers archers barracks','Build Barracks, tap them and pick troops to train. The <b>Lab</b> makes troops stronger. Archers stay home to defend.'],
  ['How do I get a pet?','pet get hatch egg crate','Open a <b>Pet Crate</b> in the Shop. You can also find eggs on the map, win them in events and sometimes dig them up from great treasure maps.'],
- ['How do I level up my pet?','pet grow level up evolve stronger','Open 🐾 Pets and press <b>Grow up</b>. Pets can reach level 100! Your Town Hall limits how high: Town Hall level × 2. Merging two of the same pet also adds a level.'],
+ ['How do I level up my pet?','pet grow level up evolve stronger','Open 🐾 Pets and press <b>Grow up</b>. Pets can reach level 100! Your Town Hall limits how high: Town Hall level × 2. Merging two of the same pet at the same level adds one level.'],
  ['What is the pet obstacle course?','pet course race cup obstacle jump','Open 🎉 Fun ▾ → 🏁 Pet course. Jump over logs and rocks! Practice runs give gold. The <b>Pet Cup</b> races 3 other players\' pets for gems. You can\'t see their levels, so good jumping matters most.'],
  ['What does my pet do?','pet guardian defend power','Your guardian pet sits by your Town Hall and fights attackers and barbarian raids. Keep it fed and happy for a bonus.'],
  ['How do I join a clan?','clan join team friends guild','Open the Clan tab to join or create a clan (Town Hall 2). Clan mates can chat, donate troops, fight the clan boss and send caravans.'],
@@ -6564,7 +6564,7 @@ function petCrateList(){ const rc=['#9aa3ab','#4fb6ff','#b46cff','#ffb020']; ret
 (function(){ const sd=shopDialog; shopDialog=function(tab){ sd(tab); try{ if(shopTab!=='crates') return; const btn=document.querySelector('#shopOv [data-act="crate:pet"]'); const card=btn&&btn.closest('.crateCard'); if(!card||card.querySelector('.pcList')) return; const odds=card.querySelector('.odds'); (odds||card.querySelector('p.desc')).insertAdjacentHTML('afterend',petCrateList()); startPetLoop(); }catch(e){} }; })();
 
 /* ===== v88: gems are harder to earn (every gem reward is 35% smaller) ===== */
-var GEM_MULT=.65, gemAdj=null;
+var GEM_MULT=.45, gemAdj=null;
 function gemScale(me,g0){ const g1=me.gems||0; if(g1>g0){ const gain=g1-g0, ng=Math.max(1,Math.round(gain*GEM_MULT)); me.gems=g0+ng; gemAdj={from:gain,to:ng,t:Date.now()}; } }
 (function(){ const t0=toast; toast=function(t,bad){ try{ if(gemAdj&&Date.now()-gemAdj.t<8000&&typeof t==='string'&&gemAdj.from!==gemAdj.to){ const a=gemAdj, fs=[String(a.from),a.from.toLocaleString()]; for(const s of fs){ const re=new RegExp('(^|[^0-9,])'+s.replace(/,/g,',')+'(\\s*(?:💎|gems?))','g'); if(re.test(t)){ t=t.replace(re,'$1'+a.to+'$2'); break; } } } }catch(e){} return t0(t,bad); }; })();
 
@@ -6589,7 +6589,7 @@ try{ FAQ.push(
  ['How do I sell things?','sell market trade buy price','Open Shop → Market to sell gear, crates, pets or resources to other players, or buy what they list.'],
  ['What do crates give?','crate crates chest open wooden iron royal legendary','Wooden and Stone crates give resources and common gear. Iron and War Chests give better gear. Royal and Legendary crates give rare to legendary gear. Pet Crates always give a pet egg.'],
  ['What is in a Pet Crate?','pet crate egg odds chance rarity dragon phoenix griffin turtle legendary pets get','Open the Shop to see every pet in the Pet Crate with its rarity and chance. Common pets are most likely; the Dragon and Phoenix are legendary and rare to get.'],
- ['How do I merge pets?','merge pets combine same twin','Get two of the same pet, then press Merge in Pets. They become one pet a level higher.'],
+ ['How do I merge pets?','merge pets combine same twin','Get two of the same pet at the same level, then press Merge in Pets. They become one pet one level higher. Pets at different levels can\'t be merged.'],
  ['How do I evolve my pet?','evolve evolution form stage','Pets change form as they grow: Baby, Young, Adult and Legend. Keep growing them to see their next form.'],
  ['How do I make a mixed pet?','hybrid mixed breed breeder mix','Build a Pet Breeder and mix two different pets. Sometimes you get a rare mixed pet!'],
  ['How do I keep my pet happy?','happy feed play pet care hungry','Feed and play with your pet in the Pets window every day. A happy pet gets a small power bonus.'],
@@ -6766,7 +6766,7 @@ var HERO_NEW=[
 (function(){ const hc=heroChibi; heroChibi=function(g,x,y,s,hk,base,t,C){ const H=HEROES[hk]; if(!H||!H.look) return hc(g,x,y,s,hk,base,t,C); const L=H.look; chibi(g,x,y,s,{...base,big:1,...L},t);
   if(L.hat){ const hx=x-(base.dir||1)*s*.02, hy=y-s*.98; g.save(); g.beginPath(); g.moveTo(hx-s*.26,hy); g.quadraticCurveTo(hx,hy-s*.06,hx+s*.26,hy); g.lineTo(hx+s*.05,hy-s*.46); g.quadraticCurveTo(hx+s*.12,hy-s*.54,hx+s*.2,hy-s*.5); g.lineTo(hx-s*.02,hy-s*.52); g.closePath(); g.fillStyle=L.hat; g.fill(); g.lineWidth=Math.max(1,s*.03); g.strokeStyle='rgba(36,22,10,.92)'; g.stroke(); g.restore(); }
   if(L.bow){ const d=base.dir||1, bx=x+d*s*.28, by=y-s*.55; g.save(); g.strokeStyle='#6b3f1c'; g.lineWidth=Math.max(1.5,s*.05); g.beginPath(); g.arc(bx,by,s*.3,d>0?-1.2:Math.PI-1.9,d>0?1.2:Math.PI+1.9); g.stroke(); g.restore(); } }; })();
-try{ const f=FAQ.find(x=>x[0]==='How do heroes work?'); if(f){ f[1]+=' witch viking paladin ninja druid samurai valkyrie emperor 20'; f[2]='There are <b>20 heroes</b>: a new one unlocks every 5 Town Hall levels, from the Warlord at Town Hall 5 to the Eternal Emperor at Town Hall 100. Heroes join your attacks and defend your kingdom. Upgrade them and buy hero slots (up to 6) to bring several into battle.'; } }catch(e){}
+try{ const f=FAQ.find(x=>x[0]==='How do heroes work?'); if(f){ f[1]+=' witch viking paladin ninja druid samurai valkyrie emperor 20'; f[2]='There are <b>20 heroes</b>: a new one unlocks every 5 Town Hall levels, from the Warlord at Town Hall 5 to the Eternal Emperor at Town Hall 100. Heroes join your attacks and defend your kingdom. Upgrade them and buy hero slots (up to 3) to bring several into battle.'; } }catch(e){}
 
 /* ===== v91: hero portraits (pets/h_<hero>_card.jpg) ===== */
 var heroArtOk={};
@@ -6798,9 +6798,9 @@ function gdSections(){ const S=[]; const add=(id,ic,name,html)=>S.push({id,ic,na
   add('res','💰','Resources',gdT([['🪙 Gold','Gold Mines (20 per minute per level), raids, quests. Used for almost everything.'],['🪨 Stone','Quarries (12/min/level) and Stone Mines (8/min/level, sometimes give gems). Used for buildings.'],['🍖 Food','Farms (15/min/level). Troops and pets eat food. At 0 food your kingdom starves and slowly loses gold, stone and troops.'],['💎 Gems','Rare! From daily rewards, quests, achievements, events, the maze, arena, Pet Cup and more. Every gem reward is about 35% smaller than shown in older windows.'],['🏆 Trophies','Win player battles to earn them and climb leagues.'],['⭐ XP','From almost everything. Each kingdom level gives a skill point.']],['Resource','How to get it / what it does'])+`<p>Storage limits rise with your Town Hall. Golden hour (a few times a week, 10 minutes) doubles everything you make.</p>`);
   add('build','🏗️','Buildings',gdT(Object.entries(B).filter(([k,b])=>b&&b.name&&k!=='hallx'&&k!=='deco').map(([k,b])=>[`<b>${esc(b.name)}</b>`,gdC(b.cost),b.th?'TH '+b.th:'TH 1',esc(b.desc||'')]),['Building','Cost','Needs','What it does'])+`<p>Buildings go up to level 12 (your Town Hall level +1). Each builder works on one thing at a time.</p>`);
   add('troops','⚔️','Troops',gdT(Object.entries(UNITS).map(([k,u])=>[`<b>${esc(u.name)}</b>`,gdC(u.cost),u.atk,u.def,u.sp,'TH '+(u.th||1),esc(u.desc||'')]),['Troop','Cost','Attack','Defense','Space','Needs','About']));
-  add('heroes','🦸','Heroes',gdT(HERO_KEYS.map(k=>{ const H=HEROES[k]; return [heroPic(k,'gdPic')+`<b>${esc(H.name)}</b>`,'TH '+H.th,gdC(H.cost),`${H.pIc} ${esc(H.power)} (${H.pTxt})`,esc(H.desc)]; }),['Hero','Unlocks','Cost','Power','About'])+`<p>Buy up to 6 hero slots to bring several heroes into battle. Mounts (War Horse TH 3, Sky Griffin TH 6, Hero Dragon TH 10) make heroes stronger and armies faster.</p>`);
+  add('heroes','🦸','Heroes',gdT(HERO_KEYS.map(k=>{ const H=HEROES[k]; return [heroPic(k,'gdPic')+`<b>${esc(H.name)}</b>`,'TH '+H.th,gdC(H.cost),`${H.pIc} ${esc(H.power)} (${H.pTxt})`,esc(H.desc)]; }),['Hero','Unlocks','Cost','Power','About'])+`<p>Buy up to 3 hero slots to bring several heroes into battle. Mounts (War Horse TH 3, Sky Griffin TH 6, Hero Dragon TH 10) make heroes stronger and armies faster.</p>`);
   add('pets','🐾','Pets',gdT(Object.keys(PETS_BASE).map(k=>{ const P2=PETS_BASE[k], pr=(PET_CRATE_ODDS.find(x=>x[0]===k)||[])[1]; return [`<b>${esc(P2.name)}</b>`,PET_RAR[P2.r||0],esc(P2.power||''),pr?Math.round(pr*100)+'% in Pet Crate':P2.ev?'Event pet':'Special']; }),['Pet','Rarity','Power','Where'])+
-    `<p><b>Mythic pets:</b> ${Object.values(MYTHS).map(M=>`${esc(M.name)} (${esc(M.power)})`).join(', ')}.</p><ul><li>Pets grow up to <b>level 100</b> (your Town Hall × 2).</li><li>Forms: Baby → Young → Adult → Legend.</li><li>Merge two of the same pet to add a level. A Pet Breeder can make rare mixed pets.</li><li>Feed and play with pets to keep them happy for a bonus.</li><li>Outfits: ${Object.values(HATS).length} hats, ${typeof ACCS!=='undefined'?Object.values(ACCS).length:0} extras and ${Object.values(AURAS).length} glows.</li></ul>`);
+    `<p><b>Mythic pets:</b> ${Object.values(MYTHS).map(M=>`${esc(M.name)} (${esc(M.power)})`).join(', ')}.</p><ul><li>Pets grow up to <b>level 100</b> (your Town Hall × 2).</li><li>Forms: Baby → Young → Adult → Legend.</li><li>Merge two of the same pet at the same level to add one level. A Pet Breeder can make rare mixed pets.</li><li>Feed and play with pets to keep them happy for a bonus.</li><li>Outfits: ${Object.values(HATS).length} hats, ${typeof ACCS!=='undefined'?Object.values(ACCS).length:0} extras and ${Object.values(AURAS).length} glows.</li></ul>`);
   add('gear','🗡️','Gear & Forge',gdT(Object.values(ITEMS).sort((a,b)=>a.r-b.r).map(I=>[`<b>${esc(I.name)}</b>`,RAR[I.r].name,SLOTS[I.slot],esc(itemText(I))]),['Gear','Rarity','Slot','Bonus'])+`<p><b>The Forge:</b> two of the same gear make one buffed piece (+). Buffed gear is stronger than its rarity but weaker than the next, and can't be forged again.</p>`);
   add('crates','📦','Crates',gdT(Object.entries(CRATES).map(([k,c])=>[`<b>${esc(c.name)}</b>`,gdC(c.cost),'TH '+(c.th||1),esc(c.desc||'')]),['Crate','Price','Needs','What\'s inside']));
   add('battle','🛡️','Battles',`<ul><li>Attack barbarian camps or other kingdoms within your <b>march range</b> (15 tiles, upgradable to 36).</li><li>Attacking from more sides gives bonus attack. Catapults, Wall Breakers and rams break defenses.</li><li>You must capture all of a kingdom's other land before attacking its Town Hall.</li><li>You can't attack clanmates, allies, newcomers or shielded kingdoms.</li><li>Spells: Rage (stronger) and Heal (fewer losses) from the Spell Tower.</li><li>Wins give 1–3 stars. Taking a Town Hall always gives 3.</li><li><b>Open battles:</b> call one on a kingdom (TH 4+). It starts in 3 minutes, and anyone nearby can join either side with half their attacking troops.</li><li><b>Bounties:</b> put gold on a kingdom (TH 3+). The first player to beat it claims the gold.</li><li>Barbarian camps near you sometimes raid you. On full moons raids come twice as often.</li></ul>`);
@@ -6989,16 +6989,16 @@ function saAnswer(q){ const qn=saNorm(q); if(!qn) return []; if(!SA_IDX) saBuild
 try{ FAQ.push(['What can I ask the question bar?','search ask question bar odds chance','Almost anything! Try "chance of a dragon pet", "odds of epic gear in an iron crate", "what unlocks at town hall 20", "how much does a farm cost", "farm level 5", "strongest troop", "all heroes", or just type a name like "Witch" or "Golden Koi".']); }catch(e){}
 /* ===== v92: chat spam filter ===== */
 var SPAM_H=[], SPAM_STRIKES=[], spamMute=0;
-function spamFix(t){ try{ return String(t||'').replace(/(.)\1{3,}/gu,'$1$1$1').replace(/\b(\w+)((?:\s+\1\b){3,})/gi,'$1 $1 $1'); }catch(e){ return String(t||''); } }
+function spamFix(t){ try{ return String(t||'').replace(/(.)\1{6,}/gu,'$1$1$1$1$1$1').replace(/\b(\w+)((?:\s+\1\b){5,})/gi,'$1 $1 $1 $1 $1'); }catch(e){ return String(t||''); } }
 function spamCheck(text){ const tn=Date.now(), n=String(text||'').toLowerCase().replace(/[^\p{L}\p{N}\[\]:]+/gu,''); SPAM_H=SPAM_H.filter(x=>tn-x.t<60000); SPAM_STRIKES=SPAM_STRIKES.filter(t=>tn-t<30000);
-  const strike=msg=>{ SPAM_STRIKES.push(tn); if(SPAM_STRIKES.length>=4){ spamMute=tn+60000; SPAM_STRIKES=[]; return 'Too much spam! Your chat is paused for 1 minute.'; } return msg; };
+  const strike=msg=>{ SPAM_STRIKES.push(tn); if(SPAM_STRIKES.length>=6){ spamMute=tn+20000; SPAM_STRIKES=[]; return 'Too much spam! Your chat is paused for 20 seconds.'; } return msg; };
   if(spamMute>tn) return `Your chat is paused for spamming. Try again in ${Math.ceil((spamMute-tn)/1000)} seconds.`;
-  if(SPAM_H.filter(x=>tn-x.t<10000).length>=4){ spamMute=tn+30000; return 'Whoa, too many messages! Your chat is paused for 30 seconds.'; }
+  if(SPAM_H.filter(x=>tn-x.t<10000).length>=8){ spamMute=tn+10000; return 'Whoa, too many messages! Your chat is paused for 10 seconds.'; }
   const sticker=/^\[s:[a-z0-9_]+\]$/.test(n);
-  if(n&&SPAM_H.some(x=>x.n===n&&tn-x.t<(sticker?10000:45000))) return strike('You just sent that. Try saying something new!');
-  if(n.length>=6&&SPAM_H.filter(x=>tn-x.t<30000&&x.n.length>=6&&(x.n.includes(n)||n.includes(x.n))).length>=2) return strike('That looks like the same message again. Please don\'t spam!');
+  if(n&&SPAM_H.filter(x=>x.n===n&&tn-x.t<(sticker?4000:15000)).length>=(sticker?1:2)) return strike('You just sent that. Try saying something new!');
+  if(n.length>=6&&SPAM_H.filter(x=>tn-x.t<20000&&x.n.length>=6&&(x.n.includes(n)||n.includes(x.n))).length>=4) return strike('That looks like the same message again. Please don\'t spam!');
   SPAM_H.push({t:tn,n}); return null; }
-try{ FAQ.push(['Why can\'t I send a chat message?','chat spam paused muted slow down blocked message','To stop spam, chat blocks sending the same message twice in a row and sending lots of messages very fast. If you keep spamming, your chat pauses for 30 seconds to 1 minute. Long rows of the same letter or word get shortened.']); }catch(e){}
+try{ FAQ.push(['Why can\'t I send a chat message?','chat spam paused muted slow down blocked message','To stop spam, chat blocks sending the exact same message 3 times in a row and sending lots of messages super fast. If you keep spamming, your chat pauses for 10 to 20 seconds. Really long rows of the same letter or word get shortened.']); }catch(e){}
 /* ===== v92: a new dungeon every 10 Town Hall levels ===== */
 var DG_MON0=DG_MON.slice();
 var DG_THEMES=[
@@ -7032,6 +7032,34 @@ function dgThemeSet(){ try{ DG_MON=DG_THEMES[dgThemeIdx()].mon; }catch(e){} }
   else if(T.fx==='gold'){ for(let i=0;i<8;i++){ const x=W*(.06+R(i,1)*.88), y=H*(.5+R(i,2)*.45), r=bT*(.3+R(i,3)*.3); const gl=gg.createRadialGradient(x,y-r*.3,0,x,y,r); gl.addColorStop(0,'#fff2a0'); gl.addColorStop(1,'#c88a10'); gg.fillStyle=gl; gg.beginPath(); gg.ellipse(x,y,r,r*.45,0,Math.PI,0); gg.fill(); } gg.fillStyle='rgba(255,230,120,.9)'; for(let i=0;i<40;i++){ gg.beginPath(); gg.arc(W*R(i,10),H*(.3+R(i,11)*.7),1+R(i,12)*1.6,0,7); gg.fill(); } }
   gg.restore(); }; })();
 try{ FAQ.push(['Does the dungeon change?','dungeon new different change town hall theme frozen lava temple crypt crystal jungle storm shadow dragon lair','Yes! There is a new dungeon every 10 Town Hall levels: Goblin Caves (Town Hall 1 to 9), Frozen Caverns (10), Lava Depths (20), Sunken Temple (30), Haunted Crypt (40), Crystal Mines (50), Jungle Ruins (60), Storm Fortress (70), Shadow Realm (80) and Dragon\'s Lair (90 to 100). Each one has 10 new monsters.']); }catch(e){}
+/* ===== v92: every save is checked against the server rules first, so attacks are never refused ===== */
+var RULE_OTHER_OK=['gold','stone','sol','arc','giant','cav','cat','heal','brk','kn','drg','cc','shield','tr','stats','dead','hero','t','lastSeen','lab','research'];
+var RULE_CAPS={sol:2000,arc:2000,giant:500,cav:800,cat:500,heal:500,brk:800,kn:600,drg:200};
+function rulesFix(id,n,o){ try{ if(typeof isAdmin==='function'&&isAdmin()) return n; const N=(x,k)=>{ const v=x?+x[k]:0; return isFinite(v)?v:0; }, fixed=[], cl=(k,mx)=>{ if(N(n,k)>mx){ n[k]=Math.max(0,Math.floor(mx)); fixed.push(k); } };
+    const same=(a,b)=>{ try{ return JSON.stringify(a)===JSON.stringify(b); }catch(e){ return false; } };
+    if(id===ME){ for(const u in RULE_CAPS) cl(u,RULE_CAPS[u]); cl('heroSlots',3); if(Array.isArray(n.pets)&&n.pets.length>24){ n.pets=n.pets.slice(0,24); fixed.push('pets'); }
+      cl('gold',2e7); cl('stone',2e7); cl('food',2e7);
+      if(o){ cl('gems',N(o,'gems')+300); cl('gold',N(o,'gold')+3e6); cl('stone',N(o,'stone')+3e6); cl('food',N(o,'food')+3e6); cl('tr',N(o,'tr')+60); cl('pres',N(o,'pres')+1); cl('story',N(o,'story')+1); } }
+    else if(o){ for(const k of new Set([...Object.keys(o),...Object.keys(n)])){ if(k==='id'||RULE_OTHER_OK.includes(k)) continue; if(!same(o[k],n[k])){ if(k in o) n[k]=clone(o[k]); else delete n[k]; fixed.push(k); } }
+      cl('gold',N(o,'gold')+2e6); cl('stone',N(o,'stone')+2e6); cl('tr',N(o,'tr')+20); for(const u in RULE_CAPS) cl(u,N(o,u)); }
+    if(fixed.length) console.warn('rulesFix',id===ME?'me':'other',fixed.join(',')); }catch(e){} return n; }
+/* ===== v93: when the server refuses a move, say exactly what it refused ===== */
+function txDiag(L){ try{ if(!L) return ''; const out=[], N=(x,k)=>{ const v=x?x[k]:0; return v==null?0:+v; }, bad=v=>typeof v==='number'&&!isFinite(v), nm=id=>id===ME?'you':((P(id)&&P(id).name)||'a player');
+    for(const id in (L.pw||{})){ const n=L.pw[id], o=(L.po||{})[id], why=[];
+      for(const k of ['gold','stone','tr','gems','food',...Object.keys(RULE_CAPS)]) if(bad(n&&n[k])||bad(o&&o[k])) why.push(k+' is broken');
+      if(id===ME){ for(const u in RULE_CAPS) if(N(n,u)>RULE_CAPS[u]) why.push(u+' over '+RULE_CAPS[u]); if(N(n,'heroSlots')>3) why.push('hero slots'); if((n.pets||[]).length>24) why.push('too many pets'); if(o){ if(N(n,'gems')>N(o,'gems')+300) why.push('gems'); if(N(n,'gold')>N(o,'gold')+3e6) why.push('gold'); if(N(n,'tr')>N(o,'tr')+60) why.push('trophies'); } if(n.banned||(o&&o.banned)) why.push('banned'); }
+      else if(o){ for(const k of new Set([...Object.keys(o),...Object.keys(n)])){ if(k==='id'||RULE_OTHER_OK.includes(k)) continue; if(JSON.stringify(o[k])!==JSON.stringify(n[k])) why.push(k); } for(const u in RULE_CAPS) if(N(n,u)>N(o,u)) why.push(u+' up'); if(N(n,'gold')>N(o,'gold')+2e6) why.push('gold'); if(N(n,'tr')>N(o,'tr')+20) why.push('trophies'); }
+      out.push(nm(id)+(why.length?': '+why.join(', '):''));
+    }
+    const nr=Object.values(L.regs||{}).filter(r=>Object.keys(r.w||{}).length).length; if(nr) out.push(nr+' map area'+(nr>1?'s':'')); const nc=Object.keys(L.cw||{}).length; if(nc) out.push(nc+' clan'); const nmk=Object.keys(L.mw||{}).length; if(nmk) out.push('market');
+    return out.join(' · '); }catch(e){ return ''; } }
+/* ===== v93: if one kingdom's save is broken, the battle still works (their kingdom just isn't changed) ===== */
+var TX_SKIP_OTHER=false;
+(function(){ const rf=rulesFix; rulesFix=function(id,n,o){ try{ if(id===ME&&n) for(const k of ['gold','stone','food','gems','tr','pres','story','heroSlots',...Object.keys(RULE_CAPS)]) if(k in n&&(n[k]===null||(typeof n[k]==='number'&&!isFinite(n[k])))) n[k]=0; }catch(e){} return rf(id,n,o); }; })();
+var MG_NERF=.5;
+/* ===== v93: timing games change speed all the time, so you can't just count a rhythm ===== */
+function mkJit(base){ let ph=0, last=null, sp=1, goal=1, next=0; return (T,mult)=>{ if(last===null){ last=T; next=T+300+Math.random()*500; } let dt=T-last; if(dt<0) dt=0; if(dt>200) dt=200; last=T;
+    if(T>=next){ goal=.5+Math.random()*1.25; if(Math.random()<.18) goal=-goal*.8; next=T+250+Math.random()*700; } sp+=(goal-sp)*Math.min(1,dt/180); ph+=dt*sp*(mult||1)/base; return (Math.sin(ph)+1)/2; }; }
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
 var SITES={vein:{name:'Gold Vein',ic:'⛏️',desc:'+25% gold from your Town Hall and Gold Mines.'},well:{name:'Magic Well',ic:'🔮',desc:'+25% food from your Town Hall and Farms.'},ruins:{name:'Ancient Ruins',ic:'🏛️',desc:'Search them once a day for 10 gems.'},grove:{name:'Crystal Grove',ic:'💎',desc:'+10% attack for your whole army.'}};
@@ -7071,7 +7099,7 @@ function shipArt(x,y,s,col,dir,T){ const bob=RM?0:Math.sin(T/500+x)*s*.03; ctx.s
 /* ===== v66: pet outfits ===== */
 var HATS={crown:{name:'Golden Crown',ic:'👑',gems:0,how:'Day 30 of the monthly calendar'},top:{name:'Top Hat',ic:'🎩',gems:25},party:{name:'Party Hat',ic:'🥳',gems:15},wizard:{name:'Wizard Hat',ic:'🧙',gems:40},viking:{name:'Viking Helmet',ic:'⚔️',gems:50},flower:{name:'Flower Crown',ic:'🌸',gems:20},pumpkin:{name:'Pumpkin Hat',ic:'🎃',gems:0,how:'Halloween holiday gift'},santa:{name:'Santa Hat',ic:'🎅',gems:0,how:'Christmas holiday gift'}};
 var AURAS={gold:{name:'Golden Glow',col:'255,210,80',gems:30},frost:{name:'Frost Glow',col:'130,210,255',gems:30},shadow:{name:'Shadow Glow',col:'170,110,255',gems:35},rainbow:{name:'Rainbow Glow',col:'rainbow',gems:60}};
-var HEAD={fox:[.86,.08],owl:[.5,.06],wolf:[.8,.05],bear:[.8,.1],turtle:[.88,.28],griffin:[.82,.08],dragon:[.82,.06],phoenix:[.72,.14],ghostcat:[.83,.06],yeti:[.62,.06],bunny:[.6,.2],sunlion:[.82,.08]};
+var HEAD={fox:[.82,.04],owl:[.57,.03],wolf:[.8,.03],bear:[.72,.05],turtle:[.85,.25],griffin:[.88,.04],dragon:[.82,.07],phoenix:[.73,.08],ghostcat:[.8,.03],yeti:[.7,.06],bunny:[.62,.18],sunlion:[.78,.06]};
 function drawHat(c,hx,hy,s,hat){ c.save(); c.translate(hx,hy); c.lineWidth=Math.max(.6,s*.05); c.strokeStyle='#2a1a0c';
   if(hat==='crown'){ c.fillStyle='#ffd13b'; c.beginPath(); c.moveTo(-s*.5,0); c.lineTo(-s*.5,-s*.45); c.lineTo(-s*.25,-s*.2); c.lineTo(0,-s*.6); c.lineTo(s*.25,-s*.2); c.lineTo(s*.5,-s*.45); c.lineTo(s*.5,0); c.closePath(); c.fill(); c.stroke(); c.fillStyle='#e8402f'; c.beginPath(); c.arc(0,-s*.15,s*.08,0,7); c.fill(); }
   else if(hat==='top'){ c.fillStyle='#1a1a22'; c.fillRect(-s*.5,-s*.08,s,s*.12); c.strokeRect(-s*.5,-s*.08,s,s*.12); c.fillRect(-s*.3,-s*.75,s*.6,s*.7); c.strokeRect(-s*.3,-s*.75,s*.6,s*.7); c.fillStyle='#c4402f'; c.fillRect(-s*.3,-s*.22,s*.6,s*.12); }
@@ -7224,7 +7252,8 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
-  92:['👹 The World Boss and the Siege castle now have 1 million HP for every active player, up to 20 million','🔎 The question bar is much smarter: ask about crate odds, the chance of any pet or gear, what unlocks at any Town Hall, costs, the strongest troops, and almost anything else','🥚 Wild eggs, star rocks and meteor showers show up less often','🙅 No more emojis in battles','🕳️ A brand new dungeon every 10 Town Hall levels: Frozen Caverns, Lava Depths, Sunken Temple, Haunted Crypt, Crystal Mines, Jungle Ruins, Storm Fortress, Shadow Realm and Dragon\'s Lair, each with 10 new monsters','🛡️ Chat now has a spam filter: no sending the same message over and over or flooding the chat'],
+  93:['🛡️ The chat spam filter is less strict: you can repeat a message once, send messages faster, and pauses are much shorter','🐛 If the server ever refuses a move, the message now says exactly what was refused, so it can be fixed fast','🐛 Fixed battles against one kingdom being refused by the server','💎 Gems are harder to earn (prices stay the same)','🎯 Mini-game rewards are smaller','🎲 Jousting, horse racing and archery now speed up, slow down and even switch direction at random, so you can\'t just learn a rhythm'],
+  92:['👹 The World Boss and the Siege castle now have 1 million HP for every active player, up to 20 million','🔎 The question bar is much smarter: ask about crate odds, the chance of any pet or gear, what unlocks at any Town Hall, costs, the strongest troops, and almost anything else','🥚 Wild eggs, star rocks and meteor showers show up less often','🙅 No more emojis in battles','🕳️ A brand new dungeon every 10 Town Hall levels: Frozen Caverns, Lava Depths, Sunken Temple, Haunted Crypt, Crystal Mines, Jungle Ruins, Storm Fortress, Shadow Realm and Dragon\'s Lair, each with 10 new monsters','🐛 Fixed the “server refused that move” error when attacking some players','🐾 Brand new pictures for all 12 pets','🛡️ Chat now has a spam filter: no sending the same message over and over or flooding the chat'],
   91:['🦸 All 20 heroes have their own portraits, and a welcome card when you recruit one','🌋 The volcano now appears at least 7 tiles from anyone\'s land and 3 tiles from lakes and forests','📚 Game Guide: a button at the top takes you to every fact about the game, sorted into tabs'],
   90:['🦸 20 heroes! A new hero unlocks every 5 Town Hall levels, all the way to the Eternal Emperor at Town Hall 100','➕ Up to 6 hero slots'],
   89:['📯 Open battles: call a battle on a kingdom, and anyone nearby can join the attack or help defend','🔧 Fixed: the Daily explorer and the Siege were sharing the same save spot and could reset each other'],
@@ -7466,12 +7495,12 @@ function gamesDialog(){ const m=P(ME); if(!m) return; const a=mgRec(m,'arch'), j
     <div class="mgCard"><h3>🐎 Horse race</h3><p class="desc">Race 3 other riders! Tap in the green zone to gallop faster. Finish first for the best prize.</p><div class="stat"><span>Plays left today</span><span>${MG_PLAYS-mgRec(m,'race').plays}</span></div>${btn('Start the race',null,'mg:race','war')}<div class="label">Fastest riders</div>${bl('race','pts')}</div>
     <div class="mgCard"><h3>🏹 Goblin defense</h3><p class="desc">Build towers along the road and stop 8 waves of goblins before they reach your castle!</p><div class="stat"><span>Plays left today</span><span>${MG_PLAYS-mgRec(m,'td').plays}</span></div>${btn('Defend the castle',null,'mg:td','war')}<div class="label">Best defenders</div>${bl('td','pts')}</div></div>
     <button class="soft" data-act="ov:close">Close</button></div></div>`; }
-function mgSave(k,score,won,rew){ return new Promise(res=>{ act([],me=>{ const r=mgRec(me,k); if(r.plays>=MG_PLAYS) fail('No plays left today. Come back tomorrow!'); const o=me[k]&&me[k].wk===r.wk?me[k]:{}; me[k]={wk:r.wk,day:r.d,plays:r.plays+1,best:Math.max(r.best,score),wins:(o.wins||0)+(won?1:0)}; me.mgTop=me.mgTop||{}; me.mgTop[k]=Math.max(me.mgTop[k]||0,score); if(won) me.mgTop.jw=(me.mgTop.jw||0)+1; settle(me); me.gold+=rew.gold||0; me.gems=(me.gems||0)+(rew.gems||0); me.food=(me.food||0)+(rew.food||0); return {}; },()=>res(true)); }); }
+function mgSave(k,score,won,rew){ try{ if(rew){ if(rew.gold>0) rew.gold=Math.round(rew.gold*MG_NERF); if(rew.gems>0) rew.gems=Math.floor(rew.gems*MG_NERF); if(rew.food>0) rew.food=Math.round(rew.food*MG_NERF); } }catch(e){} return new Promise(res=>{ act([],me=>{ const r=mgRec(me,k); if(r.plays>=MG_PLAYS) fail('No plays left today. Come back tomorrow!'); const o=me[k]&&me[k].wk===r.wk?me[k]:{}; me[k]={wk:r.wk,day:r.d,plays:r.plays+1,best:Math.max(r.best,score),wins:(o.wins||0)+(won?1:0)}; me.mgTop=me.mgTop||{}; me.mgTop[k]=Math.max(me.mgTop[k]||0,score); if(won) me.mgTop.jw=(me.mgTop.jw||0)+1; settle(me); me.gold+=rew.gold||0; me.gems=(me.gems||0)+(rew.gems||0); me.food=(me.food||0)+(rew.food||0); return {}; },()=>res(true)); }); }
 function archery(){ const m=P(ME); if(mgRec(m,'arch').plays>=MG_PLAYS) return toast('No archery plays left today. Come back tomorrow!',true);
   $('ov').innerHTML=`<div class="overlay" id="mgOv"><div class="dialog wide"><h2>🏹 Archery</h2><canvas id="mgCv" style="width:100%;height:300px;border-radius:12px;border:3px solid var(--woodd);touch-action:none;cursor:crosshair"></canvas><p class="desc" id="mgInfo">Tap the target (or press Space) to shoot. The wind pushes your arrow!</p><button class="war" id="mgShoot">🏹 Shoot!</button></div></div>`;
   const cv=$('mgCv'), dpr=Math.min(2,window.devicePixelRatio||1), W=cv.clientWidth, H=300; cv.width=W*dpr; cv.height=H*dpr; const g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
   let arrows=5, score=0, hits=[], fly=null, wind=(Math.random()-.5)*2, t0=performance.now(), over=false;
-  const tgt=T=>({x:W/2+Math.sin((T-t0)/(900-score*6))*W*.28,y:H*.42,r:54});
+  const tgtJ=mkJit(900), tgt=T=>({x:W/2+(tgtJ(T,900/(900-score*6))*2-1)*W*.28,y:H*.42,r:54});
   const shoot=()=>{ if(fly||over) return; const T=performance.now(), tg=tgt(T); fly={t:T,tx:W/2,ty:H*.42,aimX:tg.x}; snd('click'); };
   $('mgShoot').onclick=shoot; cv.onpointerdown=e=>{ e.preventDefault(); shoot(); }; const kd=e=>{ if(e.code==='Space'&&$('mgOv')){ e.preventDefault(); shoot(); } }; document.addEventListener('keydown',kd);
   const loop=()=>{ if(!$('mgCv')){ document.removeEventListener('keydown',kd); return; } const T=performance.now(); g.clearRect(0,0,W,H);
@@ -7487,12 +7516,12 @@ function archery(){ const m=P(ME); if(mgRec(m,'arch').plays>=MG_PLAYS) return to
 const NPC_KNIGHTS=[{id:'npc1',name:'Sir Bramble (training knight)',best:12},{id:'npc2',name:'Lady Vex the Swift',best:20},{id:'npc3',name:'The Iron Baron',best:26}];
 function joustPick(){ const m=P(ME); if(mgRec(m,'joust').plays>=MG_PLAYS) return toast('No jousts left today. Come back tomorrow!',true); const wk=weekId();
   const riv=[...NPC_KNIGHTS,...Object.values(G.players).filter(p=>p.id!==ME&&!p.dead&&!p.banned&&p.joust&&p.joust.wk===wk&&p.joust.best).map(p=>({id:p.id,name:p.name,best:p.joust.best}))].slice(0,12);
-  $('ov').innerHTML=`<div class="overlay"><div class="dialog"><h2>🐎 Pick a rival</h2><p class="desc">Beat a player's best score to win <b>1,200 gold and 3 gems</b> (training knights give 600 gold). Entry costs 200 gold.</p><div class="board">${riv.map(r=>`<div><span>${esc(cleanText(r.name))}</span><span>best ${r.best}</span><span>${btn('Joust!',{gold:200},'mg:jv:'+r.id,'war')}</span></div>`).join('')}</div><button class="soft" data-act="mg:games">Back</button></div></div>`; refreshButtons(); }
+  $('ov').innerHTML=`<div class="overlay"><div class="dialog"><h2>🐎 Pick a rival</h2><p class="desc">Beat a player's best score to win <b>700 gold and 1 gem</b> (training knights give 400 gold). Entry costs 200 gold.</p><div class="board">${riv.map(r=>`<div><span>${esc(cleanText(r.name))}</span><span>best ${r.best}</span><span>${btn('Joust!',{gold:200},'mg:jv:'+r.id,'war')}</span></div>`).join('')}</div><button class="soft" data-act="mg:games">Back</button></div></div>`; refreshButtons(); }
 function joust(rid){ const r=NPC_KNIGHTS.find(x=>x.id===rid)||(P(rid)?{id:rid,name:P(rid).name,best:P(rid).joust?.best||10}:null); if(!r) return; const m=P(ME); if((cur(m).gold||0)<200) return toast('You need 200 gold to enter.',true);
   $('ov').innerHTML=`<div class="overlay" id="mgOv"><div class="dialog wide"><h2>🐎 Joust vs ${esc(cleanText(r.name))}</h2><canvas id="mgCv" style="width:100%;height:240px;border-radius:12px;border:3px solid var(--woodd);touch-action:none"></canvas><p class="desc" id="mgInfo">Tap when the marker is in the <b>gold zone</b>! 3 passes. Score to beat: <b>${r.best}</b></p><button class="war" id="mgShoot">🗡️ Strike!</button></div></div>`;
   const cv=$('mgCv'), dpr=Math.min(2,window.devicePixelRatio||1), W=cv.clientWidth, H=240; cv.width=W*dpr; cv.height=H*dpr; const g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0);
   let pass=0, total=0, t0=performance.now(), struck=null, over=false, speed=1;
-  const meter=T=>(Math.sin((T-t0)/(330/speed))+1)/2;
+  const meterJ=mkJit(330), meter=T=>meterJ(T,speed);
   const strike=()=>{ if(struck||over) return; const v=meter(performance.now()), d=Math.abs(v-.5), pts=d<.04?10:d<.1?8:d<.18?5:d<.3?2:0; total+=pts; struck={t:performance.now(),pts}; snd(pts>=8?'boom':'click'); $('mgInfo').textContent=pts===10?'💥 PERFECT HIT! +10':pts?`Hit! +${pts}`:'Missed!'; };
   $('mgShoot').onclick=strike; cv.onpointerdown=e=>{ e.preventDefault(); strike(); }; const kd=e=>{ if(e.code==='Space'&&$('mgOv')){ e.preventDefault(); strike(); } }; document.addEventListener('keydown',kd);
   const knight=(x,y,dir,col)=>{ g.save(); g.translate(x,y); g.scale(dir,1); g.fillStyle='#6b4a2a'; g.beginPath(); g.ellipse(0,0,34,16,0,0,7); g.fill(); g.fillRect(-30,8,6,22); g.fillRect(-12,8,6,22); g.fillRect(8,8,6,22); g.fillRect(22,8,6,22); g.beginPath(); g.ellipse(36,-14,12,9,-.6,0,7); g.fill();
@@ -7504,7 +7533,7 @@ function joust(rid){ const r=NPC_KNIGHTS.find(x=>x.id===rid)||(P(rid)?{id:rid,na
     if(!struck&&!over){ const v=meter(T); g.fillStyle='#e8402f'; g.fillRect(mx+mw*v-3,my-6,6,28); }
     g.fillStyle='#3b2412'; g.font='bold 15px sans-serif'; g.textAlign='left'; g.fillText(`Pass ${Math.min(3,pass+1)}/3   Score: ${total}   To beat: ${r.best}`,10,H-12);
     if(struck&&T-struck.t>1100){ pass++; struck=null; t0=T; speed+=.35; if(pass>=3){ over=true; const npc=r.id.startsWith('npc'), won=total>r.best, rew=won?(npc?{gold:600-200}:{gold:1200-200,gems:3}):{gold:-200};
-        mgSave('joust',total,won,rew).then(()=>{ $('mgInfo').innerHTML=won?`🏆 <b>You win!</b> ${total} beats ${r.best}. ${npc?'+600 gold!':'+1,200 gold and 3 gems!'}`:`You scored ${total}, but ${esc(cleanText(r.name))} had ${r.best}. Try again!`; $('mgShoot').textContent='Back to games'; $('mgShoot').onclick=()=>gamesDialog(); if(won) snd('win'); }); } }
+        mgSave('joust',total,won,rew).then(()=>{ $('mgInfo').innerHTML=won?`🏆 <b>You win!</b> ${total} beats ${r.best}. +${f((rew.gold||0)+200)} gold${rew.gems?` and ${rew.gems} gem${rew.gems>1?'s':''}`:''}!`:`You scored ${total}, but ${esc(cleanText(r.name))} had ${r.best}. Try again!`; $('mgShoot').textContent='Back to games'; $('mgShoot').onclick=()=>gamesDialog(); if(won) snd('win'); }); } }
     requestAnimationFrame(loop); }; loop(); }
 
 /* ===== owner (admin) panel ===== */
