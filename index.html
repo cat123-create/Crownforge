@@ -420,6 +420,15 @@ body.vet .newGuide,body.vet details.intro{display:none!important}
 .obSides{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;margin:4px 0}.obSides>div{display:flex;flex-direction:column;align-items:center;text-align:center}.obA{background:#ffd9cf;border-radius:10px;padding:6px}.obD{background:#d6e8ff;border-radius:10px;padding:6px}.obVs{font:900 1.3rem var(--display),system-ui;color:#a8301c}.obSides small{font-size:.75rem;color:var(--muted)}
 .heroPic{width:64px;height:54px;object-fit:cover;object-position:center 30%;border-radius:10px;border:2px solid #c9a24a;flex:0 0 auto}.heroPic.dim{filter:grayscale(.85) brightness(.75)}.heroLock{display:flex;gap:8px;align-items:center}.heroRow{flex-wrap:wrap}#gameGuide{margin:12px auto;max-width:1240px}#gdQ{width:100%;box-sizing:border-box;margin:4px 0 6px}.gdTabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px}.gdTabs button{margin:0}.gdBody ul{margin:4px 0;padding-left:20px}.gdBody li{margin:3px 0}.gdTable{overflow-x:auto;margin:4px 0}.gdTable table{border-collapse:collapse;width:100%;font-size:.85rem}.gdTable th{text-align:left;background:#e8d4a8;padding:5px 6px;position:sticky;top:0}.gdTable td{padding:5px 6px;border-bottom:1px dashed #d8c39a;vertical-align:top}.gdPic{width:40px;height:34px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:6px}.gdBoss{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;margin:4px 0}.gdBoss>div{text-align:center}.gdBoss img{width:100%;height:72px;object-fit:cover;border-radius:8px;border:2px solid #c9a24a}.gdBoss small{display:block;font-weight:700}.gdFaq details{border-bottom:1px dashed #d8c39a;padding:4px 0}.gdFaq summary{cursor:pointer;font-weight:700}.heroRow>div{flex:1 1 180px!important}@media (max-width:600px){.heroRow>button,.heroRow>.row{flex:1 1 100%}}.heroBig{width:min(320px,85vw);border-radius:14px;border:4px solid #ffd13b;box-shadow:0 6px 20px rgba(0,0,0,.35);display:block;margin:6px auto}
 .saBox{margin:0 0 10px}.askA ul,.askA ol{margin:4px 0 4px 18px;padding:0}.askA li{margin:2px 0}.askA p{margin:4px 0}.askA small{opacity:.75}.dgThemeP{margin:0 0 6px;font-weight:600}.dgThemeP small{display:block;font-weight:400;opacity:.85}
+/* v94: tidier buttons */
+button{justify-content:center}
+button.mini,button.hbtn,.gdTabs button,#navRow button,.row>button.soft,.row>button.prime,.row>button.war,.row>button.gemb{align-items:center;text-align:center}
+button.mini{min-height:0}
+.gdTabs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.gdTabs button{margin:0!important;min-height:32px;padding:4px 10px 5px;font-size:.78rem}
+#navRow{gap:6px}
+#navRow button{margin:0}
+@media (max-width:600px){ .bnav button{align-items:center;text-align:center;white-space:nowrap;padding-left:4px;padding-right:4px} .gdTabs button{min-height:34px;font-size:.74rem;padding:4px 8px} button.mini{min-height:34px} }
 </style>
 </head>
 <body>
@@ -536,7 +545,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 93;
+const GAME_VERSION = 95;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -3592,7 +3601,7 @@ const petGrowHall=l=>Math.min(HALL_MAX,l+1);           // town hall needed to gr
 /* Draws a pet standing at (x,y) (feet), s = adult height in pixels. o: {lvl, dir, act (0..1 attack lunge), ph, sleep} */
 /* Pet pictures: if a file like pets/dragon.png is uploaded next to index.html, the game uses it instead of the drawn pet. */
 /* Painted pet pictures (made for Crownforge). Each one is a small WebP image stored right here, so nothing extra needs uploading. */
-var PET_DIR='pets/'; (function(){ const t=new Image(); t.onerror=()=>{ const t2=new Image(); t2.onload=()=>{ PET_DIR='pets/pets/'; try{ for(const k in petImgs) delete petImgs[k]; petSprC.clear(); fpetC.clear(); }catch(e){} try{ draw(); }catch(e){} }; t2.src='pets/pets/fox.webp'; }; t.src='pets/fox.webp'; })();
+var PET_DIR='pets/'; (function(){ const t=new Image(); t.onerror=()=>{ const t2=new Image(); t2.onload=()=>{ PET_DIR='pets/pets/'; try{ for(const k in petImgs) delete petImgs[k]; petSprC.clear(); fpetC.clear(); }catch(e){} try{ draw(); }catch(e){} }; t2.onerror=()=>{ const t3=new Image(); t3.onload=()=>{ try{ petDirFix(''); }catch(e){} }; t3.src='fox.webp'; }; t2.src='pets/pets/fox.webp'; }; t.src='pets/fox.webp'; })();
 const PET_PICS={}; /* v81: pet pictures now live in the pets/ folder next to index.html */
 var petImgs={};
 const PICMODE={wolf:'walk',bear:'walk',griffin:'walk',dragon:'walk',sunlion:'walk',turtle:'crawl',fox:'walk',bunny:'hop',ghostcat:'walk',yeti:'walk',owl:'fly',phoenix:'fly'};
@@ -7060,6 +7069,12 @@ var MG_NERF=.5;
 /* ===== v93: timing games change speed all the time, so you can't just count a rhythm ===== */
 function mkJit(base){ let ph=0, last=null, sp=1, goal=1, next=0; return (T,mult)=>{ if(last===null){ last=T; next=T+300+Math.random()*500; } let dt=T-last; if(dt<0) dt=0; if(dt>200) dt=200; last=T;
     if(T>=next){ goal=.5+Math.random()*1.25; if(Math.random()<.18) goal=-goal*.8; next=T+250+Math.random()*700; } sp+=(goal-sp)*Math.min(1,dt/180); ph+=dt*sp*(mult||1)/base; return (Math.sin(ph)+1)/2; }; }
+/* ===== v95: pictures also work when they are uploaded straight into the main folder ===== */
+function petDirFix(dir){ PET_DIR=dir; try{ for(const k in petImgs) delete petImgs[k]; petSprC.clear(); fpetC.clear(); }catch(e){}
+  try{ const lists=[[()=>BEASTS,'n','f'],[()=>WB_KINDS,'name','filter'],[()=>CB_KINDS,'name','filter'],[()=>DG_MON0||DG_MON,'n','f']];
+    for(const [get,nk,fk] of lists){ let L; try{ L=get(); }catch(e){ continue; } for(const K of L){ const key=BOSS_ART[K[nk]]; if(!key) continue; const im=new Image(); im.onload=()=>{ bossArtOk[key]=1; K.pic=key; K[fk]='none'; try{ fpetC.clear(); }catch(e){} try{ drawWB.fc=null; }catch(e){} }; im.src=PET_DIR+key+'.webp'; } } }catch(e){}
+  try{ for(const k of HERO_KEYS){ const im=new Image(); im.onload=()=>{ heroArtOk[k]=1; }; im.src=PET_DIR+'h_'+k+'_card.jpg'; } }catch(e){}
+  try{ draw(); }catch(e){} }
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
 var SITES={vein:{name:'Gold Vein',ic:'⛏️',desc:'+25% gold from your Town Hall and Gold Mines.'},well:{name:'Magic Well',ic:'🔮',desc:'+25% food from your Town Hall and Farms.'},ruins:{name:'Ancient Ruins',ic:'🏛️',desc:'Search them once a day for 10 gems.'},grove:{name:'Crystal Grove',ic:'💎',desc:'+10% attack for your whole army.'}};
@@ -7252,6 +7267,8 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  95:['🖼️ Pet and boss pictures now load even if they were uploaded into the main folder instead of a pets folder'],
+  94:['🧹 Cleaner buttons: text now sits in the middle of every button, and the guide tabs are neater'],
   93:['🛡️ The chat spam filter is less strict: you can repeat a message once, send messages faster, and pauses are much shorter','🐛 If the server ever refuses a move, the message now says exactly what was refused, so it can be fixed fast','🐛 Fixed battles against one kingdom being refused by the server','💎 Gems are harder to earn (prices stay the same)','🎯 Mini-game rewards are smaller','🎲 Jousting, horse racing and archery now speed up, slow down and even switch direction at random, so you can\'t just learn a rhythm'],
   92:['👹 The World Boss and the Siege castle now have 1 million HP for every active player, up to 20 million','🔎 The question bar is much smarter: ask about crate odds, the chance of any pet or gear, what unlocks at any Town Hall, costs, the strongest troops, and almost anything else','🥚 Wild eggs, star rocks and meteor showers show up less often','🙅 No more emojis in battles','🕳️ A brand new dungeon every 10 Town Hall levels: Frozen Caverns, Lava Depths, Sunken Temple, Haunted Crypt, Crystal Mines, Jungle Ruins, Storm Fortress, Shadow Realm and Dragon\'s Lair, each with 10 new monsters','🐛 Fixed the “server refused that move” error when attacking some players','🐾 Brand new pictures for all 12 pets','🛡️ Chat now has a spam filter: no sending the same message over and over or flooding the chat'],
   91:['🦸 All 20 heroes have their own portraits, and a welcome card when you recruit one','🌋 The volcano now appears at least 7 tiles from anyone\'s land and 3 tiles from lakes and forests','📚 Game Guide: a button at the top takes you to every fact about the game, sorted into tabs'],
