@@ -429,6 +429,7 @@ button.mini{min-height:0}
 #navRow{gap:6px}
 #navRow button{margin:0}
 @media (max-width:600px){ .bnav button{align-items:center;text-align:center;white-space:nowrap;padding-left:4px;padding-right:4px} .gdTabs button{min-height:34px;font-size:.74rem;padding:4px 8px} button.mini{min-height:34px} }
+body.chatOff .card.near,body.chatOff #chatLog,body.chatOff #chatForm,body.chatOff #bMsg{display:none!important}
 </style>
 </head>
 <body>
@@ -475,7 +476,7 @@ button.mini{min-height:0}
       <div class="card" data-t="more"><div class="label">War report</div><ul class="log" id="log"></ul></div>
       <div class="card" data-t="more"><div class="label">⚙️ Settings</div>
         <div class="setRow"><button class="prime" data-act="settings">⚙️ All settings</button>
-          <button id="bAlert" class="soft">Alerts: off</button><button id="bStyle" class="soft">Style: Realistic</button><button id="bGfx" class="soft">Graphics: Auto</button><button id="bSound" class="soft">Sound: on</button><button id="bMusic" class="soft">Music: off</button><button class="soft" data-act="tut:again">Replay tutorial</button><button class="soft" data-act="help">How to play</button>
+          <button id="bAlert" class="soft">Alerts: off</button><button id="bStyle" class="soft">Style: Realistic</button><button id="bGfx" class="soft">Graphics: Auto</button><button id="bSound" class="soft">Sound: on</button><button id="bMusic" class="soft">Music: off</button><button id="bChatOn" class="soft" data-act="v97:chat">Chat: on</button><button id="bMsgAl" class="soft" data-act="v97:alerts">Message alerts: on</button><button class="soft" data-act="tut:again">Replay tutorial</button><button class="soft" data-act="help">How to play</button>
           <button id="bNewAcct" class="soft">New account</button><button id="bChg" class="soft">Change account</button>
           <button id="bAbandon" class="war">Abandon kingdom</button>
         </div>
@@ -545,7 +546,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 95;
+const GAME_VERSION = 97;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -645,7 +646,8 @@ const COLORS=['#ffd13b','#4fb6ff','#f4f0e4','#7ee04f','#c77dff','#ff9a3c','#3fe0
 let N=WORLD.size, ME=null, DB=null, sel=null, hover=null, busy=false, playersReady=false, regionsReady=false, inbox=[], sessionStart=Date.now();
 const G={n:WORLD.size,seed:WORLD.seed,lakes:true,players:{},plots:{},clans:{},muted:false};
 try{ G.muted=localStorage.getItem('iron-acre-muted')==='1'; }catch(e){}
-const now=()=>Date.now();
+var CLOCK_OFF=0; const now=()=>Date.now()+CLOCK_OFF;
+try{ if(/^https?:/.test(location.protocol)) fetch(location.href.split('#')[0],{method:'HEAD',cache:'no-store'}).then(r=>{ const d=Date.parse(r.headers.get('Date')||''); if(d){ const off=d-Date.now(); if(Math.abs(off)>90000) CLOCK_OFF=off; } }).catch(()=>{}); }catch(e){}
 const $=id=>document.getElementById(id);
 /* ----- word filter for names and chat ----- */
 const BAD_START=['fuck','shit','bitch','cunt','nigg','fagg','motherf','asshole','dickhead','bullshit','whore','slut','retard','jackass','dumbass','wanker'];
@@ -876,7 +878,7 @@ function firebaseBackend(){
       };
       const out=await fn(t);
       const same=(a,b)=>{ try{ return JSON.stringify(a)===JSON.stringify(b); }catch(e){ return false; } };
-      for(const id in pw){ const o=po[id]; if(id!==ME&&TX_SKIP_OTHER) continue; try{ pw[id]=rulesFix(id,pw[id],o); }catch(e){} if(id===ME||!o){ tr.set(PL.doc(id),pw[id]); continue; }
+      for(const id in pw){ const o=po[id]; if(id!==ME&&(TX_SKIP_OTHER||TX_LVL>=3)) continue; if(id!==ME&&TX_LVL>=1&&o){ try{ pw[id]=txMin(pw[id],o,TX_LVL); }catch(e){} } try{ pw[id]=rulesFix(id,pw[id],o); }catch(e){} if(id===ME||!o){ tr.set(PL.doc(id),pw[id]); continue; }
         const up={}; for(const k of new Set([...Object.keys(o),...Object.keys(pw[id])])){ if(k==='id') continue; if(!(k in pw[id])) up[k]=FV.delete(); else if(!same(o[k],pw[id][k])) up[k]=pw[id][k]; }
         if(Object.keys(up).length) tr.update(PL.doc(id),up); }
       for(const id in cw) cw[id]===null?tr.delete(CL.doc(id)):tr.set(CL.doc(id),cw[id]);
@@ -886,7 +888,7 @@ function firebaseBackend(){
         if(r.exists){ const up={}; ks.forEach(k=>up['p.'+k]=r.w[k]===null?FV.delete():r.w[k]); tr.update(RG.doc(rk),up); }
         else { const p={}; ks.forEach(k=>{ if(r.w[k]!==null) p[k]=r.w[k]; }); tr.set(RG.doc(rk),{p}); } }
       return out;
-    }).then(out=>{ applyLocal(last); return out; },e=>{ try{ if(/permission/i.test(String((e&&e.code)||'')+String((e&&e.message)||''))){ e.cfDiag=txDiag(last); console.warn('refused',e.cfDiag); if(!TX_SKIP_OTHER&&last&&Object.keys(last.pw||{}).some(id=>id!==ME)){ TX_SKIP_OTHER=true; return DB.tx(fn).finally(()=>{ TX_SKIP_OTHER=false; }); } } }catch(x){} throw e; }); }
+    }).then(out=>{ applyLocal(last); return out; },e=>{ try{ if(/permission/i.test(String((e&&e.code)||'')+String((e&&e.message)||''))){ e.cfDiag=txDiag(last); console.warn('refused',e.cfDiag); if(TX_LVL<3&&last&&Object.keys(last.pw||{}).some(id=>id!==ME)){ TX_LVL++; console.warn('retry level',TX_LVL); return DB.tx(fn).finally(()=>{ TX_LVL=Math.max(0,TX_LVL-1); }); } } }catch(x){} throw e; }); }
   };
 }
 const PREVIEW_KEY='iron-acre-device-'+WORLD.id, CUR_KEY='iron-acre-device-current-'+WORLD.id;
@@ -1171,7 +1173,7 @@ async function attack(cell,opts){
       const reg=await t.getRegion(regionOf(cell)); const tg=reg[cell]?normalize(clone(reg[cell])):null; if(!tg||tg.o===ME) fail('That tile changed hands. Take another look.');
       const myC=me.clan?await t.getClan(me.clan):null;
       let v=null, isHall=false, vRegs=[];
-      if(tg.o!=='npc'){ v=await t.getPlayer(tg.o); if(!v||v.dead) fail('That kingdom is gone.'); if((v.shield||0)>now()) fail(`${v.name} is under a peace shield.`);
+      if(tg.o!=='npc'){ v=await t.getPlayer(tg.o); if(!v||v.dead) fail('That kingdom is gone.'); if((v.shield||0)>now()) fail(`${v.name} is under a peace shield.`); atkLogCheck(me,v);
         if(me.clan&&v.clan===me.clan&&clanHas(me.clan,v.id)&&clanHas(me.clan,ME)) fail('You cannot attack your own clanmates.'); if(areAllied(ME,v.id)) fail('Their clan is allied with yours.'); if(isNewbie(v)) fail(`${v.name} is a newcomer and still protected.`); isHall=tg.b==='hall';
         if(rvg){ me.rev=me.rev||[]; if(me.rev.includes(opts.revenge)) fail('You already took your revenge.'); me.rev=[...me.rev.slice(-19),opts.revenge]; }
         if(!exposedTile(cell,v.id,reg)) fail(`That tile is surrounded by ${v.name}'s land. Capture a tile on the edge of their kingdom first to open a path.`);
@@ -1179,7 +1181,7 @@ async function attack(cell,opts){
         for(const rk of rks) if(rk!==regionOf(cell)) vRegs.push([rk,await t.getRegion(rk)]); vRegs.push([regionOf(cell),reg]); }
       settle(me); if(sendU) ATK.forEach(u=>{ const n=Math.min(me[u]||0,sendU[u]||0); held[u]=(me[u]||0)-n; me[u]=n; }); const heroOn=heroReady(me), sup=tg.o==='npc'?supTowers(ME,cell):[], supA=sup.reduce((a,q)=>a+TOWER_SUP*q[2],0); if(!attackers(me)&&!heroOn&&!supA) fail('You need an army to attack. Archers only defend.');
       me.sp=me.sp||{}; const rage=castSel.rage&&(me.sp.rage||0)>0, heal=castSel.heal&&(me.sp.heal||0)>0; if(rage) me.sp.rage--; if(heal) me.sp.heal--;
-      const roll=(0.85+Math.random()*0.3)*flankMult(flank)*cryBonus; me.shield=0; me.lastSeen=now();
+      const roll=(0.85+Math.random()*0.3)*flankMult(flank)*cryBonus; if(tg.o!=='npc') me.shield=0; me.lastSeen=now();
       const units={}; ATK.forEach(u=>units[u]=me[u]||0);
       const healF=1-Math.min(.4,.04*(me.heal||0)), brkN=me.brk||0, lossMul=Math.max(.35,(heal?.5:1)*healF*(1-gearBonus(me,'armor')));
       const out={cell,rage,heal,trapped:0,sprung:0,flank,brkUsed:brkN,healers:me.heal||0};
@@ -1235,7 +1237,7 @@ async function attack(cell,opts){
       const extraTxt=(brkN?` ${brkN} wall breaker${brkN>1?'s':''} blew up the defenses.`:'')+(flank>1?` Attacking from ${flank} sides gave +${Math.round((flankMult(flank)-1)*100)}% attack.`:'');
       out.text=(rvg?'Revenge! ':'')+(!win?`Your attack on ${v.name}'s ${what} failed. ${aLost} troops lost.`:isHall?`You conquered ${v.name}! Took all their land, ${f(sg)} gold, ${f(ss)} stone and 25 gems.`:`Captured ${v.name}'s ${what}: +${f(sg)} gold, +${f(ss)} stone, +${f(out.food||0)} food.`)+trapTxt+extraTxt+(out.warStars?` +${out.warStars} clan war stars!`:'');
       out.vText=(vOff?'While you were offline, ':'')+(!win?`${me.name} attacked your ${what} and was beaten back. You lost ${dLost} troops and gained ${trD} trophies.`:isHall?`${me.name} took your Town Hall and everything you owned.`:`${me.name} captured your ${what} and stole ${f(sg)} gold and ${f(ss)} stone. You lost ${-trD} trophies.`)+(out.sprung?` Your traps caught ${out.trapped} of their troops.`:'')+(vOff?' You are now protected until you come back online, and for 15 minutes after that.':'');
-      t.setPlayer(ME,me); t.setPlayer(v.id,v);
+      try{ atkLogAdd(me,v); }catch(e){} t.setPlayer(ME,me); t.setPlayer(v.id,v);
       return out;
     });
   }catch(e){ err=e; }
@@ -6718,8 +6720,8 @@ function obJoin(id,side){ act([OB_CELL],(me,pl)=>{ const b=pl[OB_CELL], x=b&&(b.
     r=>{ snd('march'); toast(r.side==='att'?`⚔️ You joined the attack on ${cleanText(r.on)}! Half your attacking troops marched off.`:`🛡️ You joined the defense of ${cleanText(r.on)}! Half your attacking troops marched off to help.`); obLoad().then(()=>{ renderPanel(true); if($('obOv')) obDialog(id); }); }); }
 function obResolve(id){ const x0=obList().find(y=>y.id===id); if(!x0||x0.res||now()<x0.end) return; const v=P(x0.on); if(!v) return;
   act([OB_CELL],(me,pl)=>{ const b=pl[OB_CELL], x=b&&(b.l||[]).find(y=>y.id===id); if(!x||x.res||now()<x.end) return {skip:1}; const D=Math.round(defOf(v,x.cell,G.plots[x.cell])*.6), A=obPow(x,'att'), H=obPow(x,'def'), roll=.85+Math.random()*.3, win=A*roll>(D+H);
-    x.res={win,A,D:D+H,loot:win?Math.floor((v.gold||0)*.3):0,t:now()}; return {win,x:clone(x)}; },
-    async r=>{ if(!r||r.skip||!r.x) return; if(r.win&&r.x.res.loot>0){ try{ await DB.tx(async t=>{ const vv=await t.getPlayer(r.x.on); if(!vv) return; vv.gold=Math.max(0,(vv.gold||0)-r.x.res.loot); t.setPlayer(r.x.on,vv); }); }catch(e){} }
+    x.res={win,A,D:D+H,loot:win&&!((v.shield||0)>now())?Math.floor((v.gold||0)*.3):0,t:now()}; return {win,x:clone(x)}; },
+    async r=>{ if(!r||r.skip||!r.x) return; if(r.win&&r.x.res.loot>0){ try{ await DB.tx(async t=>{ const vv=await t.getPlayer(r.x.on); if(!vv||(vv.shield||0)>now()) return; vv.gold=Math.max(0,(vv.gold||0)-r.x.res.loot); t.setPlayer(r.x.on,vv); }); }catch(e){} }
       try{ report(r.x.on,r.x.res.win?`⚔️ The open battle on your kingdom was LOST. The attackers took ${f(r.x.res.loot)} gold.`:`🛡️ Your kingdom WON the open battle! The attackers were beaten back.`,r.x.res.win?'bad':'good',r.x.cell); }catch(e){}
       try{ addNews(r.x.res.win?`⚔️ The attackers won the open battle on ${cleanText(r.x.onName)}!`:`🛡️ ${cleanText(r.x.onName)} held off the open battle!`,r.x.res.win?'bad':'good'); }catch(e){} obLoad().then(()=>{ renderPanel(true); if($('obOv')) obDialog(id); }); }); }
 setInterval(()=>{ try{ for(const x of obLive()) if(now()>=x.end&&(obSide(x,ME)||x.on===ME)&&!busy){ obResolve(x.id); break; } }catch(e){} },5000);
@@ -7075,6 +7077,42 @@ function petDirFix(dir){ PET_DIR=dir; try{ for(const k in petImgs) delete petImg
     for(const [get,nk,fk] of lists){ let L; try{ L=get(); }catch(e){ continue; } for(const K of L){ const key=BOSS_ART[K[nk]]; if(!key) continue; const im=new Image(); im.onload=()=>{ bossArtOk[key]=1; K.pic=key; K[fk]='none'; try{ fpetC.clear(); }catch(e){} try{ drawWB.fc=null; }catch(e){} }; im.src=PET_DIR+key+'.webp'; } } }catch(e){}
   try{ for(const k of HERO_KEYS){ const im=new Image(); im.onload=()=>{ heroArtOk[k]=1; }; im.src=PET_DIR+'h_'+k+'_card.jpg'; } }catch(e){}
   try{ draw(); }catch(e){} }
+/* ===== v96: peace shield fixes ===== */
+(function(){ const a0=attack; attack=function(cell,opts){ try{ const tg=G.plots[cell], m=P(ME); if(tg&&tg.o&&tg.o!=='npc'&&tg.o!==ME&&m&&(m.shield||0)>now()) toast('⚠️ Heads up: attacking another player ends your own peace shield.',true); }catch(e){} return a0.apply(this,arguments); }; })();
+try{ FAQ.push(['Why did my peace shield go away?','shield peace protection gone ended broke attacked','Your peace shield ends early if YOU attack another player\'s kingdom. Attacking barbarian camps, bosses and dungeons does NOT end it. New kingdoms get a 2-hour shield, and after someone attacks you, you get a 30-minute shield (longer if you were offline). Clan wars can still attack you while shielded.']); }catch(e){}
+/* ===== v97: explored land stays visible forever ===== */
+var EXP_CH=10, EXP=null, EXP_N=0, EXP_DIRTY=0, EXP_FOR='';
+function expLoad(){ if(!ME) return null; if(EXP&&EXP_FOR===ME) return EXP; EXP_FOR=ME; EXP=new Set(); try{ const s=localStorage.getItem('cf-exp-'+ME); if(s) for(const k of s.split(';')) if(k) EXP.add(k); }catch(e){} EXP_N=EXP.size; return EXP; }
+function expSave(){ if(!EXP||!EXP_DIRTY) return; EXP_DIRTY=0; try{ let a=[...EXP]; if(a.length>40000) a=a.slice(-40000); localStorage.setItem('cf-exp-'+ME,a.join(';')); }catch(e){} }
+function expMark(){ try{ const E=expLoad(); if(!E) return; const cs=fogCenters(); const R=FOG_R-EXP_CH*.75; for(const [cx,cy] of cs){ const x0=Math.floor((cx-R)/EXP_CH), x1=Math.floor((cx+R)/EXP_CH), y0=Math.floor((cy-R)/EXP_CH), y1=Math.floor((cy+R)/EXP_CH);
+    for(let i=x0;i<=x1;i++) for(let j=y0;j<=y1;j++){ const mx=(i+.5)*EXP_CH-cx, my=(j+.5)*EXP_CH-cy; if(mx*mx+my*my<=R*R){ const k=i+','+j; if(!E.has(k)){ E.add(k); EXP_N++; EXP_DIRTY=1; } } } } }catch(e){} }
+setInterval(expMark,2000); setInterval(expSave,10000); window.addEventListener('pagehide',()=>{ try{ expSave(); }catch(e){} });
+(function(){ const st0=seenTile; seenTile=function(x,y){ if(st0(x,y)) return true; const E=EXP; return !!(E&&E.size&&E.has(Math.floor(x/EXP_CH)+','+Math.floor(y/EXP_CH))); }; })();
+function fogExpCut(f){ const E=EXP; if(!E||!E.size) return; const v=view(), cn=[[v.x0,v.y0],[v.x1,v.y0],[v.x0,v.y1],[v.x1,v.y1]].map(([wx,wy])=>{ const a=(wx-OX)/(TW/2), b=(wy-OY)/(TH/2); return [(a+b)/2,(b-a)/2]; });
+  const xs=cn.map(c=>c[0]), ys=cn.map(c=>c[1]), i0=Math.floor(Math.min(...xs)/EXP_CH)-1, i1=Math.floor(Math.max(...xs)/EXP_CH)+1, j0=Math.floor(Math.min(...ys)/EXP_CH)-1, j1=Math.floor(Math.max(...ys)/EXP_CH)+1;
+  const cut=(i,j)=>{ const x0=i*EXP_CH-.5, y0=j*EXP_CH-.5, x1=x0+EXP_CH, y1=y0+EXP_CH, p=[ctr(x0,y0),ctr(x1,y0),ctr(x1,y1),ctr(x0,y1)]; f.beginPath(); f.moveTo(p[0][0],p[0][1]); for(let k=1;k<4;k++) f.lineTo(p[k][0],p[k][1]); f.closePath(); f.fill(); };
+  f.fillStyle='rgba(0,0,0,1)';
+  if((i1-i0)*(j1-j0)<60000){ for(let i=i0;i<=i1;i++) for(let j=j0;j<=j1;j++) if(E.has(i+','+j)) cut(i,j); }
+  else for(const k of E){ const [i,j]=k.split(',').map(Number); if(i>=i0&&i<=i1&&j>=j0&&j<=j1) cut(i,j); } }
+
+/* ===== v97: no attacking the same kingdom again and again ===== */
+var ATK_AGAIN_MIN=30;
+function atkLogCheck(me,v){ const a=(me.atkLog||{})[v.id]; if(!a) return; if(a.off&&(v.lastSeen||0)<a.t) fail(`${v.name} was offline when you last attacked. You can attack them again after they come back.`); const left=a.t+ATK_AGAIN_MIN*60000-now(); if(left>0) fail(`You attacked ${v.name} a moment ago. Wait ${fmtT(left/1000)} before attacking them again.`); }
+function atkLogAdd(me,v){ const L=Object.assign({},me.atkLog||{}); L[v.id]={t:now(),off:now()-(v.lastSeen||0)>=ONLINE_MIN*60000?1:0}; const ks=Object.keys(L).sort((a,b)=>L[b].t-L[a].t); for(const k of ks.slice(40)) delete L[k]; for(const k of ks) if(now()-L[k].t>40*864e5) delete L[k]; me.atkLog=L; }
+var TX_LVL=0;
+function txMin(n,o,lvl){ const keep=lvl<=1?['gold','stone',...VICU,'cc','shield','dead','tr','stats','t','lastSeen','hero']:['gold','stone',...VICU,'shield']; const r=clone(o); for(const k of keep){ if(k in n) r[k]=n[k]; } return r; }
+
+/* ===== v97: talk to the whole map, message alerts, and turning chat off ===== */
+var chatOff=(()=>{ try{ return localStorage.getItem('cf-chat-off')==='1'; }catch(e){ return false; } })();
+var msgAlerts=(()=>{ try{ return localStorage.getItem('cf-msg-alerts')!=='0'; }catch(e){ return true; } })();
+function chatPrefsApply(){ document.body.classList.toggle('chatOff',chatOff); const a=$('bChatOn'), b=$('bMsgAl'); if(a) a.firstChild.textContent='Chat: '+(chatOff?'off':'on'); if(b) b.firstChild.textContent='Message alerts: '+(msgAlerts&&!chatOff?'on':'off'); }
+function chatAlert(title,text){ if(chatOff||!msgAlerts) return; snd('click'); toast(`${title}: ${text}`.slice(0,90)); try{ if(document.hidden) notifyMe('New message',`${title}: ${text}`); }catch(e){} }
+var clanLastT=0;
+(function(){ const rc=renderChat; renderChat=function(){ rc(); try{ const top=(chatMsgs||[])[0]; if(top&&top.t){ if(clanLastT&&top.t>clanLastT&&top.uid!==ME&&!isBlocked(top.uid)){ const vis=$('chatLog')&&$('chatLog').offsetParent!==null&&!document.hidden; if(!vis) chatAlert('🛡️ '+cleanText(top.name),cleanText(typeof stickerText==='function'?stickerText(top.text):top.text)); } clanLastT=Math.max(clanLastT,top.t); } else if(!clanLastT) clanLastT=1; }catch(e){} }; })();
+(function(){ const va=v82Act; v82Act=function(a,b){ if(a==='v97:chat'){ chatOff=!chatOff; try{ localStorage.setItem('cf-chat-off',chatOff?'1':'0'); }catch(e){} chatPrefsApply(); toast(chatOff?'💬 Chat is off. You won\'t see or get any chat messages.':'💬 Chat is on.'); return true; } if(a==='v97:alerts'){ msgAlerts=!msgAlerts; try{ localStorage.setItem('cf-msg-alerts',msgAlerts?'1':'0'); }catch(e){} chatPrefsApply(); toast(msgAlerts?'🔔 Message alerts are on.':'🔕 Message alerts are off.'); return true; } return va(a,b); }; })();
+setTimeout(chatPrefsApply,500); setInterval(chatPrefsApply,5000);
+try{ FAQ.push(['Can I talk to the whole map?','chat whole map world everyone global shout distance','Yes! In 📢 Nearby chat, pick who can hear you: from 2 tiles (whisper) up to 100 tiles, or 🌍 Whole map to talk to everyone.']); FAQ.push(['How do I turn off chat or message alerts?','chat off mute alerts notifications messages turn off','Open ⚙️ Settings. "Chat: on/off" hides all chat. "Message alerts: on/off" stops the pop-ups and sounds for new messages.']); FAQ.push(['Can someone attack me over and over?','attacked again repeatedly spam attack same player twice','No. After someone attacks you, they must wait 30 minutes before attacking you again, and if you were offline they have to wait until you come back. You also get a peace shield after being attacked.']); }catch(e){}
+(function(){ const a0=attack; attack=function(cell,opts){ try{ const tg=G.plots[cell], m=P(ME); if(tg&&tg.o&&tg.o!=='npc'&&tg.o!==ME&&m&&P(tg.o)) atkLogCheck(m,{...P(tg.o),id:tg.o}); }catch(e){ if(e instanceof UErr) return toast(e.message,true); } return a0.apply(this,arguments); }; })();
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
 var SITES={vein:{name:'Gold Vein',ic:'⛏️',desc:'+25% gold from your Town Hall and Gold Mines.'},well:{name:'Magic Well',ic:'🔮',desc:'+25% food from your Town Hall and Farms.'},ruins:{name:'Ancient Ruins',ic:'🏛️',desc:'Search them once a day for 10 gems.'},grove:{name:'Crystal Grove',ic:'💎',desc:'+10% attack for your whole army.'}};
@@ -7267,6 +7305,8 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  97:['🗺️ Land you have explored now stays visible forever','🛡️ Nobody can attack the same kingdom again for 30 minutes, or until an offline player comes back','🌍 Nearby chat can now reach 50 tiles, 100 tiles or the whole map','🔔 Message alerts and the whole chat can be turned on or off in ⚙️ Settings'],
+  96:['🛡️ Peace shield fixes: attacking barbarian camps no longer ends your shield, open battles can\'t loot a shielded kingdom, and shields work even if someone\'s device clock is wrong'],
   95:['🖼️ Pet and boss pictures now load even if they were uploaded into the main folder instead of a pets folder'],
   94:['🧹 Cleaner buttons: text now sits in the middle of every button, and the guide tabs are neater'],
   93:['🛡️ The chat spam filter is less strict: you can repeat a message once, send messages faster, and pauses are much shorter','🐛 If the server ever refuses a move, the message now says exactly what was refused, so it can be fixed fast','🐛 Fixed battles against one kingdom being refused by the server','💎 Gems are harder to earn (prices stay the same)','🎯 Mini-game rewards are smaller','🎲 Jousting, horse racing and archery now speed up, slow down and even switch direction at random, so you can\'t just learn a rhythm'],
@@ -7348,12 +7388,13 @@ function drawFog(dpr){ const cs=fogCenters(); if(!cs.length) return; const W=Mat
   // skip the work when every corner of the view is inside the vision
   const v=view(), corners=[[v.x0,v.y0],[v.x1,v.y0],[v.x0,v.y1],[v.x1,v.y1]].map(([wx,wy])=>{ const a=(wx-OX)/(TW/2), b=(wy-OY)/(TH/2); return [(a+b)/2,(b-a)/2]; });
   if(corners.every(([x,y])=>seenTile(x,y))) return;
-  const fkey=[Math.round(cam.x),Math.round(cam.y),cam.z.toFixed(4),W,H,cs.map(c=>c[0].toFixed(1)+','+c[1].toFixed(1)).join(';')].join('|');
+  const fkey=[Math.round(cam.x),Math.round(cam.y),cam.z.toFixed(4),W,H,cs.map(c=>c[0].toFixed(1)+','+c[1].toFixed(1)).join(';'),(typeof EXP_N!=='undefined'?EXP_N:0)].join('|');
   if(fogCv&&fogCv.key===fkey){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(fogCv,0,0); ctx.restore(); return; }
   if(!fogCv) fogCv=document.createElement('canvas'); if(fogCv.width!==W||fogCv.height!==H){ fogCv.width=W; fogCv.height=H; } fogCv.key=fkey; const f=fogCv.getContext('2d');
   f.setTransform(1,0,0,1,0,0); f.globalCompositeOperation='source-over'; f.clearRect(0,0,W,H); f.fillStyle='rgba(14,22,34,.82)'; f.fillRect(0,0,W,H);
   f.setTransform(dpr*cam.z,0,0,dpr*cam.z,dpr*cam.x,dpr*cam.y); f.globalCompositeOperation='destination-out';
   for(const [x,y] of cs){ const [px,py]=ctr(x,y), r=FOG_R*TW/Math.SQRT2; f.save(); f.translate(px,py); f.scale(1,TH/TW); const g=f.createRadialGradient(0,0,r*.9,0,0,r); g.addColorStop(0,'rgba(0,0,0,1)'); g.addColorStop(1,'rgba(0,0,0,0)'); f.fillStyle=g; f.beginPath(); f.arc(0,0,r,0,7); f.fill(); f.restore(); }
+  try{ fogExpCut(f); }catch(e){}
   ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(fogCv,0,0); ctx.restore(); }
 
 /* ===== roads and bridges ===== */
@@ -7693,30 +7734,30 @@ function pillPath(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,
 const NEAR_R=10, NEAR_Z=40;
 var nearMsgs={}, nearSubs=[], nearKey='', nearSeen=0, nearBub={};
 const zoneOf=cell=>{ const [x,y]=xy(cell); return [Math.floor(x/NEAR_Z),Math.floor(y/NEAR_Z)]; };
-var nearR=(()=>{ try{ return +localStorage.getItem('cf-near-r')||NEAR_R; }catch(e){ return NEAR_R; } })();
-const NEAR_OPTS=[[2,'2 tiles (whisper)'],[5,'5 tiles'],[10,'10 tiles'],[20,'20 tiles'],[30,'30 tiles (shout)']];
+var nearR=(()=>{ try{ const v=localStorage.getItem('cf-near-r'); return v!==null&&isFinite(+v)?+v:NEAR_R; }catch(e){ return NEAR_R; } })();
+const NEAR_OPTS=[[2,'2 tiles (whisper)'],[5,'5 tiles'],[10,'10 tiles'],[20,'20 tiles'],[30,'30 tiles'],[50,'50 tiles'],[100,'100 tiles (shout)'],[0,'🌍 Whole map (everyone)']];
 function myNearPos(){ const m=P(ME); if(!m||m.dead) return []; const l=[], h=stats(ME).hall, cc=campCell(m); if(cc) l.push(cc); if(h) l.push(h); return l; }
 const posOf=p=>{ const l=[]; const cc=campCell(p); if(cc) l.push(cc); if(p.hall) l.push(p.hall); return l; };
 function syncNear(){ const ps=myNearPos(); if(!ps.length||!DB) return; const zs=new Set(); for(const c of ps){ const [zx,zy]=zoneOf(c); for(let dx=-1;dx<=1;dx++) for(let dy=-1;dy<=1;dy++) zs.add(`near_${zx+dx}_${zy+dy}`); }
   const key=[...zs].sort().join(','); if(key===nearKey) return; nearKey=key; if(Array.isArray(nearSubs)) nearSubs={};
   for(const id in nearSubs) if(!zs.has(id)){ const f=nearSubs[id]; delete nearSubs[id]; delete nearMsgs[id]; setTimeout(()=>{ try{ f&&f(); }catch(e){} },0); }
-  for(const id of zs) if(!nearSubs[id]) nearSubs[id]=DB.watchChat(id,l=>{ if(!nearSubs[id]) return; nearMsgs[id]=l; renderNear(); }); }
-function nearList(){ const ps=myNearPos(); if(!ps.length) return []; const all=[].concat(...Object.values(nearMsgs)).filter(x=>x&&x.cell&&x.t&&!isBlocked(x.uid)&&(x.uid===ME||ps.some(c=>dist(x.cell,c)<=(x.r||NEAR_R))));
+  zs.add('near_world'); for(const id of zs) if(!nearSubs[id]) nearSubs[id]=DB.watchChat(id,l=>{ if(!nearSubs[id]) return; nearMsgs[id]=l; renderNear(); }); }
+function nearList(){ const ps=myNearPos(); if(!ps.length) return []; const all=[].concat(...Object.values(nearMsgs)).filter(x=>x&&x.cell&&x.t&&!isBlocked(x.uid)&&(x.uid===ME||x.r===0||ps.some(c=>dist(x.cell,c)<=(x.r||NEAR_R))));
   const seen=new Set(); return all.filter(x=>{ const k=x.uid+x.t; if(seen.has(k)) return false; seen.add(k); return true; }).sort((a,b)=>a.t-b.t).slice(-50); }
-function nearPeople(){ const ps=myNearPos(); if(!ps.length) return []; return Object.values(G.players).filter(p=>p.id!==ME&&!p.dead&&posOf(p).some(a=>dist(a,ps[0])<=nearR)); }
+function nearPeople(){ const ps=myNearPos(); if(!ps.length) return []; return Object.values(G.players).filter(p=>p.id!==ME&&!p.dead&&(nearR===0||posOf(p).some(a=>dist(a,ps[0])<=nearR))); }
 function renderNear(){ const l=nearList(); const last=l.length?l[l.length-1].t:0;
   for(const x of l) if(now()-x.t<12000) nearBub[x.uid]={text:typeof stickerText==='function'?stickerText(x.text):x.text,t:x.t,cell:x.cell};
-  if(last>nearSeen&&nearSeen){ const x=l[l.length-1]; if(x.uid!==ME){ snd('click'); if(!$('nearLog')||document.querySelector('.card.near')?.offsetParent===null) toast(`📢 ${cleanText(x.name)}: ${cleanText(typeof stickerText==='function'?stickerText(x.text):x.text).slice(0,60)}`); } }
+  if(last>nearSeen&&nearSeen){ const x=l[l.length-1]; if(x.uid!==ME&&!chatOff&&msgAlerts){ snd('click'); if(!$('nearLog')||document.querySelector('.card.near')?.offsetParent===null) toast(`📢 ${cleanText(x.name)}: ${cleanText(typeof stickerText==='function'?stickerText(x.text):x.text).slice(0,60)}`); } }
   if(last) nearSeen=Math.max(nearSeen,last); else if(!nearSeen) nearSeen=1;
   const el=$('nearLog'); if(!el) return; const atB=el.scrollHeight-el.scrollTop-el.clientHeight<40, ppl=nearPeople(), cc=campCell(P(ME));
   const sel2=$('nearR'); if(sel2&&!sel2.dataset.b){ sel2.dataset.b=1; sel2.innerHTML=NEAR_OPTS.map(([v,t])=>`<option value="${v}"${v===nearR?' selected':''}>${t}</option>`).join(''); sel2.onchange=()=>{ nearR=+sel2.value; try{ localStorage.setItem('cf-near-r',nearR); }catch(e){} renderNear(); }; }
-  $('nearInfo').innerHTML=`Your messages reach players within <b>${nearR} tile${nearR===1?'':'s'}</b> of ${cc?'your <b>🏕️ camp</b>':'your Town Hall'}. Pick a small distance to talk almost privately${cc?'':', or send troops to camp next to a friend and talk from there'}. ${ppl.length?`<b>${ppl.length}</b> in range: ${ppl.slice(0,6).map(p=>plink(p.id,esc(cleanText(p.name)))+(online(p)?' <span class="on">●</span>':'')).join(', ')}${ppl.length>6?'…':''}`:'Nobody is in range right now.'}`;
+  $('nearInfo').innerHTML=nearR===0?`🌍 You are talking to <b>the whole map</b>: everyone can read your messages. ${ppl.length} players around.`:`Your messages reach players within <b>${nearR} tile${nearR===1?'':'s'}</b> of ${cc?'your <b>🏕️ camp</b>':'your Town Hall'}. Pick a small distance to talk almost privately${cc?'':', or send troops to camp next to a friend and talk from there'}. ${ppl.length?`<b>${ppl.length}</b> in range: ${ppl.slice(0,6).map(p=>plink(p.id,esc(cleanText(p.name)))+(online(p)?' <span class="on">●</span>':'')).join(', ')}${ppl.length>6?'…':''}`:'Nobody is in range right now.'}`;
   el.innerHTML=l.length?l.map(x=>`<li class="${x.uid===ME?'mine':''}"><b>${plink(x.uid,esc(cleanText(x.name)))}</b> <time>${new Date(x.t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})}${x.r&&x.r<=5?' · 🤫 '+x.r+' tiles':''}</time><br>${(typeof stickerHtml==='function'&&stickerHtml(x.text))||esc(cleanText(x.text))}</li>`).join(''):'<li class="desc">No messages nearby yet. Say hi to your neighbours!</li>';
   if(atB) el.scrollTop=el.scrollHeight; }
 let nearLastSent=0;
 function sendNear(text){ text=spamFix((text||'').replace(/\s+/g,' ').trim().slice(0,200)); const ps=myNearPos(); if(!text||!ps.length) return; if(now()-nearLastSent<1500) return toast('Slow down a little!',true); { const sp=spamCheck(text); if(sp) return toast(sp,true); } nearLastSent=now();
-  const from=ps[0], [zx,zy]=zoneOf(from), msg={uid:ME,name:P(ME).name,text,t:now(),cell:from,r:nearR}; $('nearIn').value=''; Promise.resolve(DB.sendChat(`near_${zx}_${zy}`,msg)).catch(e=>explain(e)); snd('click'); }
-function drawBubbles(v){ if(cam.z<.4||!nearBub) return; const tn=now();
+  const from=ps[0], [zx,zy]=zoneOf(from), msg={uid:ME,name:P(ME).name,text,t:now(),cell:from,r:nearR}; $('nearIn').value=''; Promise.resolve(DB.sendChat(nearR===0||nearR>NEAR_Z?'near_world':`near_${zx}_${zy}`,msg)).catch(e=>explain(e)); snd('click'); }
+function drawBubbles(v){ if(cam.z<.4||!nearBub||chatOff) return; const tn=now();
   for(const uid in nearBub){ const b=nearBub[uid]; if(b.cell&&!seenCell(b.cell)) continue; if(tn-b.t>10000){ delete nearBub[uid]; continue; } const p=P(uid), bc=b.cell||(p&&p.hall); if(!p||!bc) continue; const atCamp=bc!==p.hall, [hx,hy]=ctr(...xy(bc)); if(hx<v.x0-TW||hx>v.x1+TW||hy<v.y0-TW*2||hy>v.y1+TW) continue;
     const txt=cleanText(b.text).slice(0,40)+(b.text.length>40?'…':''), fs=Math.max(TW*.14,11/cam.z); ctx.font=`600 ${fs}px sans-serif`; ctx.textAlign='center'; const w=ctx.measureText(txt).width+fs, h=fs*1.6, y=hy-TW*(atCamp?1.15:G.plots[p.hall]&&G.plots[p.hall].big?2.5:1.7);
     ctx.save(); ctx.globalAlpha=Math.min(1,(10000-(tn-b.t))/800); ctx.fillStyle='#fffaf0'; ctx.strokeStyle='#3b2412'; ctx.lineWidth=Math.max(1,1.5/cam.z); pillPath(hx-w/2,y-h,w,h,h/2.4); ctx.fill(); ctx.stroke();
@@ -7749,7 +7790,7 @@ const convoUnread=c=>c&&c.lastBy&&c.lastBy!==ME&&!isBlocked(c.lastBy)&&(c.t||0)>
 const unreadN=()=>Object.values(convos).filter(convoUnread).length;
 function msgBadge(){ const b=$('bMsg'); if(!b) return; const n=unreadN(); b.textContent=n?`💬 Messages (${n})`:'💬 Messages'; b.classList.toggle('war',!!n); b.classList.toggle('soft',!n); }
 function onConvos(list){ const old=convos; convos={}; for(const c of list) convos[c.id]=c;
-  if(!msgFirst) for(const c of list){ const o=old[c.id]; if(convoUnread(c)&&(!o||(o.t||0)<c.t)&&msgOpen!==c.id&&msgSeenT[c.id]!==c.t){ msgSeenT[c.id]=c.t; snd('click'); toast(`💬 ${cleanText(c.lastName||'Someone')}: ${cleanText(c.last||'').slice(0,60)}`); try{ notifyMe('New message',`${cleanText(c.lastName||'')}: ${cleanText(c.last||'')}`); }catch(e){} } }
+  if(!msgFirst) for(const c of list){ const o=old[c.id]; if(convoUnread(c)&&(!o||(o.t||0)<c.t)&&msgOpen!==c.id&&msgSeenT[c.id]!==c.t){ msgSeenT[c.id]=c.t; if(chatOff||!msgAlerts) continue; snd('click'); toast(`💬 ${cleanText(c.lastName||'Someone')}: ${cleanText(c.last||'').slice(0,60)}`); try{ notifyMe('New message',`${cleanText(c.lastName||'')}: ${cleanText(c.last||'')}`); }catch(e){} } }
   msgFirst=false; msgBadge(); if($('msgOv')&&msgView==='list') msgDialog(); if(msgOpen&&convos[msgOpen]&&$('msgOv')) msgHead(); }
 function msgPeople(){ const m=P(ME), c=myClan(), ids=new Set([...(m.friends||[]),...(c?c.members||[]:[])]); ids.delete(ME);
   const q=msgSearch.trim().toLowerCase();
