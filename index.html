@@ -507,6 +507,25 @@ body.nightUI input,body.nightUI select{background:#1e1828;color:#ece6f5;border-c
 .sfGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.sfCard{background:#cfe6f5;border-radius:10px;text-align:center;padding:5px 2px;opacity:.6}.sfCard.got{opacity:1;background:#bfe8ff;box-shadow:0 0 0 2px #4fb6ff}.sfCard span{font-size:1.6rem;display:block}.sfCard small{font-size:.62rem}
 .kcGrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.kcCv{width:120px;height:168px;cursor:pointer}
 .introDlg{text-align:center;max-width:420px}.introIc{font-size:4rem}.introTx{font-size:1.15rem;font-weight:700;line-height:1.4;margin:8px 4px}#introCv{display:block;margin:0 auto;max-width:100%}.introDots{display:flex;gap:6px;justify-content:center;margin:6px}.introDots i{width:9px;height:9px;border-radius:50%;background:#d9c7a0}.introDots i.on{background:#e8702f}
+.playRow{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px;margin-bottom:6px}.playIt{display:flex;align-items:center;gap:6px;justify-content:flex-start;text-align:left;padding:8px 10px;font-size:.88rem}.playIt span{font-size:1.25rem}
+@media (max-width:420px){.playRow{grid-template-columns:repeat(2,minmax(0,1fr))}.playIt{font-size:.8rem;padding:7px}}
+.htRow{display:flex;gap:10px;align-items:flex-start;margin:6px 0}.htRow>span{font-size:1.6rem}
+.pollRow{background:#fff8e6;border:2px solid #e3c98f;border-radius:12px;padding:6px 8px;margin:5px 0}.pollRow.me{border-color:#7ec34f}.pollRow .bar{height:7px;margin:3px 0}.pollRow button{width:100%}
+
+.cwScore{display:flex;align-items:center;justify-content:space-around;gap:8px;margin:8px 0;text-align:center}.cwScore b{display:block;font-family:"Lilita One",sans-serif;font-size:2rem}.cwScore span{font-family:"Lilita One",sans-serif;font-size:1.3rem;color:#b9392b}.cwScore small{display:block;max-width:130px;overflow:hidden;text-overflow:ellipsis}
+.tnBr{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}.tnCol{display:flex;flex-direction:column;justify-content:space-around;gap:4px;min-width:96px}.tnSlot{background:#fff6dc;border:2px solid #c9a24a;border-radius:8px;padding:3px 6px;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px}.tnSlot.me{background:#ffe08a;font-weight:900}
+.rxWrap{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px;align-items:center}.rxChip{border:1px solid #c9a24a;background:#fff6dc;border-radius:12px;padding:0 6px;font-size:.8rem;cursor:pointer}.rxChip.on{background:#ffe08a}.rxAdd{border:0;background:transparent;opacity:.55;cursor:pointer;font-size:.9rem;padding:0 4px}.rxBar{display:flex;flex-wrap:wrap;gap:3px;width:100%}.rxBar .on{background:#ffe08a}
+.musGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:6px 0}.musGrid div{background:#fff6dc;border:2px solid #c9a24a;border-radius:10px;text-align:center;padding:4px}.musGrid span{font-size:1.3rem;display:block}.musGrid b{display:block}.musGrid small{font-size:.7rem}
+.musPets{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.musPets div{text-align:center;background:#fff6dc;border-radius:10px;padding:4px;overflow:hidden}.musPets b,.musPets small{display:block;font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lvBig{font-family:"Lilita One",sans-serif;font-size:3rem;text-align:center;color:#e8a317;text-shadow:0 3px 0 #3b2412}.lvBar{height:16px;border:2px solid #3b2412;border-radius:9px;background:#e9dcc0;overflow:hidden}.lvBar i{display:block;height:100%;background:linear-gradient(90deg,#ffd13b,#ff9d1e)}
+#lvBan{position:fixed;left:50%;top:70px;transform:translateX(-50%);z-index:60;background:#2b1a0c;color:#fff6dc;border:3px solid #d8402f;border-radius:14px;padding:6px 10px;display:flex;gap:6px;align-items:center;max-width:calc(100vw - 24px);box-shadow:0 6px 14px rgba(0,0,0,.4)}#lvBan span{font-size:.85rem}
+.phBtn{width:100%;margin:4px 0}.petHero.ph_beach::after,.petHero.ph_castle::after,.petHero.ph_night::after,.petHero.ph_candy::after,.petHero.ph_space::after{content:'';position:absolute;inset:0;pointer-events:none}
+.petHero.ph_beach::after{background:linear-gradient(180deg,rgba(80,200,255,.25),rgba(255,220,140,.45));mix-blend-mode:multiply}.petHero.ph_castle::after{background:linear-gradient(180deg,rgba(120,110,100,.55),rgba(150,90,60,.45));mix-blend-mode:multiply}
+.petHero.ph_night::after{background:radial-gradient(circle at 80% 20%,rgba(255,255,220,.5) 0 6%,transparent 7%),linear-gradient(180deg,rgba(20,30,90,.75),rgba(30,40,80,.5));mix-blend-mode:multiply}.petHero.ph_candy::after{background:linear-gradient(180deg,rgba(255,140,200,.45),rgba(170,120,255,.35));mix-blend-mode:multiply}
+.petHero.ph_space::after{background:radial-gradient(circle at 20% 30%,#fff 0 1px,transparent 2px),radial-gradient(circle at 70% 15%,#fff 0 1px,transparent 2px),radial-gradient(circle at 85% 45%,#fff 0 1px,transparent 2px),linear-gradient(180deg,rgba(10,10,40,.85),rgba(60,30,100,.55));mix-blend-mode:multiply}
+.petHero.ph_beach::before{content:'🌴🐚';}.petHero.ph_castle::before{content:'🏰🕯️';}.petHero.ph_night::before{content:'🌙⭐';}.petHero.ph_candy::before{content:'🍭🍬';}.petHero.ph_space::before{content:'🪐🚀';}
+.petHero[class*="ph_"]::before{position:absolute;right:8px;top:6px;font-size:1.4rem;z-index:2;pointer-events:none}
+@media (max-width:420px){.musGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -623,7 +642,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 126;
+const GAME_VERSION = 132;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -1953,7 +1972,7 @@ function bSprite(t,col){ const zb=zBucket(), key='b'+t+col+'_'+bLvl+'_'+zb; let 
   const w=TW*1.4, h=TW*1.85, ax=w/2, ay=h*.79; const can=offscreen(w,h,zb,ax,ay,()=>drawB(t,0,0,col)); s={can,w,h,ax,ay}; spriteCache.set(key,s); return s; }
 let drawStyle=null;
 const building=(t,cx,cy,col,lvl)=>{ bLvl=lvl||1; if(drawStyle&&drawStyle!=='stone'&&t!=='camp'&&t!=='boss'&&t!=='ruins') return blit(styleSprite(t,col,drawStyle),cx,cy); return cam.z<=.75||lowGfx?blit(bSprite(t,col),cx,cy):bQuick(t,cx,cy,col); };
-function drawWall(x,y,cx,cy,p){ const u=TW, h=u*(.16+.025*p.lvl), wood=p.lvl<=2, col=wood?'#a8743f':p.lvl>=5?'#7d8892':'#bdb29c', tex=wood?'wood':'stone';
+function drawWall(x,y,cx,cy,p){ const u=TW, h=u*(.16+.025*p.lvl), wood=p.lvl<=2, wsk=typeof bskinOf==='function'&&bskinOf(p.o,'wall'), col=wsk?wsCol(wsk,wood?'#a8743f':'#bdb29c'):wood?'#a8743f':p.lvl>=5?'#7d8892':'#bdb29c', tex=wsk?'stone':wood?'wood':'stone';
   const same=(dx,dy)=>{ const q=G.plots[cid(x+dx,y+dy)]; return q&&q.o===p.o&&q.b==='wall'&&q.lvl>0; };
   const seg=(dx,dy,order)=>{ const ex=(dx-dy)*u/4, ey=(dx+dy)*u/8; for(const tt of order) box(cx+ex*tt,cy+ey*tt,u*.21,h,col,tex); };
   ell(cx+u*.06,cy+u*.05,u*.22,u*.09,'rgba(12,40,6,.22)',false);
@@ -2012,7 +2031,7 @@ function drawCell0(x,y,t){
   if(p.b==='road'){ drawRoad(x,y,cx,cy,p); return; }
   if(p.b==='dock'){ drawDock(x,y,cx,cy,p); return; }
   const col=colorOf(p.o); const bigH=p.b==='hall'&&p.big; if(bigH){ ctx.save(); ctx.translate(cx,cy-TH/2); const _ks=1.85*(typeof settleOf==='function'?settleOf(P(p.o)).s:1); ctx.scale(_ks,_ks); ctx.translate(-cx,-cy); } try{ pad();
-  if(p.bt&&!p.lvl) box(cx,cy,TW*.72,TW*.04,'#b89a6e'); else { drawStyle=styleOf(p.o); try{ building(p.b,cx,cy,col,p.lvl); } finally{ drawStyle=null; } if(!p.bt){ try{ levelFlair(p,cx,cy,col); }catch(e){} if(p.b==='hall') try{ rankCastle(p,cx,cy,col); }catch(e){} if(p.b==='farm'&&p.lvl) try{ farmAnimals(p,cx,cy); }catch(e){} } }
+  if(p.bt&&!p.lvl) box(cx,cy,TW*.72,TW*.04,'#b89a6e'); else { drawStyle=(typeof bskinOf==='function'&&bskinOf(p.o,p.b))||styleOf(p.o); try{ building(p.b,cx,cy,col,p.lvl); } finally{ drawStyle=null; } if(!p.bt){ try{ levelFlair(p,cx,cy,col); }catch(e){} if(p.b==='hall') try{ rankCastle(p,cx,cy,col); }catch(e){} if(p.b==='farm'&&p.lvl) try{ farmAnimals(p,cx,cy); }catch(e){} } }
   if(p.bt) scaffold(cx,cy,Math.min(1,(t-p.bt.start)/(p.bt.done-p.bt.start)));
   else if(p.b!=='hut'&&cam.z>=.5) badge(cx,cy,p.lvl,'#ffd13b');
   if(p.o===ME&&PROD[p.b]&&!p.bt&&p.lvl&&stored(p)>=Math.max(5,collCap(p)*.1)) bubble(cx,cy,PROD[p.b].res,stored(p)>=collCap(p)-.5);
@@ -2798,7 +2817,7 @@ async function cwMatch(){ const c=myClan(); if(!c||!cwActive()||cwOf(c)||(c.memb
 let cwFirst=false;
 async function cwClaim(){ const m=P(ME), c=myClan(); if(!m||!c||busy||!c.cw||c.cw.wk>=weekId()&&cwActive()||c.cw.wk>=weekId()||(m.cwClaim||0)>=c.cw.wk) return;
   const o=G.clans[c.cw.opp]; const mine=cwStars(c.cw), theirs=o&&o.cw&&o.cw.wk===c.cw.wk?cwStars(o.cw):0, res=mine>theirs?'win':mine===theirs?'tie':'loss';
-  try{ await DB.tx(async t=>{ const me=await t.getPlayer(ME); if(!me||(me.cwClaim||0)>=c.cw.wk) fail('done'); me.cwClaim=c.cw.wk; me.gems=(me.gems||0)+CW_GEMS[res]; t.setPlayer(ME,me);
+  try{ await DB.tx(async t=>{ const me=await t.getPlayer(ME); if(!me||(me.cwClaim||0)>=c.cw.wk) fail('done'); me.cwClaim=c.cw.wk; me.gems=(me.gems||0)+CW_GEMS[res]; if(res==='win'){ me.stash=me.stash||{}; me.stash.royal=(me.stash.royal||0)+1; me.cwW=(me.cwW||0)+1; } t.setPlayer(ME,me);
       const cc=await t.getClan(c.id); if(cc&&cc.cw&&cc.cw.wk===c.cw.wk&&!cc.cw.done){ cc.cw.done=res; cc.cw.mine=mine; cc.cw.theirs=theirs; cc.cw.oppTag=o?.tag||'?'; cwFirst=true; if(res==='win'){ cc.banners=(cc.banners||0)+1; const sd=seasonId(); cc.bm=cc.bm&&cc.bm.s===sd?{s:sd,n:cc.bm.n+1}:{s:sd,n:1}; } t.setClan(cc.id,cc); } });
     if(cwFirst&&res==='win') addNews(`⚔️ [${c.tag}] won the clan war against [${o?.tag||'?'}] ${mine} ★ to ${theirs} ★!`,'good'); cwFirst=false; toast(`Clan war ${res==='win'?'won':res==='tie'?'tied':'lost'} ${mine} ★ to ${theirs} ★! +${CW_GEMS[res]} gems${res==='win'?' and a trophy banner for your clan':''}.`); snd(res==='win'?'win':'coin'); }catch(e){} }
 setInterval(()=>{ try{ cwMatch(); cwClaim(); }catch(e){} },5000);
@@ -2936,7 +2955,7 @@ function mkView(){ const q=mkQ.trim().toLowerCase(); let l=Object.values(G.marke
   const nm=L=>mkName(L).toLowerCase(), by={new:(a,b)=>b.t-a.t,old:(a,b)=>a.t-b.t,cheap:(a,b)=>a.price-b.price||b.t-a.t,pricey:(a,b)=>b.price-a.price||b.t-a.t,az:(a,b)=>nm(a).localeCompare(nm(b)),za:(a,b)=>nm(b).localeCompare(nm(a)),rare:(a,b)=>mkRare(b)-mkRare(a)||a.price-b.price};
   return l.sort(by[mkSort]||by.new); }
 function mkRows(){ const list=mkView(); return list.length?list.map(L=>{ const own=L.seller===ME, it=L.kind==='item'?ITEMS[L.k]:null, col=it?RAR[it.r].col:L.kind==='crate'?'#c98a4a':'#ffd13b';
-      return `<div class="gear" style="--rc:${col}">${L.kind==='pet'&&PETS[L.k]?`<canvas data-pet="${L.k}" data-lvl="${L.lvl||1}" data-id="${L.id}" class="petcv" style="width:64px;height:56px;flex:0 0 64px"></canvas>`:icon(it?it.ic:L.kind==='crate'?'crate':L.k,col)}<div><b>${esc(mkName(L))}</b><div class="desc">${it?RAR[it.r].name+' · '+itemText(it):L.kind==='crate'?'Unopened crate':L.kind==='pet'?`${PET_RAR[(PETS[L.k]||{r:0}).r]} pet · +${f(petDefOf({k:L.k,lvl:L.lvl||1}))} guard power`:'Resources'} · sold by ${esc(L.sname||'?')}</div>
+      return `<div class="gear" style="--rc:${col}">${L.kind==='pet'&&PETS[L.k]?`<canvas data-pet="${L.k}" data-lvl="${L.lvl||1}" data-id="${L.id}" class="petcv" style="width:64px;height:56px;flex:0 0 64px"></canvas>`:icon(it?it.ic:L.kind==='crate'?'crate':L.k,col)}<div><b>${esc(mkName(L))}</b><div class="desc">${it?RAR[it.r].name+' · '+itemText(it):L.kind==='crate'?'Unopened crate':L.kind==='pet'?`${petRarN(PETS[L.k])} pet · +${f(petDefOf({k:L.k,lvl:L.lvl||1}))} guard power`:'Resources'} · sold by ${esc(L.sname||'?')}</div>
         <div class="row">${own?btn('Take back',null,'mk:cancel:'+L.id,'soft'):btn('Buy',{[L.cur]:L.price},'mk:buy:'+L.id,'prime')}<b>${f(L.price)} ${L.cur}</b></div></div></div>`; }).join(''):`<p class="desc">${Object.keys(G.market).length?'Nothing matches your search.':'Nothing for sale yet.'}</p>`; }
 function bindMk(){ const w=$('mkWhat'), a=$('mkAmt'); if(!w) return;
   const redo=()=>{ const el=$('mkList'); if(el){ el.innerHTML=mkRows(); try{ startPetLoop(); }catch(e){} refreshButtons(); } };
@@ -2957,7 +2976,7 @@ function buyListing(id){ busy||(async()=>{ busy=true;
       if(L.seller===ME) fail('That is your own listing.'); if(L.kind==='trade'||L.kind==='tradeback'||L.kind==='order'||L.kind==='ofill'||L.to) fail('That is not for sale.'); const sel2=await t.getPlayer(L.seller); settle(me); pay(me,{[L.cur]:L.price});
       if(L.kind==='item'){ me.inv=me.inv||[]; if(me.inv.length>=INV_MAX) fail('Your bag is full. Sell something first.'); me.inv.push({id:L.iid||Math.random().toString(36).slice(2,9),k:L.k,...(L.b?{b:1}:{})}); }
       else if(L.kind==='crate'){ me.stash=me.stash||{}; me.stash[L.k]=(me.stash[L.k]||0)+1; }
-      else if(L.kind==='pet'){ me.pets=me.pets||[]; if(me.pets.length>=PET_KEEP) fail('Your pet house is full. Sell a pet first.'); me.pets.push({id:Math.random().toString(36).slice(2,9),k:L.k,lvl:L.lvl||1,name:L.pname||PETS[L.k].name}); if(!me.petOn) me.petOn=me.pets[me.pets.length-1].id; bookAdd(me,'p',L.k); }
+      else if(L.kind==='pet'){ me.pets=me.pets||[]; if(me.pets.length>=petCap(me)) fail('Your pet house is full. Sell a pet first.'); me.pets.push({id:Math.random().toString(36).slice(2,9),k:L.k,lvl:L.lvl||1,name:L.pname||PETS[L.k].name}); if(!me.petOn) me.petOn=me.pets[me.pets.length-1].id; bookAdd(me,'p',L.k); }
       else me[L.k]=(me[L.k]||0)+L.n;
       if(sel2){ settle(sel2); sel2[L.cur]=(sel2[L.cur]||0)+L.price; t.setPlayer(L.seller,sel2); }
       me.lastSeen=now(); t.setPlayer(ME,me); t.setMk(id,null); return L; });
@@ -2966,7 +2985,7 @@ function buyListing(id){ busy||(async()=>{ busy=true;
 function cancelListing(id){ mkTx(async(t,me)=>{ const L=await t.getMk(id); if(!L||L.seller!==ME) fail('That listing is gone.'); if(L.kind==='order'||L.kind==='ofill') fail('Cancel orders from the Orders list.');
     if(L.kind==='item'){ me.inv=me.inv||[]; if(me.inv.length>=INV_MAX) fail('Your bag is full. Sell something first.'); me.inv.push({id:L.iid||Math.random().toString(36).slice(2,9),k:L.k,...(L.b?{b:1}:{})}); }
     else if(L.kind==='crate'){ me.stash=me.stash||{}; me.stash[L.k]=(me.stash[L.k]||0)+1; }
-    else if(L.kind==='pet'){ me.pets=me.pets||[]; if(me.pets.length>=PET_KEEP) fail('Your pet house is full.'); me.pets.push({id:L.pid||Math.random().toString(36).slice(2,9),k:L.k,lvl:L.lvl||1,name:L.pname||PETS[L.k].name}); }
+    else if(L.kind==='pet'){ me.pets=me.pets||[]; if(me.pets.length>=petCap(me)) fail('Your pet house is full.'); me.pets.push({id:L.pid||Math.random().toString(36).slice(2,9),k:L.k,lvl:L.lvl||1,name:L.pname||PETS[L.k].name}); }
     else { settle(me); me[L.k]=(me[L.k]||0)+L.n; }
     t.setMk(id,null); t.setPlayer(ME,me); },()=>toast('Taken back.')); }
 function exchange(from){ act([],me=>{ const to=from==='gold'?'stone':'gold'; pay(me,{[from]:EXCH.give}); me[to]+=EXCH.get; return {to}; },r=>{ snd('coin'); toast(`+${f(EXCH.get)} ${r.to}`); if($('shopOv')) shopDialog(); }); }
@@ -3078,6 +3097,7 @@ function renderPanel(force){ if(sel&&G.plots[sel]&&(G.plots[sel].b==='hallx'||G.
     <div class="stat"><span>Their army</span><span>Unknown</span></div>${isNewbie(v)?`<div class="stat"><span>Newcomer protection</span><span>${fmtT(newbieLeft(v)*60)} left</span></div>`:''}<div class="stat"><span>Distance</span><span>${range} tiles</span></div>
     <p class="desc">${p.b==='hall'&&landLeft(p.o)>0?hallLockMsg(p.o):!exposedTile(sel,p.o)?`🛡️ This tile is surrounded by ${esc(cleanText(v.name))}'s land. Capture a tile on the edge of their kingdom first to open a path${p.b==='hall'?' to their Town Hall':''}.`:sh?shieldTxt(v):far?`Too far. Your army can march ${MARCH_RANGE} tiles from your borders.`:'No scouts can get close to a real kingdom. You will only find out how strong they are by attacking!'}</p>${sh||far||isNewbie(v)||!exposedTile(sel,p.o)||(p.b==='hall'&&landLeft(p.o)>0)?'':spellRow(m)+btn('Attack with your army',null,'attack','war')}${!online(v)&&!sh?'<p class="desc">They are offline: you can attack them once, then they are protected until they come back.</p>':''}`; } }
   if(myClan()&&sel) h+=`<div class="label">📍 Ping your clan here</div><div class="row">${Object.entries(PING).map(([k,q])=>btn(q.ic+' '+q.txt,null,'ping:'+k,'soft mini')).join('')}</div>`;
+  if(sel&&typeof mnPanel==='function') h+=mnPanel(sel);
   el.innerHTML=(isPhone()?'<button class="soft sheetX" data-act="desel" aria-label="Close">✕</button>':'')+h; refreshButtons(); sheetState();
 }
 const isPhone=()=>window.innerWidth<=900;
@@ -3324,7 +3344,7 @@ async function claimDaily(){
   if(busy) return; busy=true; refreshButtons(); let out=null, err=null;
   try{ out=await DB.tx(async t=>{ const me=await t.getPlayer(ME); if(!me||me.dead) fail('Your kingdom has fallen.'); me.stats=Object.assign(defaultStats(),me.stats||{});
       const ds=dailyState(me); if(!ds.can) fail('You already claimed today. Come back tomorrow!'); settle(me);
-      const r=dailyReward(ds.next), cr=applyReward(me,r); evGain(me,5); me.daily={last:ds.today,streak:ds.next}; me.stats.dailies=(me.stats.dailies||0)+1; me.lastSeen=now(); t.setPlayer(ME,me); return {r,cr,n:ds.next}; }); }
+      const r=dailyReward(ds.next), cr=applyReward(me,r); evGain(me,5); me.daily={last:ds.today,streak:ds.next}; try{ streakMile(me,ds.next); }catch(e){} me.stats.dailies=(me.stats.dailies||0)+1; me.lastSeen=now(); t.setPlayer(ME,me); return {r,cr,n:ds.next}; }); }
   catch(e){ err=e; }
   busy=false; if(err){ explain(err); refreshButtons(); return; }
   snd('quest'); toast(`Day ${out.n} reward: ${rewardTxt(out.r)}`); renderAll();
@@ -3969,10 +3989,12 @@ function petShot(c,k,x0,y0,x1,y1,q,s){ const P2=PETS[k]||PETS.fox, x=x0+(x1-x0)*
 const myPet=p=>p&&p.pets?p.pets.find(x=>x.id===p.petOn)||null:null;
 const petMaxLvl=()=>Math.min(PET_MAX,Math.max(2,(stats(ME).hallLvl||1)*2));
 const PET_RAR=['Common','Rare','Epic','Legendary'];
+function petRarN(P2){ return P2&&P2.mythic?'Mythic':PET_RAR[(P2&&P2.r)||0]; }
+function petRarC(P2){ return P2&&P2.mythic?'#ff5fd2':RAR[(P2&&P2.r)||0].col; }
 function rollPetKind(){ let r=Math.random(); for(const [k,pr] of PET_CRATE_ODDS){ if(r<pr) return k; r-=pr; } return 'fox'; }
 function bookAdd(me,kind,k){ me.book=me.book||{}; const a=me.book[kind]=me.book[kind]||[]; if(!a.includes(k)) a.push(k); }
 function hatchPet(me,k){ me.pets=me.pets||[]; k=k||rollPetKind(); bookAdd(me,'p',k); const twin=me.pets.some(x=>x.k===k);
-  if(me.pets.length>=PET_KEEP){ const g=petPrice({k,lvl:1}); me.gold+=g.gold; me.gems=(me.gems||0)+g.gems; return {pet:k,full:1,gold:g.gold,gems:g.gems,lvl:1,name:PETS[k].name}; }
+  if(me.pets.length>=petCap(me)){ const g=petPrice({k,lvl:1}); me.gold+=g.gold; me.gems=(me.gems||0)+g.gems; return {pet:k,full:1,gold:g.gold,gems:g.gems,lvl:1,name:PETS[k].name}; }
   const id=Math.random().toString(36).slice(2,9), name=pick(PET_NAMES[k]||['Buddy']); me.pets.push({id,k,lvl:1,name}); if(!me.petOn||!me.pets.some(x=>x.id===me.petOn)) me.petOn=id; return {pet:k,id,lvl:1,name,isNew:1,twin}; }
 /* selling and merging pets */
 const petPrice=pt=>{ const r=(PETS[pt.k]||{r:0}).r; return {gold:Math.round([400,1200,3000,6500][r]*(1+.35*((pt.lvl||1)-1))),gems:[0,0,5,15][r]}; };
@@ -4024,7 +4046,7 @@ function petsDialog(){ const m=P(ME); if(!m||m.dead) return; const pets=m.pets||
       <p class="desc odds">${petOddsTxt()}</p>
       <div class="row" style="justify-content:center">${can?btn('Open a Pet Crate',CRATES.pet.cost,'crate:pet','gemb'):`<p class="desc">Pet Crates unlock at Town Hall ${CRATES.pet.th}.</p>`}</div>`; }
   else { const P2=PETS[on.k], mx=petMaxLvl(), nd=on.lvl<PET_MAX?petDefOf({...on,lvl:on.lvl+1})-petDefOf(on):0, rn=petRename===on.id;
-    body=`<div class="petHero"><canvas data-pet="${on.k}" data-lvl="${on.lvl}" data-id="${on.id}" data-big="1" class="petcv big"></canvas><span class="petRar" style="--rc:${RAR[P2.r].col}">${PET_RAR[P2.r]}${P2.ev?' · Event':''}</span></div>
+    body=`<div class="petHero"><canvas data-pet="${on.k}" data-lvl="${on.lvl}" data-id="${on.id}" data-big="1" class="petcv big"></canvas><span class="petRar" style="--rc:${petRarC(P2)}">${petRarN(P2)}${P2.ev?' · Event':''}</span></div>
       ${rn?`<form class="row" id="petNameF" style="justify-content:center"><input id="petNameIn" maxlength="14" value="${esc(on.name)}" style="max-width:12rem" autocomplete="off"><button class="prime" type="submit">Save name</button><button class="soft" type="button" data-act="pet:renameoff">Cancel</button></form>`
         :`<h2 class="petName">${esc(cleanText(on.name))} <button class="soft mini" data-act="pet:rename:${on.id}" aria-label="Rename">✏️ Rename</button></h2>`}
       <p class="desc" style="text-align:center"><b>${esc(petForm(on.k,on.lvl))}</b> · ${petStage(on.lvl)} · level ${on.lvl} of ${PET_MAX}${petNextEvo(on.k,on.lvl)?` · ✨ evolves into <b>${esc(petNextEvo(on.k,on.lvl).name)}</b> at level ${petNextEvo(on.k,on.lvl).at}`:' · ✨ fully evolved'}${on.id===m.petOn?' · 🛡️ Guarding your kingdom':''}</p>
@@ -4048,8 +4070,8 @@ let petView=null;
 function petOddsTxt(){ const by=[0,0,0,0]; for(const [k,pr] of PET_CRATE_ODDS) by[PETS[k].r]+=pr; return by.map((p,i)=>`${PET_RAR[i]} ${Math.round(p*100)}%`).join(' · '); }
 function petReveal(res,k,again,back){ const P2=PETS[res.pet];
   $('ov').innerHTML=`<div class="overlay" id="petOv"><div class="dialog reveal petDlg"><p class="desc">${CRATES[k]?.name||'Pet Crate'}</p><div class="petHero"><canvas data-pet="egg" data-big="1" data-t0="${performance.now()}" data-gold="${P2.r>=2?1:0}" class="petcv big" id="revCv"></canvas></div>
-    <div class="prize" hidden><p class="big" style="color:${RAR[P2.r].col}">${res.isNew?'It hatched!':PET_RAR[P2.r]+'!'}</p><h2>${res.isNew?`Meet ${esc(res.name)} the ${P2.name}!`:`Your pet house is full, so the ${P2.name} egg was sold for ${f(res.gold)} gold${res.gems?' and '+res.gems+' gems':''}.`}</h2>${res.twin?`<p class="desc"><b>You now have two ${P2.name}${/(x|s|sh|ch)$/.test(P2.name)?'es':'s'}!</b> Open your pets and press Merge to combine them into one stronger pet, or sell the extra one.</p>`:''}
-    <p class="desc">${PET_RAR[P2.r]} pet · Special power: ${P2.power}. ${res.isNew?'Your new pet guards your kingdom against attackers.':''}</p>
+    <div class="prize" hidden><p class="big" style="color:${petRarC(P2)}">${res.isNew?'It hatched!':petRarN(P2)+'!'}</p><h2>${res.isNew?`Meet ${esc(res.name)} the ${P2.name}!`:`Your pet house is full, so the ${P2.name} egg was sold for ${f(res.gold)} gold${res.gems?' and '+res.gems+' gems':''}.`}</h2>${res.twin?`<p class="desc"><b>You now have two ${P2.name}${/(x|s|sh|ch)$/.test(P2.name)?'es':'s'}!</b> Open your pets and press Merge to combine them into one stronger pet, or sell the extra one.</p>`:''}
+    <p class="desc">${petRarN(P2)} pet · Special power: ${P2.power}. ${res.isNew?'Your new pet guards your kingdom against attackers.':''}</p>
     <div class="row">${res.isNew?btn('Name your pet',null,'pet:renamenew:'+res.id,'prime'):''}${btn('See your pets',null,'pet:open','soft')}${again?btn('Open another',null,'crate:'+k,'gemb'):''}${back==='rew'?btn('Back to rewards',null,'rew:open','soft'):''}</div></div></div></div>`;
   if(res.isNew&&P2.r===3) addNews(`🐉 ${P(ME).name} hatched a Legendary ${P2.name}!`,'good');
   snd('march'); startPetLoop();
@@ -4378,7 +4400,8 @@ const petSnap=p=>{ const pt=myPet(p); return pt&&PETS[pt.k]?{k:pt.k,lvl:pt.lvl,n
    the wandering merchant, clan map pings, clan alliances and the world news board ================= */
 
 /* ----- block and report ----- */
-const isBlocked=id=>!!id&&((P(ME)||{}).blocked||[]).includes(id);
+const isBlocked=id=>!!id&&(((P(ME)||{}).blocked||[]).includes(id)||(typeof muteOn==='function'&&muteOn(id)));
+const isBlkReal=id=>!!id&&((P(ME)||{}).blocked||[]).includes(id);
 function blockPlayer(uid,on){ act([],me=>{ if(uid===ME) fail('That is you!'); me.blocked=(me.blocked||[]).filter(x=>x!==uid); if(on){ if(me.blocked.length>=100) fail('Your block list is full.'); me.blocked.push(uid); me.friends=(me.friends||[]).filter(x=>x!==uid); me.frOut=(me.frOut||[]).filter(x=>x!==uid); } return {on}; },
   r=>{ snd('click'); toast(r.on?'Blocked. You will not see their chat, news or friend requests any more.':'Unblocked.'); renderChat(); renderNews(); if($('profOv')) profileDialog(profUid); }); }
 const REPORT_WHY=['Rude or mean chat','Rude kingdom or pet name','Cheating','Bullying','Something else'];
@@ -6982,7 +7005,7 @@ function saBuild(){ const E=[]; const add=(kind,k,name,card,o)=>{ if(!name) retu
   for(const k of saCrateOrder()){ const c=CRATES[k]; add('crate',k,c.name,()=>saCrateCard(k),{th:c.th||1,alias:[{wood:'wood crate',legend:'legend chest',troop:'troop crate',pet:'pet egg',gem:'gem crate',war:'war crate'}[k]||'',k+' crate']}); }
   for(const k in ITEMS){ const it=ITEMS[k]; add('item',k,it.name,()=>{ const cr=saItemCrates(k); return `<p><b>${RAR[it.r].name}</b> ${SLOTS[it.slot]||it.slot}: ${itemText(it)}.</p>${cr.length?`<p><b>Chance per crate:</b></p><ul>${cr.map(([c,p])=>`<li>${esc(CRATES[c].name)}: <b>${saPct(p)}</b>${saIn(p)}</li>`).join('')}</ul>`:''}<p>You can also find gear in the Armory shop (its stock changes every day) and make it stronger at the Forge.</p>`; }); }
   const pkeys=[...Object.keys(PETS_BASE),...Object.keys(MYTHS)];
-  for(const k of pkeys){ const P2=PETS[k]; if(!P2) continue; add('pet',k,P2.name,()=>`<p><b>${P2.mythic?'Mythic':PET_RAR[P2.r]}</b> pet · power: <b>${esc(P2.power||'')}</b> · guards your kingdom (defense ×${(+P2.def||1).toFixed(2).replace(/\.?0+$/,'')}).</p>${saPetHow(k)}<p>Pets level up to ${PET_MAX}. Two of the same pet can be merged into a stronger one.</p>`,{alias:[k==='sunlion'?'sun lion':k==='ghostcat'?'ghost cat':k]}); }
+  for(const k of pkeys){ const P2=PETS[k]; if(!P2) continue; add('pet',k,P2.name,()=>`<p><b>${petRarN(P2)}</b> pet · power: <b>${esc(P2.power||'')}</b> · guards your kingdom (defense ×${(+P2.def||1).toFixed(2).replace(/\.?0+$/,'')}).</p>${saPetHow(k)}<p>Pets level up to ${PET_MAX}. Two of the same pet can be merged into a stronger one.</p>`,{alias:[k==='sunlion'?'sun lion':k==='ghostcat'?'ghost cat':k]}); }
   for(const k in DECOS){ const d=DECOS[k]; add('deco',k,d.name,()=>`<p>A decoration for your kingdom.</p><p>${d.special?`How to get it: <b>${esc(d.special)}</b>.`:`Cost: <b>${saCost(d.cost)}</b> · needs Town Hall ${d.th||1}.`}</p>`,{th:d.special?null:(d.th||1)}); }
   try{ for(const k in WONDERS){ const w=WONDERS[k]; add('wonder',k,w.n,()=>`<p>${esc(w.desc)}</p><ul><li>Bonus: <b>${esc(w.bonus)}</b></li><li>Cost: <b>${saCost(WONDER_COST)}</b> · takes ${fmtT(WONDER_SECS)} to build</li><li>Needs Town Hall ${WONDER_TH}. Extra wonder slots cost ${f(typeof W_SLOT_GEMS!=='undefined'?W_SLOT_GEMS:10000)} gems.</li></ul>`,{th:WONDER_TH}); } }catch(e){}
   try{ for(const k in HATS){ const h=HATS[k]; add('hat',k,h.name,()=>`<p>A hat for your king or pets ${h.ic}.</p><p>${h.how?`How to get it: <b>${esc(h.how)}</b>.`:`Costs <b>${h.gems} gems</b>.`}</p>`); } }catch(e){}
@@ -7062,7 +7085,7 @@ function saBest(qn){ const m=/\b(best|strongest|most powerful|top|rarest|cheapes
   else if(k==='mount'){ sc=e=>MOUNTS[e.k].pow; why=e=>`+${Math.round(MOUNTS[e.k].pow*100)}% hero power`; }
   else return [];
   const top=E.slice().sort((a,b)=>sc(b)-sc(a)).slice(0,3); return [{q:`🏆 ${w[0].toUpperCase()+w.slice(1)} ${SA_KN[k].replace(/^\S+ /,'').toLowerCase()}`,a:`<ol>${top.map(e=>`<li><b>${esc(e.name)}</b>: ${why(e)}</li>`).join('')}</ol>`,s:0}]; }
-function saMax(qn){ if(!/\b(max|maximum|highest|top|cap|limit)\b/.test(qn)||!/\blevel|lvl|lv\b/.test(qn)) return []; return [{q:'📈 Highest levels',a:`<ul><li>Town Hall: <b>${HALL_MAX}</b></li><li>Buildings: <b>${BLD_MAX}</b> (and never more than your Town Hall level + 1)</li><li>Pets: <b>${PET_MAX}</b></li><li>Gear you can carry: ${INV_MAX} pieces · pets you can keep: ${PET_KEEP}</li></ul>`,s:0}]; }
+function saMax(qn){ if(!/\b(max|maximum|highest|top|cap|limit)\b/.test(qn)||!/\blevel|lvl|lv\b/.test(qn)) return []; return [{q:'📈 Highest levels',a:`<ul><li>Town Hall: <b>${HALL_MAX}</b></li><li>Buildings: <b>${BLD_MAX}</b> (and never more than your Town Hall level + 1)</li><li>Pets: <b>${PET_MAX}</b></li><li>Gear you can carry: ${INV_MAX} pieces · pets you can keep: ${petCap(P(ME))}</li></ul>`,s:0}]; }
 /* ----- fallback: look through the whole Game Guide ----- */
 var SA_GD=null;
 function saGuide(qn,max){ try{ if(!SA_GD){ SA_GD=[]; for(const x of gdSections()){ const parts=x.html.split(/<\/li>|<\/p>|<br\s*\/?>|<\/tr>|<\/h3>/); for(const h of parts){ const t=h.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(); if(t.length>12) SA_GD.push({sec:x.ic+' '+x.name,t,n:saNorm(t)}); } } }
@@ -7601,7 +7624,7 @@ function museumHtml(o){ setTimeout(()=>{ try{ startPetLoop(); }catch(e){} },60);
     <div class="thGrid"><div><span>💠</span><b>${ascOf(p)}</b><small>Ascensions</small></div><div><span>🌟</span><b>${presOf(p)}</b><small>Prestige stars</small></div><div><span>🗼</span><b>${((p.tower||{}).top)||0}</b><small>Best tower floor</small></div><div><span>${rr[2]}</span><b>${rr[1]}</b><small>Best arena rank</small></div><div><span>🐲</span><b>${p.raidWins||0}</b><small>Raid Bosses beaten</small></div><div><span>🏛️</span><b>${hof.length}</b><small>Hall of Fame</small></div></div>
     ${hof.length?`<div class="label">🏛️ Hall of Fame badges</div><p class="desc hofBadges">${hof.map(H=>`<span title="${esc(H.d)}">${H.ic} ${H.n}</span>`).join('')}</p>`:''}
     <div class="label">⚔️ Rare gear</div>${gear.length?`<div class="musGear">${gear.map(x=>`<span style="--rc:${RAR[ITEMS[x.k].r].col}">${esc(ITEMS[x.k].name)}${x.b?'+':''}<small>${RAR[ITEMS[x.k].r].name}</small></span>`).join('')}</div>`:'<p class="desc">No Legendary gear yet.</p>'}
-    <div class="label">🐾 Prize pets</div>${pets.length?`<div class="awkGrid">${pets.map(pt=>`<div class="${pt.aw?'aw':''}"><canvas data-pet="${pt.k}" data-lvl="${pt.lvl||1}" class="petcv" style="height:80px"></canvas><b>${pt.aw?'✨ ':''}${esc(cleanText(pt.name||PETS[pt.k].name))}</b><small>${PET_RAR[PETS[pt.k].r]||''} ${PETS[pt.k].name} · Lv ${pt.lvl||1}</small></div>`).join('')}</div>`:'<p class="desc">No pets yet.</p>'}
+    <div class="label">🐾 Prize pets</div>${pets.length?`<div class="awkGrid">${pets.map(pt=>`<div class="${pt.aw?'aw':''}"><canvas data-pet="${pt.k}" data-lvl="${pt.lvl||1}" class="petcv" style="height:80px"></canvas><b>${pt.aw?'✨ ':''}${esc(cleanText(pt.name||PETS[pt.k].name))}</b><small>${petRarN(PETS[pt.k])||''} ${PETS[pt.k].name} · Lv ${pt.lvl||1}</small></div>`).join('')}</div>`:'<p class="desc">No pets yet.</p>'}
     ${T.statues.length?`<div class="label">🗿 Statues</div><p class="desc">${T.statues.map(esc).join(' · ')}</p>`:''}
     ${T.bosses.length?`<div class="label">🃏 Boss cards</div><p class="desc">${T.bosses.length} boss cards: ${T.bosses.slice(0,12).map(esc).join(' · ')}${T.bosses.length>12?' …':''}</p>`:''}`; }
 function musDialog(o){ const p=P(o); if(!p) return; $('ov').innerHTML=`<div class="overlay"><div class="dialog wide lgDlg"><h2>🖼️ ${esc(cleanText(p.name||''))}'s Museum</h2>${museumHtml(o)}<button class="soft" data-act="ov:close">Close</button></div></div>`; try{ startPetLoop(); }catch(e){} }
@@ -7689,7 +7712,7 @@ function auBid(aid){ const inp=$('auB_'+aid), amt=Math.round(+(inp&&inp.value)||
     if(a.top){ b.owe[a.top]=b.owe[a.top]||{g:0,it:[],w:0}; b.owe[a.top].g+=a.bid; } a.top=ME; a.tn=String(me.name||'').slice(0,24); a.bid=amt; if(a.end-now()<5*60000) a.end=now()+5*60000; pl[AU_CELL]=b; return {amt,n:auItemName(a.it)}; },
     r=>{ snd('gem'); toast(`🔨 You bid ${f(r.amt)} gems on ${r.n}!`); auDialog(); }); }
 function auCollect(){ act([AU_CELL],(me,pl)=>{ const b=auSettle(pl[AU_CELL]||{o:'npc',b:'auction',L:[],owe:{}}), ow=b.owe[ME]; if(!ow) fail('Nothing to collect.'); const got={it:0,g:0}, left=[];
-    for(const it of ow.it||[]){ if(it.t==='g'&&(me.inv||[]).length<INV_MAX){ me.inv=me.inv||[]; me.inv.push(it.x); bookAdd(me,'g',it.x.k); got.it++; } else if(it.t==='p'&&(me.pets||[]).length<PET_KEEP){ me.pets=me.pets||[]; me.pets.push(it.x); got.it++; } else left.push(it); }
+    for(const it of ow.it||[]){ if(it.t==='g'&&(me.inv||[]).length<INV_MAX){ me.inv=me.inv||[]; me.inv.push(it.x); bookAdd(me,'g',it.x.k); got.it++; } else if(it.t==='p'&&(me.pets||[]).length<petCap(me)){ me.pets=me.pets||[]; me.pets.push(it.x); got.it++; } else left.push(it); }
     const g=Math.min(300,ow.g||0); if(g>0){ gemsAdd(me,g); got.g=g; } ow.g=(ow.g||0)-g; if(ow.w){ me.aucW=(me.aucW||0)+ow.w; ow.w=0; } ow.it=left; if(!ow.it.length&&!(ow.g>0)) delete b.owe[ME]; pl[AU_CELL]=b; got.left=left.length+((ow.g||0)>0?1:0); return got; },
     r=>{ snd('quest'); toast(`📦 Collected ${r.it?`${r.it} item${r.it>1?'s':''}`:''}${r.it&&r.g?' and ':''}${r.g?`${r.g} gems`:''}${!r.it&&!r.g?'nothing (your bag or pet house is full)':''}.${r.left?' Some things are still waiting: make room and collect again.':''}`); auDialog(); }); }
 
@@ -8819,7 +8842,7 @@ var cvWatchFor=null, cvUnsub=null;
 function cvWatchTick(){ try{ if(!DB||!ME||!P(ME)||typeof DB.watchConvos!=='function') return; if(cvWatchFor===ME) return; if(cvUnsub){ try{ cvUnsub(); }catch(e){} } cvUnsub=null; convos={}; msgFirst=true; cvWatchFor=ME; const u=DB.watchConvos(ME,l=>{ if(cvWatchFor!==ME) return; onConvos(l||[]); }); if(typeof u==='function') cvUnsub=u; }catch(e){} }
 setInterval(cvWatchTick,1500);
 setTimeout(()=>{ try{ if(!$('bMsg')){ const k=$('bRew')||$('bKing'); const b=document.createElement('button'); b.id='bMsg'; b.className='soft hbtn'; b.dataset.act='msg:list'; b.textContent='💬 Messages'; if(k&&k.parentNode) k.parentNode.insertBefore(b,k.nextSibling); } msgBadge(); }catch(e){} },0);
-msgHead=(o=>function(){ o.apply(this,arguments); try{ const c=convos[msgOpen], el=$('msgHead'); if(c&&el&&(c.members||[]).length===2&&!el.querySelector('.privNote')){ const p=document.createElement('p'); p.className='desc privNote'; p.textContent='🔒 Private: only the two of you can read this chat.'; el.appendChild(p); } }catch(e){} })(msgHead);
+msgHead=(o=>function(){ o.apply(this,arguments); try{ const c=convos[msgOpen], el=$('msgHead'); if(c&&el&&(c.members||[]).length===2&&!el.querySelector('.privNote')){ const p=document.createElement('p'); p.className='desc privNote'; p.textContent='🔒 Private chat: only the two of you see it in the game.'; el.appendChild(p); } }catch(e){} })(msgHead);
 /* purchases: if the game was busy with a background save when you tapped, your tap used to be ignored. Now it waits its turn (a quick moment) and then goes through.
    A second tap while YOUR first purchase is still going is still ignored, so you can't buy twice by accident. */
 var BUSY_USER=false;
@@ -8987,7 +9010,7 @@ setInterval(()=>{ try{ if(Object.keys(MYTH_OWN).length<Object.keys(MYTHS).length
 /* ===== v124: Fun & Collect ===== */
 function fnOpen(title,body,back){ fkOpen(title,body,back===undefined?'v124:hub':back); }
 var fnTileDots={};
-function fnHub(){ const m=P(ME); if(!m) return; const T=[['boss','👹','Daily Boss','A new monster every day'],['book','📖','Monster Book','Collect every dungeon monster'],['cup','🏆','Mini-game Cup','Weekly mini-game contest'],['tricks','🎪','Pet Tricks','Teach your pet tricks'],['photo','📸','Photo Mode','Save a picture of your kingdom'],['season','🍂','Season Shop','Castle skins for this season'],['titles','🎖️','Titles','Show a title next to your name'],['guide','📋','First Day Guide','Fun goals for new rulers'],['away','📰','News','What happened lately'],['v125:orders','📦','Orders','Ask for things, deliver for gold'],['v125:rush','💀','Boss Rush','All 10 bosses in a row'],['v125:pb','🐾','Pet Battles','Battle a friend\'s pet'],['v125:map','🗺️','Treasure Map','Find 4 pieces, dig a chest'],['v125:ev','📜','Kingdom Events','Make a choice'],['v125:pvis','🏡','Pet Visits','Send your pet to a friend'],['v125:kotw','🏅','Kingdom of the Week','Vote for the coolest kingdom'],['v125:fl','👫','Friend Leaderboard','You vs your friends'],['v125:ach','🏆','Achievements','Everything you collected'],['v126:isl','⛰️','Crown Island','Clans fight for it every month'],['v126:gdn','🌱','Royal Garden','Plant, water, harvest'],['v126:sf','🎣','Seasonal Fish','Rare fish for each season'],['v126:cards','📇','Kingdom Cards','Collect a card from every kingdom']];
+function fnHub(){ const m=P(ME); if(!m) return; const T=[['boss','👹','Daily Boss','A new monster every day'],['book','📖','Monster Book','Collect every dungeon monster'],['cup','🏆','Mini-game Cup','Weekly mini-game contest'],['tricks','🎪','Pet Tricks','Teach your pet tricks'],['photo','📸','Photo Mode','Save a picture of your kingdom'],['season','🍂','Season Shop','Castle skins for this season'],['titles','🎖️','Titles','Show a title next to your name'],['guide','📋','First Day Guide','Fun goals for new rulers'],['away','📰','News','What happened lately'],['v125:orders','📦','Orders','Ask for things, deliver for gold'],['v125:rush','💀','Boss Rush','All 10 bosses in a row'],['v125:pb','🐾','Pet Battles','Battle a friend\'s pet'],['v125:map','🗺️','Treasure Map','Find 4 pieces, dig a chest'],['v125:ev','📜','Kingdom Events','Make a choice'],['v125:pvis','🏡','Pet Visits','Send your pet to a friend'],['v125:kotw','🏅','Kingdom of the Week','Vote for the coolest kingdom'],['v125:fl','👫','Friend Leaderboard','You vs your friends'],['v125:ach','🏆','Achievements','Everything you collected'],['v126:isl','⛰️','Crown Island','Clans fight for it every month'],['v126:gdn','🌱','Royal Garden','Plant, water, harvest'],['v126:sf','🎣','Seasonal Fish','Rare fish for each season'],['v126:cards','📇','Kingdom Cards','Collect a card from every kingdom'],['v127:cal','📅','Events Calendar','What\'s on now and soon'],['v127:tour','🧭','Kingdom Tour','Visit a cool kingdom'],['v127:poll','🗳️','Vote','What should come next?']];
   const d={}; try{ d.boss=dbCan(m); d.book=mbClaimable(m).length>0; d.cup=!!mgtPrize(m); d.guide=fdgClaimable(m).length>0; d['v125:ev']=kevOpen(m); d['v125:map']=(m.tmapP||0)>=4; d['v125:rush']=brRec(m).d!==dayNum()||!!brPrize(m); d['v125:pvis']=!!(pvOf(m)&&now()>=pvOf(m).t1); d['v125:orders']=ordList().some(O=>O.seller!==ME); d['v126:isl']=(islOn()&&!!myClan()&&now()-(m.islA||0)>=ISL_CD)||!!islClaimable(m); d['v126:gdn']=gdnOf(m).some(p=>p&&now()-p.t0>=GDN_SEEDS[p.s].min*60000); }catch(e){}
   $('ov').innerHTML=`<div class="overlay" id="fkOv"><div class="dialog wide lgDlg"><h2>✨ Fun &amp; Collect</h2><p class="desc">Daily bosses, collecting monsters, pet tricks, photos and more!</p><div class="lgGrid">${T.map(([k,ic,n,s])=>`<button class="lgTile" data-act="${k.includes(':')?k:'v124:'+k}">${d[k]?'<i class="lgDot"></i>':''}<span>${ic}</span><b>${n}</b><small>${s}</small></button>`).join('')}</div><div class="row"><button class="soft" data-act="v113:hub">🏰 Kingdom Life</button><button class="soft" data-act="ov:close">Close</button></div></div></div>`; }
 
@@ -9140,7 +9163,7 @@ function fdgDialog(){ const m=P(ME), got=m.fdg||[], hl=Math.max(1,stats(ME).hall
   fnOpen('📋 First Day Guide',`<p class="desc">New here? These are the most fun things to try first. Each one gives a reward, and finishing them all gives a big bonus!</p><div class="board">${FDG.map(F=>{ const d=fdgDone(m,F), c=got.includes(F[0]); return `<div><span>${c?'✅':d?'🎁':'⬜'} ${F[1]} <b>${F[2]}</b></span><span>${c?'<i>Done</i>':d?btn('Collect',null,'v124:fdg:'+F[0],'prime mini'):'<small>Not yet</small>'}</span></div>`; }).join('')}</div>
   <p class="desc">Each goal: <b>${f(800*hl)} gold and ${f(500*hl)} stone</b>. All 8: <b>an Iron Crate and gems</b>! (${got.length}/8)</p>`); }
 function fdgClaim(id){ const F=FDG.find(x=>x[0]===id); if(!F) return; act([],me=>{ me.fdg=me.fdg||[]; if(me.fdg.includes(id)) fail('Already collected.'); if(!fdgDone(me,F)) fail('Do it first!'); me.fdg.push(id); const hl=Math.max(1,stats(ME).hallLvl||1); me.gold+=800*hl; me.stone+=500*hl; let all=false; if(me.fdg.length>=FDG.length&&!me.fdgAll){ me.fdgAll=1; all=true; me.stash=me.stash||{}; me.stash.iron=(me.stash.iron||0)+1; gemsAdd(me,25); } return {all}; },r=>{ snd(r.all?'win':'quest'); if(r.all){ try{ confetti(); }catch(e){} toast('📋 You finished the First Day Guide! Iron Crate and gems added.'); } else toast('📋 Reward collected!'); fdgDialog(); }); }
-setInterval(()=>{ try{ const m=P(ME); if(!m||m.dead||m.fdgAll||busy) return; if(now()-(m.created||now())>5*864e5) return; if(typeof tutStep==='function'&&typeof TUT!=='undefined'&&tutStep()<TUT.length) return; if(document.querySelector('#ov .overlay')) return; const k='cf-fdg-'+ME, d=String(dayNum()); let s=''; try{ s=localStorage.getItem(k)||''; }catch(e){} if(s===d) return; try{ localStorage.setItem(k,d); }catch(e){} fdgDialog(); }catch(e){} },20000);
+setInterval(()=>{ try{ const m=P(ME); if(!m||m.dead||m.fdgAll||busy) return; if(now()-(m.created||now())>5*864e5) return; if(m.march||Date.now()-lastInput<20000||document.querySelector('#bSkip,#dGo,#batOv')) return; if(typeof tutStep==='function'&&typeof TUT!=='undefined'&&tutStep()<TUT.length) return; if(document.querySelector('#ov .overlay')) return; const k='cf-fdg-'+ME, d=String(dayNum()); let s=''; try{ s=localStorage.getItem(k)||''; }catch(e){} if(s===d) return; try{ localStorage.setItem(k,d); }catch(e){} fdgDialog(); }catch(e){} },20000);
 
 /* ---------- 13. while you were away ---------- */
 var nwPrev=0;
@@ -9157,7 +9180,7 @@ function nwDialog(since){ since=since||(now()-3*864e5); const L=nwItems(since), 
   ${G2.gift.length?`<div class="label">🎁 Gifts (${G2.gift.length})</div><ul class="awayL">${G2.gift.slice(0,8).map(line).join('')}</ul>`:''}
   ${G2.other.length?`<div class="label">📜 Other news (${G2.other.length})</div><ul class="awayL">${G2.other.slice(0,10).map(line).join('')}</ul>`:''}
   ${btn('🔔 Things ready for you',null,'ready:open','soft')}`); }
-readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const m=P(ME); if(m&&!m.dead){ if(dbCan(m)&&(stats(ME).hallLvl||1)>=5) L.push({ic:'👹',t:'Fight today\'s Daily Boss',act:'v124:boss'}); if(mbClaimable(m).length) L.push({ic:'📖',t:'Monster Book page prize',act:'v124:book:'+mbClaimable(m)[0]}); if(mgtPrize(m)) L.push({ic:'🏆',t:'Mini-game Cup prize',act:'v124:cup'}); if(!m.fdgAll&&fdgClaimable(m).length) L.push({ic:'📋',t:'First Day Guide reward',act:'v124:guide'}); if(kevOpen(m)) L.push({ic:'📜',t:'A Kingdom Event needs your choice',act:'v125:ev'}); if((m.tmapP||0)>=4) L.push({ic:'🗺️',t:'Dig up your treasure!',act:'v125:map'}); if(pvOf(m)&&now()>=pvOf(m).t1) L.push({ic:'🐾',t:'Your pet is home from its visit',act:'v125:pvis'}); if(brPrize(m)) L.push({ic:'💀',t:'Boss Rush prize',act:'v125:rush'}); if(islClaimable(m)) L.push({ic:'⛰️',t:'Crown Island prize',act:'v126:isl'}); else if(islOn()&&myClan()&&now()-(m.islA||0)>=ISL_CD) L.push({ic:'⛰️',t:'Crown Island is open! Attack for your clan',act:'v126:isl'}); if(gdnOf(m).some(p=>p&&now()-p.t0>=GDN_SEEDS[p.s].min*60000)) L.push({ic:'🌱',t:'Your garden is ready to harvest',act:'v126:gdn'}); } }catch(e){} return L; })(readyList);
+readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const m=P(ME); if(m&&!m.dead){ if(dbCan(m)&&(stats(ME).hallLvl||1)>=5) L.push({ic:'👹',t:'Fight today\'s Daily Boss',act:'v124:boss'}); if(mbClaimable(m).length) L.push({ic:'📖',t:'Monster Book page prize',act:'v124:book:'+mbClaimable(m)[0]}); if(mgtPrize(m)) L.push({ic:'🏆',t:'Mini-game Cup prize',act:'v124:cup'}); if(!m.fdgAll&&fdgClaimable(m).length) L.push({ic:'📋',t:'First Day Guide reward',act:'v124:guide'}); if(kevOpen(m)) L.push({ic:'📜',t:'A Kingdom Event needs your choice',act:'v125:ev'}); if((m.tmapP||0)>=4) L.push({ic:'🗺️',t:'Dig up your treasure!',act:'v125:map'}); if(pvOf(m)&&now()>=pvOf(m).t1) L.push({ic:'🐾',t:'Your pet is home from its visit',act:'v125:pvis'}); if(brPrize(m)) L.push({ic:'💀',t:'Boss Rush prize',act:'v125:rush'}); if(islClaimable(m)) L.push({ic:'⛰️',t:'Crown Island prize',act:'v126:isl'}); else if(islOn()&&myClan()&&now()-(m.islA||0)>=ISL_CD) L.push({ic:'⛰️',t:'Crown Island is open! Attack for your clan',act:'v126:isl'}); if(gdnOf(m).some(p=>p&&now()-p.t0>=GDN_SEEDS[p.s].min*60000)) L.push({ic:'🌱',t:'Your garden is ready to harvest',act:'v126:gdn'}); if(!(m.pv&&m.pv.id===pollNow().id)&&(stats(ME).hallLvl||1)>=3) L.push({ic:'🗳️',t:'Vote: '+pollNow().q,act:'v127:poll'}); } }catch(e){} return L; })(readyList);
 
 /* ---------- 14. simple mode ---------- */
 try{ SET_TOGGLES.push(['simple','🧸 Simple mode','Bigger text and buttons, and fewer busy things moving on the map.'],['clanFlag','🚩 Clan banners on castles','Show each clan\'s banner next to its members\' castles.']); }catch(e){ setTimeout(()=>{ try{ SET_TOGGLES.push(['simple','🧸 Simple mode','Bigger text and buttons, and fewer busy things moving on the map.'],['clanFlag','🚩 Clan banners on castles','Show each clan\'s banner next to its members\' castles.']); }catch(e2){} },0); }
@@ -9443,7 +9466,7 @@ function gdnHarvest(i){ i=+i; act([],me=>{ const p=(me.gdn||[])[i]; if(!p) fail(
 var SFISH={winter:[['icefish','Ice Fish','🧊'],['snowtrout','Snow Trout','❄️'],['aurora','Aurora Koi','🌌'],['frostcrab','Frost King Crab','🦀']],spring:[['blossomkoi','Blossom Koi','🌸'],['rainbowcarp','Rainbow Carp','🌈'],['frogfish','Lily Frogfish','🐸'],['petalray','Petal Ray','🪷']],summer:[['sunfish','Golden Sunfish','☀️'],['coralbass','Coral Bass','🪸'],['flyfish','Flying Fish','🐟'],['sharkpup','Baby Shark','🦈']],autumn:[['pumpkinpike','Pumpkin Pike','🎃'],['mapleperch','Maple Perch','🍁'],['ghostfish','Ghost Fish','👻'],['harvestcod','Harvest Cod','🌾']]};
 function sfRoll(me,r){ if(Math.random()>.12) return; const L=SFISH[seasonCF()]; if(!L) return; const F=L[Math.floor(Math.random()*L.length)]; me.sfish=Object.assign({},me.sfish||{}); r.sfNew=!me.sfish[F[0]]; me.sfish[F[0]]=(me.sfish[F[0]]||0)+1; r.sf=F[0]; me.sfLast={k:F[0],t:now()}; }
 var sfSeen=null;
-setInterval(()=>{ try{ const m=P(ME); if(!m||!m.sfLast) return; const k=m.sfLast.k+m.sfLast.t; if(sfSeen===null){ sfSeen=k; return; } if(k!==sfSeen){ sfSeen=k; let F=null; for(const s in SFISH) for(const x of SFISH[s]) if(x[0]===m.sfLast.k) F=x; if(F){ snd('rare'); toast(`🌟 RARE seasonal fish: ${F[2]} ${F[1]}! Check your Seasonal Fish book.`); } } }catch(e){} },1500);
+setInterval(()=>{ try{ const m=P(ME); if(!m) return; const k=m.sfLast?m.sfLast.k+m.sfLast.t:''; if(sfSeen===null){ sfSeen=k; return; } if(k&&k!==sfSeen){ sfSeen=k; let F=null; for(const s in SFISH) for(const x of SFISH[s]) if(x[0]===m.sfLast.k) F=x; if(F){ snd('rare'); toast(`🌟 RARE seasonal fish: ${F[2]} ${F[1]}! Check your Seasonal Fish book.`); } } }catch(e){} },1500);
 function sfDialog(){ const m=P(ME), got=m.sfish||{}, cur=seasonCF(), cl=m.sfC||[];
   fnOpen('🎣 Seasonal Fish',`<p class="desc">When you go fishing, you can sometimes catch a <b>rare seasonal fish</b>. Each season has 4 different ones, and they only bite during their season! Catch all 4 of a season for a prize.</p>
   ${Object.entries(SFISH).map(([s,L])=>{ const I=SEASON_INFO[s], all=L.every(F=>got[F[0]]); return `<div class="label">${I[0]} ${I[1]}${s===cur?' · <b>biting now!</b>':''}</div><div class="sfGrid">${L.map(F=>`<div class="sfCard${got[F[0]]?' got':''}"><span>${got[F[0]]?F[2]:'❔'}</span><small>${got[F[0]]?esc(F[1])+(got[F[0]]>1?' ×'+got[F[0]]:''):'???'}</small></div>`).join('')}</div>${all?(cl.includes(s)?'<p class="desc">✅ Set complete!</p>':btn('🎁 Collect set prize',null,'v126:sfclaim:'+s,'prime mini')):''}`; }).join('')}
@@ -9487,6 +9510,314 @@ setInterval(()=>{ try{ const m=P(ME); if(!m||m.dead||m.intro||$('introOv')) retu
   else if(k==='sf') sfDialog(); else if(k==='fish'){ $('ov').innerHTML=''; fishDialog(); } else if(k==='sfclaim') sfClaim(r[2]);
   else if(k==='kc'){ kcCollect(r[2]); const sb=$('stampBar'); if(sb) sb.remove(); } else if(k==='cards') kcDialog();
   else if(k==='intronext'){ introI++; introShow(); } else if(k==='introdone') introDone();
+  return true; }; })();
+
+/* ===== v127: share, how to play, polls, owner stats, one big menu, events calendar, tours, streak bonuses ===== */
+/* ---------- 📣 share + how to play ---------- */
+function shareUrl(){ try{ return location.protocol==='file:'?'':location.origin+location.pathname; }catch(e){ return ''; } }
+async function shareGame(){ const url=shareUrl(), text=`Come play Crownforge with me! My kingdom is ${P(ME)?P(ME).name:''} 👑`;
+  try{ if(navigator.share&&url){ await navigator.share({title:'Crownforge',text,url}); return; } }catch(e){ if(e&&e.name==='AbortError') return; }
+  try{ await navigator.clipboard.writeText(url?text+' '+url:text); toast('🔗 Link copied! Paste it to your friends.'); }catch(e){ fnOpen('📣 Share Crownforge',`<p class="desc">Copy this link and send it to your friends:</p><input readonly value="${esc(url||'(open the game from your GitHub site to get its link)')}" style="width:100%" onclick="this.select()">`,null); } }
+var HOWTO=[['🏰','Build','Tap land next to your kingdom to buy it, then build Gold Mines, Quarries and Farms. Tap them to collect.'],['⬆️','Grow','Upgrade your Town Hall to unlock new buildings, troops, heroes and pets.'],['⚔️','Fight','Train troops at the Barracks. Raid barbarian camps and other kingdoms for loot and trophies.'],['🐾','Pets','Open crates to find pets. Your guard pet protects your kingdom and grows stronger.'],['🛡️','Clans','Join a clan to chat, help each other and fight clan wars and Crown Island.'],['🎯','Fun','Try the dungeon, mini-games, fishing, the garden, Daily Boss and lots more in 🎮 Play.'],['🔔','Stuck?','Tap 🔔 to see what\'s ready, or ask a question in the search bar at the top.']];
+function howtoDialog(){ fnOpen('📖 How to play',`<p class="desc">Crownforge in 7 quick steps:</p>${HOWTO.map(([ic,n,t],i)=>`<div class="htRow"><span>${ic}</span><div><b>${i+1}. ${n}</b><br><small>${t}</small></div></div>`).join('')}${btn('📣 Invite friends',null,'v127:share','prime')}`,null); }
+
+/* ---------- 🎮 one big Play menu ---------- */
+var PLAY_SECTIONS=[
+ ['⚔️ Fight',[['🏕️','Barbarian camps','v127:go:camps'],['🕳️','Dungeon','v127:btn:bDungeon'],['👹','Daily Boss','v124:boss'],['💀','Boss Rush','v125:rush'],['🐉','World Boss','v127:btn:bWB'],['⛰️','Crown Island','v126:isl']]],
+ ['🐾 Pets',[['🐾','My pets','v127:btn:bPet'],['🎪','Pet Tricks','v124:tricks'],['🐾','Pet Battles','v125:pb'],['🏡','Pet Visits','v125:pvis']]],
+ ['🏰 My kingdom',[['👑','Kingdom','v127:btn:bKing'],['🌱','Royal Garden','v126:gdn'],['🏯','Castle skins','v108:skins'],['🎖️','Titles','v124:titles'],['🏆','Achievements','v125:ach']]],
+ ['👥 Friends & clans',[['💬','Messages','msg:list'],['📦','Orders','v125:orders'],['👫','Friend Leaderboard','v125:fl'],['🏅','Kingdom of the Week','v125:kotw'],['📇','Kingdom Cards','v126:cards'],['🧭','Kingdom Tour','v127:tour']]],
+ ['🎯 Games & collecting',[['🎮','Mini-games','v127:games'],['🎣','Fishing','v126:fish'],['🐟','Seasonal Fish','v126:sf'],['📖','Monster Book','v124:book'],['🗺️','Treasure Map','v125:map'],['📜','Kingdom Events','v125:ev']]],
+ ['🌍 Big menus',[['🏆','Legends','v107:hub'],['🌍','Adventures','v108:hub'],['🏰','Kingdom Life','v113:hub'],['✨','Fun & Collect','v124:hub']]],
+ ['ℹ️ Help',[['📖','How to play','v127:howto'],['📅','Events calendar','v127:cal'],['🗳️','Vote: what\'s next?','v127:poll'],['📣','Invite friends','v127:share']]]];
+function playMenu(){ const m=P(ME); if(!m) return;
+  $('ov').innerHTML=`<div class="overlay" id="fkOv"><div class="dialog wide lgDlg"><h2>🎮 Play</h2><p class="desc">Everything you can do, in one place.</p>${PLAY_SECTIONS.map(([n,L])=>`<div class="label">${n}</div><div class="playRow">${L.map(([ic,t,a])=>`<button class="soft playIt" data-act="${a}"><span>${ic}</span>${t}</button>`).join('')}</div>`).join('')}<div class="row"><button class="soft" data-act="ov:close">Close</button></div></div></div>`; }
+function clickBtn(id){ $('ov').innerHTML=''; const b=$(id); if(b) b.click(); else toast('That is not unlocked yet.',true); }
+function goCamps(){ $('ov').innerHTML=''; try{ const [hx,hy]=xy(stats(ME).hall); let best=null,bd=1e9; for(const k in G.plots){ const q=G.plots[k]; if(q.o==='npc'&&q.b==='camp'){ const [x,y]=xy(k), d=Math.abs(x-hx)+Math.abs(y-hy); if(d<bd){ bd=d; best=k; } } } if(best){ setTab&&setTab('map'); centerOn(best); tapCell(best); draw(); } else toast('No camps nearby right now.'); }catch(e){} }
+
+/* ---------- 🧭 kingdom tours ---------- */
+function tourPick(){ const L=Object.values(G.players).filter(p=>p&&p.id!==ME&&!p.dead&&!p.banned&&p.hall&&G.plots[p.hall]).map(p=>({p,s:(stats(p.id).hallLvl||1)*3+(stats(p.id).count||0)+((p.cstyle&&p.cstyle!=='stone')?15:0)+(p.banner?5:0)})).sort((a,b)=>b.s-a.s).slice(0,25); if(!L.length) return null; return L[Math.floor(Math.random()*L.length)].p; }
+function tourGo(){ const p=tourPick(); if(!p) return toast('No kingdoms to visit right now.',true); visitFriend(p.id); setTimeout(()=>toast(`🧭 Welcome to ${cleanText(p.name)}! Tap 🧭 Kingdom Tour in 🎮 Play to visit another.`),400); }
+
+/* ---------- 📅 events calendar ---------- */
+function calDialog(){ const d=new Date(), L=[];
+  const isl=islOn()?`Open now! Ends in ${fmtT(islEndsIn()/1000)}`:`Starts in ${fmtT(islNextIn()/1000)}`; L.push(['⛰️','Crown Island',isl,'v126:isl']);
+  L.push(['👹','Daily Boss','New boss every day','v124:boss']); L.push(['📜','Kingdom Event',kevOpen(P(ME))?'Waiting for your choice!':`Next in ${fmtT((KEV_H*36e5-Date.now()%(KEV_H*36e5))/1000)}`,'v125:ev']);
+  const wkLeft=(7*864e5-((Date.now()-4*864e5)%(7*864e5)))/1000; L.push(['🏆','Mini-game Cup: '+mgtGame()[1],`Ends in ${fmtT(wkLeft)}`,'v124:cup']); L.push(['💀','Boss Rush week',`Ends in ${fmtT(wkLeft)}`,'v125:rush']); L.push(['🏅','Kingdom of the Week',`Voting ends in ${fmtT(wkLeft)}`,'v125:kotw']);
+  try{ L.push(['🛒','Wandering Merchant',merchHere()?`Here now! Leaves in ${fmtT(merchLeft()/1000)}`:`Back in ${fmtT((MERCH_EVERY-Date.now()%MERCH_EVERY)/1000)}`,'v127:merch']); }catch(e){}
+  const S=SEASON_INFO[seasonCF()]; L.push([S[0],S[1]+' Season Shop',`Open until ${S[2]}`,'v124:season']); L.push(['🎣','Seasonal fish',`${S[1]} fish are biting`,'v126:sf']);
+  fnOpen('📅 Events Calendar',`<p class="desc">What's happening now and what's coming soon.</p><div class="board">${L.map(([ic,n,t,a])=>`<div><span>${ic} <b>${esc(n)}</b><br><small>${esc(t)}</small></span><span>${btn('Go',null,a,'soft mini')}</span></div>`).join('')}</div>`,null); }
+
+/* ---------- 🔥 login streak bonuses ---------- */
+var STREAK_MILES={7:['an Iron Crate',m=>{ m.stash=m.stash||{}; m.stash.iron=(m.stash.iron||0)+1; }],14:['a Royal Crate',m=>{ m.stash=m.stash||{}; m.stash.royal=(m.stash.royal||0)+1; }],30:['a Pet Crate and 10 Star Shards',m=>{ m.stash=m.stash||{}; m.stash.pet=(m.stash.pet||0)+1; m.shards=shardsOf(m)+10; }],50:['2 Royal Crates and 20 Star Shards',m=>{ m.stash=m.stash||{}; m.stash.royal=(m.stash.royal||0)+2; m.shards=shardsOf(m)+20; }],100:['the 🔥 Unstoppable title, a Pet Crate and 40 Star Shards',m=>{ m.stash=m.stash||{}; m.stash.pet=(m.stash.pet||0)+1; m.shards=shardsOf(m)+40; m.streak100=1; }]};
+function streakMile(me,n){ const M=STREAK_MILES[n]; if(!M) return; M[1](me); me.strkMile={n,t:now()}; }
+var strkSeen=null;
+setInterval(()=>{ try{ const m=P(ME); if(!m) return; const k=m.strkMile?m.strkMile.n+'_'+m.strkMile.t:''; if(strkSeen===null){ strkSeen=k; return; } if(k&&k!==strkSeen){ strkSeen=k; snd('win'); toast(`🔥 ${m.strkMile.n}-day login streak! Bonus: ${STREAK_MILES[m.strkMile.n][0]}!`); } }catch(e){} },1500);
+try{ TITLES.push({id:'unstop',t:'the Unstoppable',how:'Log in 100 days in a row',ok:p=>!!p.streak100}); }catch(e){}
+
+/* ---------- 🗳️ polls ---------- */
+var POLL_DEF={id:'p1',q:'What should come next in Crownforge?',opts:['More pets','More dungeons','More clan stuff','More mini-games']}, POLL=null;
+function pollNow(){ return POLL&&POLL.id&&Array.isArray(POLL.opts)&&POLL.opts.length?POLL:POLL_DEF; }
+function pollTally(P0){ const T=P0.opts.map(()=>0); let n=0; for(const p of Object.values(G.players)){ const v=p&&p.pv; if(v&&v.id===P0.id&&T[v.c]!=null){ T[v.c]++; n++; } } return {T,n}; }
+function pollDialog(){ const P0=pollNow(), m=P(ME), mine=m.pv&&m.pv.id===P0.id?m.pv.c:null, {T,n}=pollTally(P0);
+  fnOpen('🗳️ Vote',`<p class="desc"><b>${esc(P0.q)}</b></p>${P0.opts.map((o,i)=>{ const pc=n?Math.round(T[i]/n*100):0; return `<div class="pollRow${mine===i?' me':''}">${mine==null?btn(esc(o),null,'v127:vote:'+i,'prime'):`<b>${mine===i?'✅ ':''}${esc(o)}</b>`}${mine!=null?`<div class="bar"><i style="width:${pc}%"></i></div><small>${pc}% · ${T[i]} vote${T[i]===1?'':'s'}</small>`:''}</div>`; }).join('')}<p class="desc"><small>${n} vote${n===1?'':'s'} so far.${mine!=null?' Thanks for voting!':''}</small></p>
+  ${typeof isAdmin==='function'&&isAdmin()?`<div class="label">👑 Owner: start a new poll</div><input id="pollQ" maxlength="80" placeholder="Question" style="width:100%"><input id="pollO" maxlength="160" placeholder="Answers, split with commas (2 to 4)" style="width:100%;margin-top:4px">${btn('Start poll',null,'v127:pollnew','prime')}`:''}`,null); }
+function pollVote(c){ const P0=pollNow(); c=+c; act([],me=>{ if(me.pv&&me.pv.id===P0.id) fail('You already voted.'); if(!(c>=0&&c<P0.opts.length)) fail('Pick an answer.'); me.pv={id:P0.id,c}; return {}; },()=>{ snd('quest'); toast('🗳️ Thanks for voting!'); pollDialog(); }); }
+async function pollNew(){ const q=cleanText(($('pollQ')||{}).value||'').trim().slice(0,80), o=cleanText(($('pollO')||{}).value||'').split(',').map(s=>s.trim().slice(0,40)).filter(Boolean).slice(0,4); if(q.length<4||o.length<2) return toast('Type a question and 2 to 4 answers.',true); try{ await DB.setConfig('poll',{id:'p'+now().toString(36),q,opts:o,t:now()}); toast('🗳️ New poll started!'); setTimeout(pollDialog,500); }catch(e){ toast('Could not start the poll.',true); } }
+setTimeout(()=>{ try{ if(DB&&DB.watchConfig) DB.watchConfig('poll',d=>{ POLL=d; }); }catch(e){} },3000);
+
+/* ---------- 📊 owner: which features people use ---------- */
+var USE_BUF={}, USE_T=Date.now();
+function useKey(a){ a=String(a||''); if(!a||/^(ov:close|tab:|set:|bn:|v124:frame|v127:vote|adm:|cr:|gsend|fr:|prof:)/.test(a)) return ''; return a.split(':').slice(0,a.startsWith('v1')?2:1).join(':').slice(0,24); }
+document.addEventListener('click',e=>{ try{ const b=e.target.closest&&e.target.closest('[data-act]'); if(!b) return; const k=useKey(b.dataset.act); if(k) USE_BUF[k]=(USE_BUF[k]||0)+1; }catch(x){} },true);
+function useFlush(force){ try{ if((!force&&Date.now()-USE_T<10*60000)||!Object.keys(USE_BUF).length||busy||!P(ME)) return; const buf=USE_BUF; USE_BUF={}; USE_T=Date.now(); act([],me=>{ const wk=weekId(); if(!me.useW||me.useW.wk!==wk) me.useW={wk,k:{}}; const K=Object.assign({},me.useW.k); for(const k in buf) K[k]=(K[k]||0)+buf[k]; const ks=Object.keys(K); if(ks.length>90) ks.sort((a,b)=>K[a]-K[b]).slice(0,ks.length-90).forEach(k=>delete K[k]); me.useW={wk,k:K}; return {}; }); }catch(e){} }
+setInterval(()=>useFlush(false),60000);
+var USE_NAMES={'v124:boss':'👹 Daily Boss','v124:book':'📖 Monster Book','v124:cup':'🏆 Mini-game Cup','v124:tricks':'🎪 Pet Tricks','v125:orders':'📦 Orders','v125:rush':'💀 Boss Rush','v125:pb':'🐾 Pet Battles','v125:ev':'📜 Events','v126:isl':'⛰️ Crown Island','v126:gdn':'🌱 Garden','v126:cards':'📇 Cards','msg':'💬 Messages','v107:hub':'🏆 Legends','v108:hub':'🌍 Adventures','v113:hub':'🏰 Kingdom Life','v124:hub':'✨ Fun & Collect','v127:play':'🎮 Play menu'};
+function useDialog(){ if(!isAdmin()) return; const wk=weekId(), act7=Object.values(G.players).filter(p=>p&&!p.dead&&now()-(p.lastSeen||0)<7*864e5), S={};
+  for(const p of Object.values(G.players)){ const u=p&&p.useW; if(!u||u.wk!==wk) continue; for(const k in u.k){ S[k]=S[k]||{p:0,c:0}; S[k].p++; S[k].c+=u.k[k]; } }
+  const L=Object.entries(S).sort((a,b)=>b[1].p-a[1].p||b[1].c-a[1].c);
+  fnOpen('📊 What players use',`<p class="desc">Players active in the last 7 days: <b>${act7.length}</b>. Below: how many players used each thing this week (and total taps). Counting started with v127.</p>${L.length?`<div class="board">${L.slice(0,60).map(([k,v])=>`<div><span>${esc(USE_NAMES[k]||k)}</span><span><b>${v.p}</b> 👤 · ${v.c} taps</span></div>`).join('')}</div>`:'<p class="desc">No data yet. Check back after people play for a while.</p>'}`,null); }
+
+/* ---------- 🐞 owner: reply to bug reports ---------- */
+function bugReply(uid,id){ const inp=$('bugR_'+id), t=cleanText((inp&&inp.value)||'').trim().slice(0,200); if(!t) return toast('Type a reply first.',true); try{ report(uid,`🐞 The game owner replied to your bug report: “${t}”`,'info'); toast('📬 Reply sent!'); if(inp) inp.value=''; }catch(e){ toast('Could not send the reply.',true); } }
+adminDialog=(o=>async function(tab){ const r=await o.apply(this,arguments); try{ const d=document.querySelector('#ov .dialog'); if(!d) return r;
+  if(!d.querySelector('.useBtn')){ const h2=d.querySelector('h2'); (h2||d.firstChild).insertAdjacentHTML('afterend',`<div class="row useBtn">${btn('📊 What players use',null,'v127:use','soft mini')}${btn('🗳️ Polls',null,'v127:poll','soft mini')}</div>`); }
+  if(adminTab==='bugs'){ let L=[]; try{ L=(await DB.listReports()).filter(x=>x.kind==='bug').sort((a,b)=>b.t-a.t).slice(0,80); }catch(e){} const rows=d.querySelectorAll('.board > div'); rows.forEach((row,i)=>{ const R=L[i]; if(!R||!R.by||row.querySelector('.bugRep')) return; row.insertAdjacentHTML('beforeend',`<div class="row bugRep" style="width:100%"><input id="bugR_${esc(R.id)}" maxlength="200" placeholder="Reply to ${esc(cleanText(R.byName||'them'))}" style="flex:1"><button class="prime mini" data-act="v127:bugrep:${esc(R.by)}:${esc(R.id)}">📬 Reply</button></div>`); }); } }catch(e){} return r; })(adminDialog);
+
+/* ---------- toolbar + router ---------- */
+setTimeout(()=>{ try{ v84add('bShare','prime','v127:share','📣 Invite friends','gMore'); v84add('bHowto','soft','v127:howto','📖 How to play','gMore'); v84add('bCal','soft','v127:cal','📅 Events calendar','gMore');
+  if(!$('bPlay')){ const k=$('bMsg')||$('bRew'); const b=document.createElement('button'); b.id='bPlay'; b.className='prime hbtn'; b.dataset.act='v127:play'; b.textContent='🎮 Play'; if(k&&k.parentNode) k.parentNode.insertBefore(b,k); } }catch(e){} },0);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v127:')) return va(a,b); const r=a.split(':'), k=r[1];
+  if(k==='play') playMenu(); else if(k==='btn') clickBtn(r[2]); else if(k==='go') goCamps(); else if(k==='games'){ $('ov').innerHTML=''; gamesDialog(); }
+  else if(k==='tour') tourGo(); else if(k==='cal') calDialog(); else if(k==='howto') howtoDialog(); else if(k==='share') shareGame();
+  else if(k==='poll') pollDialog(); else if(k==='vote') pollVote(r[2]); else if(k==='pollnew') pollNew(); else if(k==='use') useDialog();
+  else if(k==='bugrep') bugReply(r[2],r.slice(3).join(':')); else if(k==='merch'){ $('ov').innerHTML=''; merchDialog(); }
+  return true; }; })();
+
+/* ===== v130: messages are saved inside each player's own kingdom data =====
+   The server never allowed the old "convos" folder, so starting a chat failed with
+   "the server refused that move". Now every player keeps the messages THEY sent
+   (pmo), their group chats (pmg), groups they left (pml) and what they've read (pmr)
+   in their own player doc, which the server already allows. The game puts both sides together. */
+var PM_KEEP=80, pmLocal={}, pmRead={}, pmQ=Promise.resolve();
+function pmDmId(a,b){ return 'dm:'+[a,b].sort().join(','); }
+function pmSave(fn){ pmQ=pmQ.then(()=>DB.tx(async t=>{ const me=await t.getPlayer(ME); if(!me||me.dead) fail('Your kingdom has fallen.'); fn(me); t.setPlayer(ME,me); })); const q=pmQ; pmQ=pmQ.catch(()=>{}); return q; }
+function pmGroups(){ const g={}, left={}; for(const p of Object.values(G.players||{})){ for(const [id,d] of Object.entries(p.pmg||{})){ if(d&&(!g[id]||(d.t||0)>(g[id].t||0))) g[id]={...d}; } for(const id in (p.pml||{})) (left[id]=left[id]||[]).push(p.id); }
+  for(const id in g){ g[id].members=(g[id].members||[]).filter(u=>!(left[id]||[]).includes(u)); } return g; }
+function pmMembers(id,groups){ if(id.startsWith('dm:')) return id.slice(3).split(','); const d=(groups||pmGroups())[id]; return d?d.members||[]:[]; }
+function pmAllMsgs(id,groups){ const mem=pmMembers(id,groups), out=[]; for(const u of mem){ const p=P(u); if(!p) continue; for(const m of p.pmo||[]) if(m&&m.c===id) out.push({uid:u,name:p.name,text:m.x,t:m.t,...(m.s?{sys:1}:{})}); }
+  return out.sort((a,b)=>b.t-a.t).slice(0,60); }
+function pmConvos(uid){ const groups=pmGroups(), ids=new Set(Object.keys(pmLocal)); const me=P(uid)||{};
+  for(const p of Object.values(G.players||{})) for(const m of p.pmo||[]){ if(!m||!m.c) continue; if(m.c.startsWith('dm:')){ if(m.c.slice(3).split(',').includes(uid)) ids.add(m.c); } }
+  for(const [id,d] of Object.entries(groups)) if((d.members||[]).includes(uid)) ids.add(id);
+  const L=[]; for(const id of ids){ const mem=pmMembers(id,groups); if(!mem.includes(uid)) continue; if(id.startsWith('dm:')&&mem.some(u=>!P(u))) continue; const ms=pmAllMsgs(id,groups), last=ms[0], d=groups[id]||{}, names={}; mem.forEach(u=>names[u]=(P(u)||{}).name||'');
+    L.push({id,members:mem,names,title:d.title||'',by:d.by||mem[0],t:last?last.t:(d.t||pmLocal[id]||0),last:last?last.text:'',lastBy:last?last.uid:'',lastName:last?last.name:'',read:{[uid]:Math.max((me.pmr||{})[id]||0,pmRead[id]||0)}}); }
+  return L; }
+function pmInstall(){ if(!DB||DB.__pm) return; DB.__pm=1;
+  DB.watchConvos=(uid,cb)=>{ let sig=''; const tick=()=>{ try{ const l=pmConvos(uid), s=JSON.stringify(l); if(s!==sig){ sig=s; cb(l); } }catch(e){} }; setTimeout(tick,0); const iv=setInterval(tick,1200); return ()=>clearInterval(iv); };
+  DB.watchMsgs=(id,cb)=>{ let sig=''; const tick=()=>{ try{ const l=pmAllMsgs(id), s=JSON.stringify(l); if(s!==sig){ sig=s; cb(l); } }catch(e){} }; setTimeout(tick,0); const iv=setInterval(tick,900); return ()=>clearInterval(iv); };
+  DB.newConvo=async d=>{ const mem=(d.members||[]).slice().sort(); if(mem.length===2&&!d.title){ const id=pmDmId(mem[0],mem[1]); pmLocal[id]=now(); return id; }
+    const id='g:'+ME+':'+Math.random().toString(36).slice(2,8); await pmSave(me=>{ me.pmg=me.pmg||{}; const ks=Object.keys(me.pmg); if(ks.length>=12) delete me.pmg[ks.sort((a,b)=>(me.pmg[a].t||0)-(me.pmg[b].t||0))[0]]; me.pmg[id]={members:mem,title:d.title||'',by:ME,t:now()}; }); pmLocal[id]=now(); return id; };
+  DB.updConvo=async(id,d)=>{ const rk='read.'+ME; if(d[rk]!=null){ pmRead[id]=d[rk]; const v=d[rk]; clearTimeout(pmReadT); pmReadT=setTimeout(()=>{ const r=Object.assign({},pmRead); pmSave(me=>{ me.pmr=me.pmr||{}; for(const k in r) me.pmr[k]=Math.max(me.pmr[k]||0,r[k]); const ks=Object.keys(me.pmr); if(ks.length>40) ks.sort((a,b)=>me.pmr[a]-me.pmr[b]).slice(0,ks.length-40).forEach(k=>delete me.pmr[k]); }).catch(()=>{}); },2500); }
+    if(d.members&&!id.startsWith('dm:')){ const g=pmGroups()[id]||{}; if(!d.members.includes(ME)) await pmSave(me=>{ me.pml=me.pml||{}; me.pml[id]=now(); if(me.pmg) delete me.pmg[id]; });
+      else await pmSave(me=>{ me.pmg=me.pmg||{}; me.pmg[id]={members:d.members.slice().sort(),title:g.title||'',by:g.by||ME,t:now()}; }); } };
+  DB.sendMsg=async(id,m)=>{ await pmSave(me=>{ me.pmo=(me.pmo||[]).filter(x=>x&&x.c); me.pmo.push({c:id,x:String(m.text||'').slice(0,MSG_MAX),t:m.t||now(),...(m.sys?{s:1}:{})}); if(me.pmo.length>PM_KEEP) me.pmo=me.pmo.slice(-PM_KEEP); }); pmRead[id]=m.t||now(); };
+}
+var pmReadT=0;
+setInterval(()=>{ try{ if(DB&&!DB.__pm){ pmInstall(); if(cvUnsub){ try{ cvUnsub(); }catch(e){} cvUnsub=null; } cvWatchFor=null; } }catch(e){} },300);
+
+/* ===== v131: blocking works everywhere =====
+   If either player blocked the other: no private messages, gifts, trades, caravans, friend requests,
+   pet visits, stamps, kingdom cards or market buying between them, and their chats and listings are hidden.
+   Block from a profile or right inside a private chat, and see/unblock everyone in "🚫 Blocked players". */
+var blkBy=uid=>!!uid&&uid!==ME&&(((P(uid)||{}).blocked)||[]).includes(ME);
+var blkAny=uid=>!!uid&&uid!==ME&&(isBlkReal(uid)||blkBy(uid));
+function blkMsg(uid){ return isBlkReal(uid)?'🚫 You blocked this player. Unblock them first (⚙️ Settings → Blocked players).':'🚫 You cannot do that with this player.'; }
+function blkGuard(fn,pick){ return function(){ const uid=pick.apply(this,arguments); if(blkAny(uid)) return toast(blkMsg(uid),true); return fn.apply(this,arguments); }; }
+addFriend=blkGuard(addFriend,u=>u);
+sendCaravan=blkGuard(sendCaravan,u=>u);
+giftKingdom=blkGuard(giftKingdom,u=>u);
+sendTrade=blkGuard(sendTrade,u=>u);
+pvGo=blkGuard(pvGo,u=>u);
+stampSend=blkGuard(stampSend,u=>u);
+kcCollect=blkGuard(kcCollect,u=>u);
+buyListing=blkGuard(buyListing,id=>((G.market||{})[id]||{}).seller);
+ordFill=blkGuard(ordFill,id=>((G.market||{})[id]||{}).seller);
+tradeAnswer=(o=>function(id,yes){ const L=(G.market||{})[id]; if(yes&&L&&blkAny(L.seller)) return toast(blkMsg(L.seller),true); return o.apply(this,arguments); })(tradeAnswer);
+mkView=(o=>function(){ const l=o.apply(this,arguments); return Array.isArray(l)?l.filter(L=>!L||L.seller===ME||!blkAny(L.seller)):l; })(mkView);
+msgPeople=(o=>function(){ return o.apply(this,arguments).filter(p=>p&&!blkAny(p.id)); })(msgPeople);
+startConvo=(o=>function(){ const bad=[...msgPick].filter(blkAny); if(bad.length){ bad.forEach(id=>msgPick.delete(id)); toast(blkMsg(bad[0]),true); if(!msgPick.size) return; } return o.apply(this,arguments); })(startConvo);
+/* private chats with a blocked player disappear; in group chats their messages are hidden */
+pmConvos=(o=>function(uid){ return o.apply(this,arguments).filter(c=>!(c.id.startsWith('dm:')&&c.members.some(u=>u!==uid&&blkAny(u)))); })(pmConvos);
+pmAllMsgs=(o=>function(){ return o.apply(this,arguments).filter(m=>m.uid===ME||!isBlocked(m.uid)); })(pmAllMsgs);
+/* opening a profile message button for someone who blocked you */
+blockPlayer=(o=>function(uid,on){ const r=o.apply(this,arguments); try{ if($('fkOv')) $('ov').innerHTML=''; }catch(e){} if(on){ try{ const c=convos[msgOpen]; if(c&&(c.members||[]).length===2&&(c.members||[]).includes(uid)){ msgAct('close'); } }catch(e){} setTimeout(()=>{ try{ if($('blkOv')) blkDialog(); }catch(e){} },900); } else setTimeout(()=>{ try{ if($('blkOv')) blkDialog(); }catch(e){} },900); return r; })(blockPlayer);
+/* 🚫 Block button inside a private chat */
+msgHead=(o=>function(){ o.apply(this,arguments); try{ const c=convos[msgOpen], el=$('msgHead'); if(c&&el&&(c.members||[]).length===2&&!el.querySelector('.blkBtn')){ const other=c.members.find(x=>x!==ME); const b=document.createElement('button'); b.className='soft blkBtn'; b.textContent='🚫 Block'; b.dataset.act='v131:ask:'+other; el.appendChild(b); } }catch(e){} })(msgHead);
+function blkDialog(){ const m=P(ME)||{}, L=(m.blocked||[]);
+  const rows=L.length?L.map(id=>{ const p=P(id); return `<div class="setItem"><div><b>${esc(cleanText((p&&p.name)||'Gone kingdom'))}</b><small>${p&&p.dead?'Kingdom has fallen':'Blocked'}</small></div><button class="soft" data-act="blk:off:${id}">Unblock</button></div>`; }).join(''):'<p class="desc">You have not blocked anyone. You can block someone from their profile or from a private chat.</p>';
+  $('ov').innerHTML=`<div class="overlay" id="blkOv"><div class="dialog"><h2>🚫 Blocked players</h2><p class="desc">Blocked players cannot message you, send you gifts, trades, caravans, friend requests, stamps or pet visits, and you won't see their chat, news or market items. They can still attack, because this is a war game!</p><div class="setList">${rows}</div><div class="row"><button class="soft" data-act="ov:close">Close</button></div></div></div>`; }
+settingsDialog=(o=>function(){ o.apply(this,arguments); try{ const d=document.querySelector('#setOv .dialog'); if(d&&!d.querySelector('.blkSet')){ const w=document.createElement('div'); w.className='blkSet'; w.innerHTML=`<div class="label">Safety</div><div class="setList"><div class="setItem"><div><b>🚫 Blocked players</b><small>See and unblock people you blocked. ${((P(ME)||{}).blocked||[]).length} blocked.</small></div><button class="soft" data-act="v131:list">Open</button></div></div>`; const btns=d.querySelector(':scope > .row:last-child')||d.lastElementChild; d.insertBefore(w,btns); } }catch(e){} })(settingsDialog);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v131:')) return va(a,b); const r=a.split(':');
+  if(r[1]==='list') blkDialog();
+  else if(r[1]==='ask'){ const uid=r[2], p=P(uid); fkOpen('🚫 Block '+esc(cleanText((p&&p.name)||'player'))+'?',`<p class="desc">They won't be able to message you, send you gifts, trades, caravans, friend requests, stamps or pet visits, and you won't see their chat or market items. You can unblock them any time in ⚙️ Settings → Blocked players.</p><div class="row"><button class="bad" data-act="blk:on:${uid}">🚫 Block</button></div>`,'msg:list'); }
+  return true; }; })();
+
+/* ===== v132: Clan Wars, Tournament, weather effects, message reactions/report/mute, building skins,
+   hero outfits, museum, daily trivia, map notes, watch clan battles, player level, pet house upgrade ===== */
+function h32(s){ let h=2166136261; s=String(s); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0)/4294967296; }
+function dowNow(){ return (Math.floor(Date.now()/864e5)+3)%7; } /* 0 = Monday ... 6 = Sunday (same weeks as weekId) */
+function nkOpen(title,body,back){ fkOpen(title,body,back===undefined?'v132:menu':back); }
+async function cellRead(c){ let v=null; try{ await DB.tx(async t=>{ const r=await t.getRegion(regionOf(c)); v=r[c]||null; }); }catch(e){} return v; }
+function trimMap(o,n){ const ks=Object.keys(o); if(ks.length>n) ks.sort((a,b)=>o[a]-o[b]).slice(0,ks.length-n).forEach(k=>delete o[k]); }
+function giveRoyal(me,n){ me.stash=me.stash||{}; me.stash.royal=(me.stash.royal||0)+(n||1); }
+
+/* ---------- 1. Clan Wars (the game already has them Friday-Sunday; now they have their own screen and a prize chest) ---------- */
+function cwxDialog(){ const c=myClan(); if(!c) return nkOpen('⚔️ Clan Wars','<p class="desc">Every Friday to Sunday, clans with 2 or more members are matched against a clan of similar strength. Every member gets 2 war attacks, and the clan with the most ⭐ wins gems and a Royal Crate! Join a clan to take part.</p>');
+  let h=''; try{ h=cwHtml(c); }catch(e){} nkOpen('⚔️ Clan Wars',`<p class="desc">Friday to Sunday, your clan fights another clan. Tap an enemy to use one of your ${CW_ATTACKS} war attacks. Winning clans get gems and every member gets a 🎁 Royal Crate.</p>${h}`); }
+/* ---------- 2. Weekly Tournament: the game already has one (tnDialog); it is now in 🎮 Play → 🆕 New and counts for levels, outfits and the museum ---------- */
+/* ---------- 3. Weather effects + forecast ---------- */
+var WX_FX={clear:['☀️','Clear','No effect.'],rain:['🌧️','Rain','Armies march 10% slower.'],storm:['⛈️','Thunderstorm','Armies march 20% slower.'],fog:['🌫️','Fog','Hard to see. No other effect.'],snow:['❄️','Snow','Armies march 15% slower and troops cost 20% more food.']};
+function wxAt(t){ const blk=Math.floor(t/(20*60000)), h=hash2(blk,77,5); if(seasonNow()==='winter') return h<.4?'snow':h<.5?'fog':'clear'; return h<.2?'rain':h<.26?'storm':h<.33?'fog':'clear'; }
+function wxMarch(){ const w=weatherNow(); return w==='storm'?1.2:w==='snow'?1.15:w==='rain'?1.1:1; }
+function wxFood(){ return weatherNow()==='snow'?1.2:1; }
+mountSpd=(o=>function(){ return o.apply(this,arguments)*wxMarch(); })(mountSpd);
+function wxDialog(){ const base=Math.floor(Date.now()/(20*60000))*20*60000, L=[]; for(let i=0;i<6;i++){ const t=base+i*20*60000, w=wxAt(t), F=WX_FX[w]||WX_FX.clear; L.push(`<div class="setItem"><div><b>${F[0]} ${i?new Date(t).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'Now'}: ${F[1]}</b><small>${F[2]}</small></div></div>`); }
+  nkOpen('🌦️ Weather forecast',`<p class="desc">The weather changes every 20 minutes and is the same for everyone.</p><div class="setList">${L.join('')}</div>`); }
+
+/* ---------- 4/5/6. Message reactions, report a message, mute ---------- */
+var RX=['👍','😂','❤️','😮'], rxOpen=null, muReported={};
+function rxKey(m){ return msgOpen+'|'+m.uid+'|'+m.t; }
+function rxOf(key,mem){ const out={}; for(const u of mem||[]){ const p=P(u); const e=p&&p.pmx&&p.pmx[key]; if(e&&RX.includes(e)) (out[e]=out[e]||[]).push(u); } return out; }
+function rxSet(key,e){ const mine=((P(ME)||{}).pmx||{})[key]; pmSave(me=>{ me.pmx=me.pmx||{}; if(mine===e) delete me.pmx[key]; else me.pmx[key]=e; const ks=Object.keys(me.pmx); if(ks.length>120) ks.slice(0,ks.length-120).forEach(k=>delete me.pmx[k]); }).then(()=>{ try{ renderMsgs(); }catch(e2){} }).catch(explain); rxOpen=null; }
+renderMsgs=(o=>function(){ o.apply(this,arguments); try{ const el=$('msgLog'), c=convos[msgOpen]; if(!el||!c) return; const l=msgList.filter(x=>!isBlocked(x.uid)).slice().reverse(); if(el.children.length!==l.length) return;
+  l.forEach((x,i)=>{ const li=el.children[i]; if(!li||x.sys) return; const key=rxKey(x), R=rxOf(key,c.members), mine=((P(ME)||{}).pmx||{})[key];
+    const chips=Object.entries(R).map(([e,us])=>`<button class="rxChip${us.includes(ME)?' on':''}" data-act="v132:rx:${i}:${RX.indexOf(e)}">${e}${us.length>1?' '+us.length:''}</button>`).join('');
+    const bar=rxOpen===key?`<div class="rxBar">${RX.map((e,j)=>`<button class="soft mini${mine===e?' on':''}" data-act="v132:rx:${i}:${j}">${e}</button>`).join('')}${x.uid!==ME?`<button class="soft mini" data-act="v132:mrep:${i}">⚠️ Report</button><button class="soft mini" data-act="v132:mute:${x.uid}">🔇 Mute 1 day</button>`:''}</div>`:'';
+    const w=document.createElement('div'); w.className='rxWrap'; w.innerHTML=chips+`<button class="rxAdd" data-act="v132:rxo:${i}" aria-label="React">☺</button>`+bar; li.appendChild(w); }); }catch(e){} })(renderMsgs);
+function rxMsgAt(i){ const l=msgList.filter(x=>!isBlocked(x.uid)).slice().reverse(); return l[+i]; }
+function msgReport(i){ const x=rxMsgAt(i); if(!x||x.uid===ME) return; const k=rxKey(x); if(muReported[k]) return toast('You already reported that message.'); if(repN>=5) return toast('You have sent a lot of reports. Thank you! Try again later.',true); repN++; muReported[k]=1;
+  DB.addReport({by:ME,byName:P(ME)?.name||'',who:x.uid,name:x.name||'',why:'Mean private message',chat:[String(x.text||'').slice(0,200)],t:now()}); rxOpen=null; toast('⚠️ Thanks. That message was sent to the person who runs the game.'); renderMsgs(); }
+function muteOn(id){ const mu=(P(ME)||{}).mute; return !!(id&&mu&&mu[id]>Date.now()); }
+function muteSet(uid,on){ if(!uid||uid===ME) return; pmSave(me=>{ me.mute=me.mute||{}; for(const k in me.mute) if(me.mute[k]<now()) delete me.mute[k]; if(on) me.mute[uid]=now()+864e5; else delete me.mute[uid]; trimMap(me.mute,50); }).then(()=>{ toast(on?'🔇 Muted for 1 day. You will not see their chat or messages until then.':'🔊 Unmuted.'); rxOpen=null; try{ renderChat(); renderMsgs(); }catch(e){} if($('muOv')) muDialog(); }).catch(explain); }
+function muDialog(){ const mu=(P(ME)||{}).mute||{}, L=Object.entries(mu).filter(([,t])=>t>now());
+  $('ov').innerHTML=`<div class="overlay" id="muOv"><div class="dialog"><h2>🔇 Muted players</h2><p class="desc">Muting hides someone's chat and messages for 1 day. It is softer than blocking.</p><div class="setList">${L.length?L.map(([u,t])=>`<div class="setItem"><div><b>${esc(cleanText((P(u)||{}).name||'Gone kingdom'))}</b><small>Muted for ${fmtT((t-now())/1000)} more</small></div><button class="soft" data-act="v132:unmute:${u}">Unmute</button></div>`).join(''):'<p class="desc">Nobody is muted.</p>'}</div><div class="row"><button class="soft" data-act="ov:close">Close</button></div></div></div>`; }
+
+/* ---------- 7. Building skins ---------- */
+NEWST.gold={name:'Golden',gems:80,desc:'Shining solid gold.',f:l=>[l*.45+140,l*.4+105,l*.15+20]};
+var BSK_G=[['hall','🏰 Town Hall'],['wall','🧱 Walls'],['tower','🗼 Towers']], BSK_LIST=['gold','icepalace','candy','crystal','dragon','haunted','jungle','pirate','snow','blossom'], BSK_PRICE=60;
+function bskGroup(b){ return b==='hall'||b==='hallx'?'hall':b==='wall'?'wall':b==='tower'?'tower':null; }
+function bskinOf(o,b){ const g=bskGroup(b); if(!g) return null; const p=P(o), k=p&&p.bskin&&p.bskin[g]; return k&&NEWST[k]?k:null; }
+function wsCol(k,hex){ const S=NEWST[k]; if(!S) return hex; const n=parseInt(hex.slice(1),16), r=n>>16&255, g=n>>8&255, b=n&255, l=.3*r+.59*g+.11*b, c=S.f(l).map(v=>Math.max(0,Math.min(255,Math.round(v)))); return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join(''); }
+function bskPrice(k){ return k==='gold'?80:BSK_PRICE; }
+function bskDialog(g){ g=g||'hall'; const m=P(ME)||{}, own=m.bsk||[], cur=(m.bskin||{})[g]||'';
+  nkOpen('🎨 Building skins',`<p class="desc">Give one kind of building its own look. Skins you buy are yours forever, and you can switch any time.</p><div class="row">${BSK_G.map(([k,n])=>`<button class="${k===g?'prime':'soft'} mini" data-act="v132:bskg:${k}">${n}</button>`).join('')}</div>
+    <div class="setList">${['',...BSK_LIST].map(k=>{ const S=NEWST[k], has=!k||own.includes(g+':'+k), on=cur===k; return `<div class="setItem"><div><b>${k?esc(S.name):'Normal (your castle style)'}</b><small>${k?esc(S.desc):'Matches the rest of your kingdom.'}</small></div>${on?'<button class="prime" disabled>Using</button>':has?`<button class="soft" data-act="v132:bsku:${g}:${k||'-'}">Use</button>`:`<button class="gemb" data-act="v132:bskb:${g}:${k}">💎 ${bskPrice(k)}</button>`}</div>`; }).join('')}</div>`); }
+function bskBuy(g,k){ if(!NEWST[k]||!bskGroup(g==='hall'?'hall':g)) return; act([],me=>{ me.bsk=me.bsk||[]; const id=g+':'+k; if(me.bsk.includes(id)) fail('You already own it.'); pay(me,{gems:bskPrice(k)}); me.bsk.push(id); me.bskin=Object.assign({},me.bskin,{[g]:k}); return {}; },()=>{ snd('build'); try{ spriteCache.clear(); }catch(e){} bskDialog(g); }); }
+function bskUse(g,k){ act([],me=>{ if(k&&!(me.bsk||[]).includes(g+':'+k)) fail('Buy it first.'); me.bskin=Object.assign({},me.bskin); if(k) me.bskin[g]=k; else delete me.bskin[g]; return {}; },()=>{ snd('build'); try{ spriteCache.clear(); }catch(e){} bskDialog(g); }); }
+
+/* ---------- 8. Hero outfits ---------- */
+var HOUT={flame:{n:'🔥 Flame Armor',flt:'hue-rotate(-25deg) saturate(1.8) contrast(1.1)',how:'Beat 3 barbarian bosses',ok:m=>((m.stats||{}).bosses||0)>=3},
+  frost:{n:'❄️ Frost Cloak',flt:'hue-rotate(170deg) saturate(1.2) brightness(1.08)',how:'Help defeat a World Boss',ok:m=>(m.bossKills||0)>=1},
+  shadow:{n:'🌑 Shadow Suit',flt:'grayscale(.6) contrast(1.35) brightness(.8) hue-rotate(230deg)',how:'Win 50 battles',ok:m=>((m.stats||{}).won||0)>=50},
+  royal:{n:'👑 Royal Robes',flt:'hue-rotate(250deg) saturate(1.5)',how:'Win a Clan War',ok:m=>(m.cwW||0)>=1},
+  golden:{n:'✨ Golden Plate',flt:'sepia(.85) saturate(2.2) brightness(1.1)',how:'Win the weekly Tournament or reach level 25',ok:m=>(m.tnWins||0)>=1||lvOf(lvXP(m)).l>=25},
+  party:{n:'🎉 Party Outfit',flt:'hue-rotate(300deg) saturate(1.6)',how:'Answer 10 trivia questions right',ok:m=>((m.trv||{}).n||0)>=10},
+  ghost:{n:'👻 Ghost Wrap',flt:'grayscale(1) brightness(1.35) contrast(.85)',how:'Finish 3 daily quests',ok:m=>((m.stats||{}).dq||0)>=3}};
+function houtOf(k){ const m=P(ME), o=m&&m.hout&&m.hout[k]; return o&&HOUT[o]&&HOUT[o].ok(m)?HOUT[o]:null; }
+heroPic=(o=>function(k,cls){ const h=o(k,cls), ou=houtOf(k); return ou&&h?h.replace('<img ',`<img style="filter:${ou.flt}" `):h; })(heroPic);
+function houtDialog(k){ const m=P(ME)||{}, ks=Object.keys(m.heroes||{}).filter(x=>HEROES[x]); k=k&&ks.includes(k)?k:ks[0];
+  if(!k) return nkOpen('👗 Hero outfits','<p class="desc">Recruit a hero first, then come back to dress them up!</p>');
+  const cur=(m.hout||{})[k]||'';
+  nkOpen('👗 Hero outfits',`<div class="row">${ks.map(x=>`<button class="${x===k?'prime':'soft'} mini" data-act="v132:houk:${x}">${HEROES[x].pIc||''} ${esc(HEROES[x].name)}</button>`).join('')}</div><div style="text-align:center">${heroPic(k,'heroPic')}</div>
+    <div class="setList"><div class="setItem"><div><b>Normal</b><small>The classic look.</small></div>${cur?`<button class="soft" data-act="v132:hou2:${k}:-">Wear</button>`:'<button class="prime" disabled>Wearing</button>'}</div>${Object.entries(HOUT).map(([id,O])=>{ const ok=O.ok(m); return `<div class="setItem"><div><b>${O.n}</b><small>${ok?'Unlocked!':'🔒 '+O.how}</small></div>${cur===id?'<button class="prime" disabled>Wearing</button>':ok?`<button class="soft" data-act="v132:hou2:${k}:${id}">Wear</button>`:'<button class="soft" disabled>Locked</button>'}</div>`; }).join('')}</div>`); }
+function houtSet(k,id){ act([],me=>{ if(!(me.heroes||{})[k]) fail('Recruit that hero first.'); if(id&&(!HOUT[id]||!HOUT[id].ok(me))) fail('That outfit is still locked.'); me.hout=Object.assign({},me.hout); if(id) me.hout[k]=id; else delete me.hout[k]; return {}; },()=>{ snd('click'); houtDialog(k); }); }
+
+/* ---------- 9. Kingdom museum: the Museum building already exists; it now also shows level, tournament and clan war wins, and you can open anyone's museum from their profile ---------- */
+function musOwner(uid){ return Object.values(G.plots||{}).some(q=>q&&q.o===uid&&q.b==='museum'); }
+function musOpen(uid){ uid=uid||ME; if(musOwner(uid)) return musDialog(uid); toast(uid===ME?`🖼️ Build a Kingdom Museum (Town Hall ${MUS_TH}) to show off your treasures!`:'They have not built a museum yet.',true); }
+museumHtml=(o=>function(uid){ const h=o.apply(this,arguments); try{ const p=P(uid)||{}; const cards=[['⭐','Level '+lvOf(lvXP(p)).l,'player level'],['🏆',p.tnWins||0,'tournament wins'],['⚔️',p.cwW||0,'clan war wins'],['🧠',(p.trv||{}).n||0,'trivia right']];
+  return `<div class="musGrid">${cards.map(([i,v,t])=>`<div><span>${i}</span><b>${v}</b><small>${t}</small></div>`).join('')}</div>`+h; }catch(e){ return h; } })(museumHtml);
+/* ---------- 10. Daily trivia ---------- */
+function trvList(){ const pc=Math.round(PET_CRATE_ODDS.filter(([k])=>PETS[k].r===3).reduce((a,x)=>a+x[1],0)*100);
+  return [['How many pets can a brand new pet house hold?',[PET_KEEP,12,30,50]],['What is the highest level a pet can reach?',[PET_MAX,50,10,999]],['How much of a resource can you gift to other players each day?',[f(GIFT_DAY_MAX),'500','50,000','No limit']],
+   ['How many days offline until your peace shield goes away?',['7 days','1 day','30 days','Never']],['Can a mythic pet come out of a Pet Crate?',['No, never','Yes, often','Only on Mondays','Only with gems']],
+   ['Which building lets armies march up to twice as fast?',['Road','Wall','Farm','Dock']],['How much defense does each Wall level add?',['25','100','5','60']],['How much food does a Farm grow per minute for each level?',['15','100','3','50']],
+   ['How much gold does a Gold Mine dig per minute for each level?',['20','5','200','1,000']],['When can you fight on Crown Island?',['The first 7 days of each month','Every Sunday','Only at night','Never']],
+   ['How do you level up a pet by merging?',['Merge two of the same pet at the same level','Feed it gold','Sell it','Put it in a crate']],[`How many war attacks does each player get in Clan Wars?`,[String(CW_ATTACKS),'10','1','Unlimited']],
+   ['Which building do you need before you can train troops?',['Barracks','Farm','Dock','Wall']],['What does rain do?',['Armies march 10% slower','Gold mines stop','Pets run away','Nothing ever']],
+   [`Where does gold above ${f(VAULT_AT)} go?`,['Into your vault','It disappears','To your clan','To the market']],[`About how likely is a Legendary pet from a Pet Crate?`,[pc+'%','50%','90%','0%']]]; }
+function trvToday(){ const L=trvList(), d=dayNum(), q=L[d%L.length], ord=[0,1,2,3].sort((a,b)=>h32(d+':'+a)-h32(d+':'+b)); return {q:q[0],opts:ord.map(i=>String(q[1][i])),c:ord.indexOf(0)}; }
+function trvDialog(){ const m=P(ME)||{}, T=trvToday(), done=m.trv&&m.trv.d===dayNum();
+  nkOpen('🧠 Daily trivia',`<p class="desc">One question a day about Crownforge. Get it right for a little prize! Right answers so far: <b>${(m.trv||{}).n||0}</b>.</p><h3>${esc(T.q)}</h3>${done?`<p class="desc">${m.trv.ok?'✅ You got it right today!':'❌ Not quite. The answer was: <b>'+esc(T.opts[T.c])+'</b>'} Come back tomorrow for a new question.</p>`:`<div class="dqs">${T.opts.map((o,i)=>`<button class="soft" data-act="v132:trv2:${i}">${esc(o)}</button>`).join('')}</div>`}`); }
+function trvAnswer(i){ const T=trvToday(); act([],me=>{ const d=dayNum(); if(me.trv&&me.trv.d===d) fail('You already answered today. Come back tomorrow!'); const ok=+i===T.c; me.trv={d,n:((me.trv||{}).n||0)+(ok?1:0),ok:ok?1:0}; if(ok){ me.gold+=Math.round(1200*(1+HLX()*.2)); gemsAdd(me,3); } return {ok}; },r=>{ snd(r.ok?'quest':'click'); toast(r.ok?'🧠 Correct! Gold and gems for you.':'❌ Not quite! Try again tomorrow.'); trvDialog(); }); }
+
+/* ---------- 11. Map notes (only you can see them) ---------- */
+function mnList(){ return ((P(ME)||{}).mn||[]).filter(x=>x&&x.c!=null); }
+function mnPanel(c){ const n=mnList().find(x=>String(x.c)===String(c)); return `<div class="label">📌 Your map note</div>${n?`<p class="desc">📌 ${esc(cleanText(n.x))}</p><div class="row"><button class="soft mini" data-act="v132:mndel:${c}">Delete note</button></div>`:`<div class="row"><input id="mnTxt" maxlength="40" placeholder="Only you can see it, like: attack later"><button class="soft mini" data-act="v132:mnadd">📌 Save</button></div>`}`; }
+function mnAdd(c,x){ x=String(x||'').replace(/\s+/g,' ').trim().slice(0,40); if(!x) return toast('Type a note first.',true); if(typeof isRude==='function'&&isRude(x)) return toast('Please keep notes kind.',true);
+  act([],me=>{ me.mn=(me.mn||[]).filter(n=>n&&String(n.c)!==String(c)); if(me.mn.length>=30) fail('You have 30 notes. Delete one first.'); me.mn.push({c,x,t:now()}); return {}; },()=>{ snd('click'); toast('📌 Note saved. Only you can see it.'); renderPanel(true); }); }
+function mnDel(c){ act([],me=>{ me.mn=(me.mn||[]).filter(n=>n&&String(n.c)!==String(c)); return {}; },()=>{ renderPanel(true); if($('fkOv')) mnDialog(); }); }
+function mnDialog(){ const L=mnList(); nkOpen('📌 Map notes',`<p class="desc">Tap any tile on the map to add a note there. Only you can see your notes. You can keep 30.</p>${L.length?`<div class="board">${L.map(n=>`<div><span>📌 ${esc(cleanText(n.x))}</span><span>${btn('Show',null,'ping:go:'+n.c,'soft')}</span><span>${btn('Delete',null,'v132:mndel:'+n.c,'soft')}</span></div>`).join('')}</div>`:'<p class="desc">No notes yet.</p>'}`); }
+drawPings=(o=>function(v){ o.apply(this,arguments); try{ if(cam.z<.3) return; const L=mnList(); if(!L.length) return; const u=TW; for(const n of L){ const [x,y]=xy(n.c), [cx,cy]=ctr(x,y); if(cx<v.x0-TW*2||cx>v.x1+TW*2||cy<v.y0-TW*2||cy>v.y1+TW*2) continue;
+  const fs=Math.max(u*.16,10/cam.z); ctx.font=`${fs}px "Lilita One",sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.lineWidth=fs*.25; ctx.strokeStyle='#2b1a0c'; const tx='📌 '+cleanText(n.x); ctx.strokeText(tx,cx,cy-u*.55); ctx.fillStyle='#ffe9a8'; ctx.fillText(tx,cx,cy-u*.55); } }catch(e){} })(drawPings);
+
+/* ---------- 12. Watch clan battles ---------- */
+var lvSeen={}, lvPrimed=false;
+report=(o=>function(uid,text,kind,cell,replay){ const r=o.apply(this,arguments); try{ if(replay&&uid&&uid!==ME&&P(uid)){ const rj=JSON.stringify(replay); if(rj.length<90000){ const vn=String(P(uid).name||'').slice(0,24); pmSave(me=>{ me.lb={t:now(),vs:uid,vn,rj}; }).catch(()=>{}); } } }catch(e){} return r; })(report);
+function lvList(){ const c=myClan(); if(!c) return []; return (c.members||[]).filter(u=>u!==ME).map(P).filter(p=>p&&p.lb&&p.lb.rj&&p.lb.t>now()-30*60000).sort((a,b)=>b.lb.t-a.lb.t); }
+function lvWatch(uid){ const p=P(uid); if(!p||!p.lb||!p.lb.rj) return toast('That battle is gone.',true); let rp=null; try{ rp=JSON.parse(p.lb.rj); }catch(e){} if(!rp) return toast('That battle cannot be shown.',true); $('ov').innerHTML=''; const b=$('lvBan'); if(b) b.remove(); playBattle(rp).then(()=>{ if($('batOv')) $('ov').innerHTML=''; }); }
+function lbDialog(){ const L=lvList(); nkOpen('📺 Watch clan battles',`<p class="desc">Watch your clanmates' attacks right after they happen (from the last 30 minutes).</p>${myClan()?'':'<p class="desc">Join a clan to watch your clanmates fight!</p>'}${L.length?`<div class="board">${L.map(p=>`<div><span>⚔️ ${esc(cleanText(p.name))} vs ${esc(cleanText(p.lb.vn||'?'))}</span><span>${fmtT((now()-p.lb.t)/1000)} ago</span><span>${btn('▶️ Watch',null,'v132:lvw:'+p.id,'prime')}</span></div>`).join('')}</div>`:'<p class="desc">No clan battles right now.</p>'}`); }
+setInterval(()=>{ try{ if(!P(ME)||busy) return; const L=lvList(); if(!lvPrimed){ L.forEach(p=>lvSeen[p.id+p.lb.t]=1); lvPrimed=true; return; } const p=L.find(q=>!lvSeen[q.id+q.lb.t]&&q.lb.t>now()-3*60000); if(!p) return; lvSeen[p.id+p.lb.t]=1; if($('batOv')||$('lvBan')) return;
+  const d=document.createElement('div'); d.id='lvBan'; d.innerHTML=`<span>🔴 ${esc(cleanText(p.name))} just attacked ${esc(cleanText(p.lb.vn||'someone'))}!</span><button class="prime mini" data-act="v132:lvw:${p.id}">▶️ Watch</button><button class="soft mini" data-act="v132:lvx">✕</button>`; document.body.appendChild(d); setTimeout(()=>{ if(d.parentNode) d.remove(); },25000); }catch(e){} },4000);
+
+/* ---------- 13. Player level ---------- */
+function lvXP(m){ if(!m) return 0; const s=Object.assign(defaultStats(),m.stats||{}); let hl=1; try{ hl=stats(m.id).hallLvl||1; }catch(e){}
+  return Math.round(s.won*20+s.captures*12+s.conquers*30+s.built*10+s.bosses*40+s.dailies*15+s.crates*5+s.fish*3+s.cleared*8+s.raids*6+s.spins*4+s.digs*5+s.car*6+s.donated*.2+(m.bossKills||0)*60+((m.trv||{}).n||0)*10+(m.cwW||0)*150+(m.tnWins||0)*200+hl*120); }
+function lvOf(xp){ let l=1, need=150, left=xp; while(left>=need&&l<200){ left-=need; l++; need=Math.round(150*Math.pow(l,1.35)); } return {l,cur:left,need}; }
+function lvReward(l){ return {gold:Math.round(300*l),gems:2}; }
+function lvDialog(){ const m=P(ME)||{}, L=lvOf(lvXP(m)), got=m.lvC||1, open=L.l-got;
+  nkOpen('⭐ Player level',`<div class="lvBig">⭐ ${L.l}</div><div class="lvBar"><i style="width:${Math.min(100,L.cur/L.need*100)}%"></i></div><p class="desc" style="text-align:center">${f(L.cur)} / ${f(L.need)} XP to level ${L.l+1}</p>
+    <p class="desc">You earn XP from almost everything: winning battles, capturing land, building, bosses, daily rewards, crates, fishing, trivia, clan wars and more. Each new level gives you gold and gems!</p>
+    ${open>0?`<div class="row"><button class="gemb" data-act="v132:lvclaim">🎁 Collect ${open} level reward${open>1?'s':''}</button></div>`:'<p class="desc">✅ All level rewards collected.</p>'}`); }
+function lvClaim(){ act([],me=>{ const L=lvOf(lvXP(me)).l, from=(me.lvC||1)+1; if(from>L) fail('No new level rewards yet.'); const to=Math.min(L,from+9); let g=0,gm=0; for(let l=from;l<=to;l++){ const r=lvReward(l); g+=r.gold; gm+=r.gems; } me.gold+=g; gemsAdd(me,gm); me.lvC=to; return {g,n:to-from+1}; },r=>{ snd('quest'); confetti(); toast(`⭐ ${r.n} level reward${r.n>1?'s':''}: ${f(r.g)} gold and some gems!`); lvDialog(); }); }
+setInterval(()=>{ try{ const w=$('who'), m=P(ME); if(!w||!m||m.dead) return; const tag=' ⭐'+lvOf(lvXP(m)).l; if(!w.textContent.includes(' ⭐')&&w.textContent.startsWith(m.name)) w.textContent=m.name+tag+w.textContent.slice(String(m.name).length); }catch(e){} },1500);
+profileDialog=(o=>function(uid){ const r=o.apply(this,arguments); try{ const p=P(uid), d=document.querySelector('#profOv .dialog'); if(p&&d&&!d.querySelector('.v132prof')){ const w=document.createElement('div'); w.className='v132prof';
+  w.innerHTML=`<p class="desc">⭐ Level ${lvOf(lvXP(p)).l}${p.tnWins?` · 👑 Tournament champion ×${p.tnWins}`:''}${p.cwW?` · ⚔️ Clan war wins: ${p.cwW}`:''}</p><div class="row">${musOwner(uid)?`<button class="soft mini" data-act="v132:mus:${uid}">🖼️ Museum</button>`:''}${uid!==ME?`<button class="soft mini" data-act="v132:${muteOn(uid)?'unmute':'mute'}:${uid}">${muteOn(uid)?'🔊 Unmute':'🔇 Mute 1 day'}</button>`:''}</div>`;
+  const h=d.querySelector('h2'); if(h) h.after(w); else d.appendChild(w); } }catch(e){} return r; })(profileDialog);
+
+/* ---------- 14. Pet house upgrade + decorations ---------- */
+var PH_MAX=5, PH_THEMES=[['meadow','🌼 Meadow',0],['beach','🏖️ Beach',1],['castle','🏰 Castle hall',2],['night','🌙 Starry night',3],['candy','🍭 Candy land',4],['space','🚀 Outer space',5]];
+function petCap(me){ return PET_KEEP+6*Math.min(PH_MAX,(me&&me.phL)||0); }
+function phCost(l){ return {gold:25000*(l+1)*(l+1),gems:40*(l+1)}; }
+function phDialog(){ const m=P(ME)||{}, L=m.phL||0, th=m.phT||'meadow';
+  nkOpen('🏠 Pet house',`<p class="desc">Your pet house holds <b>${petCap(m)}</b> pets (you have ${(m.pets||[]).length}). Each upgrade adds 6 more spaces and unlocks a new decoration.</p>
+    ${L<PH_MAX?`<div class="row"><button class="gemb" data-act="v132:phup">⬆️ Upgrade to level ${L+1} (${costTxt(phCost(L))})</button></div>`:'<p class="desc">✅ Your pet house is fully upgraded!</p>'}
+    <div class="label">🎨 Decorate (changes the background on your Pets screen)</div><div class="setList">${PH_THEMES.map(([k,n,need])=>`<div class="setItem"><div><b>${n}</b><small>${need?'Pet house level '+need:'Free'}</small></div>${th===k?'<button class="prime" disabled>Using</button>':L>=need?`<button class="soft" data-act="v132:pht:${k}">Use</button>`:'<button class="soft" disabled>Locked</button>'}</div>`).join('')}</div>`,null); }
+function phUp(){ act([],me=>{ const L=me.phL||0; if(L>=PH_MAX) fail('Your pet house is fully upgraded.'); settle(me); pay(me,phCost(L)); me.phL=L+1; return {l:L+1}; },r=>{ snd('build'); confetti(); toast(`🏠 Pet house level ${r.l}! You can keep ${petCap(P(ME))} pets now.`); phDialog(); }); }
+function phTheme(k){ const T=PH_THEMES.find(x=>x[0]===k); if(!T) return; act([],me=>{ if((me.phL||0)<T[2]) fail('Upgrade your pet house to unlock it.'); me.phT=k; return {}; },()=>{ snd('click'); phDialog(); }); }
+petsDialog=(o=>function(){ const r=o.apply(this,arguments); try{ const m=P(ME)||{}, d=document.querySelector('#ov .dialog'), hero=d&&d.querySelector('.petHero'); if(hero){ PH_THEMES.forEach(([k])=>hero.classList.remove('ph_'+k)); if(m.phT&&m.phT!=='meadow') hero.classList.add('ph_'+m.phT); }
+  if(d&&!d.querySelector('.phBtn')){ const b=document.createElement('button'); b.className='soft phBtn'; b.dataset.act='v132:ph'; b.textContent=`🏠 Pet house (${(m.pets||[]).length}/${petCap(m)})`; const h=d.querySelector('h2'); if(h) h.after(b); else d.prepend(b); } }catch(e){} return r; })(petsDialog);
+
+/* ---------- menu, ready list, router ---------- */
+var NEW132=[['⚔️','Clan Wars','v132:cw'],['🏆','Tournament','v132:tn'],['⭐','Player level','v132:lv'],['🧠','Daily trivia','v132:trv'],['🌦️','Weather','v132:wx'],['📺','Watch clan battles','v132:lvd'],['🖼️','My museum','v132:mus:'],['🏠','Pet house','v132:ph'],['🎨','Building skins','v132:bsk'],['👗','Hero outfits','v132:hou'],['📌','Map notes','v132:mn'],['🔇','Muted players','v132:mul']];
+function v132Menu(){ nkOpen('🆕 New stuff',`<div class="playRow">${NEW132.map(([ic,t,a])=>`<button class="soft playIt" data-act="${a}"><span>${ic}</span>${t}</button>`).join('')}</div>`,null); }
+setTimeout(()=>{ try{ PLAY_SECTIONS.unshift(['🆕 New',NEW132]); }catch(e){} },0);
+readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const m=P(ME); if(m&&!m.dead){ if(!(m.trv&&m.trv.d===dayNum())) L.push({ic:'🧠',t:'Answer today\'s trivia question',act:'v132:trv'}); if(lvOf(lvXP(m)).l>(m.lvC||1)) L.push({ic:'⭐',t:'Collect your level rewards',act:'v132:lv'});
+  const c=myClan(), cw=c&&cwOf(c); if(cw&&cwActive()&&((cw.used||{})[ME]||0)<CW_ATTACKS) L.push({ic:'⚔️',t:'Use your Clan War attacks',act:'v132:cw'}); } }catch(e){} return L; })(readyList);
+settingsDialog=(o=>function(){ o.apply(this,arguments); try{ const d=document.querySelector('#setOv .blkSet .setList'); if(d&&!d.querySelector('.muSet')){ const w=document.createElement('div'); w.className='setItem muSet'; w.innerHTML='<div><b>🔇 Muted players</b><small>People you muted for a day.</small></div><button class="soft" data-act="v132:mul">Open</button>'; d.appendChild(w); } }catch(e){} })(settingsDialog);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v132:')) return va(a,b); const r=a.split(':'), k=r[1];
+  if(k==='menu') v132Menu(); else if(k==='cw') cwxDialog();
+  else if(k==='tn') tnDialog(); else if(k==='wx') wxDialog();
+  else if(k==='rxo'){ const x=rxMsgAt(r[2]); if(x){ const key=rxKey(x); rxOpen=rxOpen===key?null:key; renderMsgs(); } }
+  else if(k==='rx'){ const x=rxMsgAt(r[2]), e=RX[+r[3]]; if(x&&e) rxSet(rxKey(x),e); }
+  else if(k==='mrep') msgReport(r[2]); else if(k==='mute') muteSet(r[2],true); else if(k==='unmute') muteSet(r[2],false); else if(k==='mul') muDialog();
+  else if(k==='bsk') bskDialog(); else if(k==='bskg') bskDialog(r[2]); else if(k==='bskb') bskBuy(r[2],r[3]); else if(k==='bsku') bskUse(r[2],r[3]==='-'?'':r[3]);
+  else if(k==='hou') houtDialog(); else if(k==='houk') houtDialog(r[2]); else if(k==='hou2') houtSet(r[2],r[3]==='-'?'':r[3]);
+  else if(k==='mus') musOpen(r[2]||ME); else if(k==='trv') trvDialog(); else if(k==='trv2') trvAnswer(r[2]);
+  else if(k==='mn') mnDialog(); else if(k==='mnadd'){ if(sel) mnAdd(sel,($('mnTxt')||{}).value); } else if(k==='mndel') mnDel(r.slice(2).join(':'));
+  else if(k==='lvd') lbDialog(); else if(k==='lvw') lvWatch(r[2]); else if(k==='lvx'){ const bn=$('lvBan'); if(bn) bn.remove(); }
+  else if(k==='lv') lvDialog(); else if(k==='lvclaim') lvClaim(); else if(k==='ph') phDialog(); else if(k==='phup') phUp(); else if(k==='pht') phTheme(r[2]);
   return true; }; })();
 
 /* ===== v63 ===== */
@@ -9580,7 +9911,7 @@ function takeThing(me,w){ if(w.kind==='pet'){ const i=(me.pets||[]).findIndex(x=
   if(w.kind==='item'){ const i=(me.inv||[]).findIndex(x=>x.id===w.id); if(i<0) fail('That gear is gone.'); if(Object.values(me.eq||{}).includes(w.id)) fail('Unequip that gear first.'); const it=me.inv.splice(i,1)[0]; return {kind:'item',k:it.k,iid:it.id,...(it.b?{b:1}:{})}; }
   if(w.kind==='crate'){ me.stash=me.stash||{}; if(!(me.stash[w.k]>0)) fail('That crate is gone.'); me.stash[w.k]--; return {kind:'crate',k:w.k}; }
   settle(me); if((me[w.kind]||0)<w.n) fail(`Not enough ${w.kind}.`); me[w.kind]-=w.n; return {kind:w.kind,n:w.n}; }
-function giveThing(me,x){ if(x.kind==='pet'){ me.pets=me.pets||[]; if(me.pets.length>=PET_KEEP) fail('The pet house is full.'); me.pets.push(x.pet); if(!me.petOn) me.petOn=x.pet.id; }
+function giveThing(me,x){ if(x.kind==='pet'){ me.pets=me.pets||[]; if(me.pets.length>=petCap(me)) fail('The pet house is full.'); me.pets.push(x.pet); if(!me.petOn) me.petOn=x.pet.id; }
   else if(x.kind==='item'){ me.inv=me.inv||[]; if(me.inv.length>=INV_MAX) fail('The gear bag is full.'); me.inv.push({id:x.iid||Math.random().toString(36).slice(2,9),k:x.k,...(x.b?{b:1}:{})}); }
   else if(x.kind==='crate'){ me.stash=me.stash||{}; me.stash[x.k]=(me.stash[x.k]||0)+1; } else { settle(me); me[x.kind]=(me[x.kind]||0)+x.n; } }
 function thingOpts(p,mine){ const o=[]; for(const pt of (p.pets||[])) if(pt.id!==p.petOn&&PETS[pt.k]) o.push([`pet:${pt.id}`,`🐾 ${cleanText(pt.name)} the ${PETS[pt.k].name} (Lv ${pt.lvl||1})`]);
@@ -9681,6 +10012,12 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  132:['⚔️ Clan Wars have their own screen now, and winners also get a Royal Crate','⭐ Player levels with rewards (the weekly Tournament is now in the Play menu too)','🌦️ Weather now matters (rain and snow slow armies) with a forecast','👍 React to messages, ⚠️ report a mean message, 🔇 mute someone for a day','🎨 Building skins, 👗 hero outfits, 🏠 bigger pet house with decorations, and museums show more','🧠 Daily trivia, 📌 map notes, 📺 watch your clanmates\' battles. Find it all in 🎮 Play → 🆕 New'],
+  131:['🚫 Blocking now works everywhere: blocked players cannot message you, gift, trade, send caravans, stamps or pet visits, and you can block right from a private chat','🚫 New Blocked players list in Settings to see and unblock people'],
+  130:['💬 Fixed private messages and group chats: they used to say "the server refused that move". Now they send!'],
+  129:['🔧 Mythic pets now say Mythic (in pink) instead of Legendary'],
+  128:['🔧 The First Day Guide no longer pops up while you are in the middle of an attack or tapping around'],
+  127:['🎮 NEW Play button: everything you can do, in one menu','📖 How to play, 📣 Invite friends and 📅 Events Calendar (in ☰ More)','🗳️ Vote on what comes next','🧭 Kingdom Tour: visit a cool kingdom with one tap','🔥 Login streak bonuses at 7, 14, 30, 50 and 100 days'],
   126:['⛰️ Crown Island: for the first 7 days of every month, clans fight to hold it','🌱 Royal Garden: plant, water and harvest food','🎣 16 rare seasonal fish to catch','📇 Kingdom Cards: collect a card from every kingdom you visit','🥚 Pet eggs and Royal Crates in Orders','✏️ Add a note to gifts and deliveries','🔊 New sounds, and the game loads faster'],
   125:['📦 NEW Orders in the Market: ask for stone, food or crates and other players deliver them for gold','💀 Boss Rush, 🐾 Pet Battles, 🗺️ Treasure Maps, 📜 Kingdom Events, 🏡 Pet Visits, 🏅 Kingdom of the Week, 👫 Friend Leaderboard and 🏆 Achievements (all in ✨ Fun & Collect)','👒 8 new pet hats and 3 new glows','⛶ Full screen button, 🌙 Night mode and new music for each season and the dungeon','💰 No more 20 million limit! Gold, stone and food over 18 million go into a safe vault that raiders cannot touch, and you can still spend it','🏆 The Richest leaderboard now shows the most you have ever had, so it never goes down'],
   124:['✨ NEW Fun & Collect menu (in Kingdom Life): Daily Boss, Monster Book, Mini-game Cup, Pet Tricks, Season Shop, Titles, First Day Guide and News','🐾 Grown-up pets glow on the map, and Mythic pets sparkle','📸 Photo mode adds your banner and pet, with 4 frames','🚩 Clans can have their own banner on every member\'s castle','🏰 Leave a stamp when you visit a friend','🧸 Simple mode in Settings: bigger text and buttons'],
@@ -9844,7 +10181,7 @@ function levelFlair(p,cx,cy,col){ const L=p.lvl||0, u=TW; if(!L||cam.z<.45) retu
 
 /* ===== food and farms ===== */
 const FOOD_PER_SP=3, START_FOOD=300;
-const foodCost=(u,n)=>UNITS[u].sp*FOOD_PER_SP*n;
+const foodCost=(u,n)=>Math.ceil(UNITS[u].sp*FOOD_PER_SP*n*(typeof wxFood==='function'?wxFood():1));
 
 /* ===== pet powers in battle ===== */
 const PET_REST=20*60000;
@@ -9874,7 +10211,7 @@ function breederHtml(p){ const m=P(ME), br=m.breed, pets=(m.pets||[]).filter(x=>
 function breedStart(){ const a=$('brA')?.value, b=$('brB')?.value; const bp=breederPlot(); if(!bp) return;
   act([],me=>{ if(me.breed) fail('The breeder is busy.'); const A=(me.pets||[]).find(x=>x.id===a), Bp=(me.pets||[]).find(x=>x.id===b); if(!A||!Bp||a===b) fail('Pick two different pets.'); if(A.k===Bp.k) fail('Pick two pets of different kinds.'); if(!PETS_BASE[A.k]||!PETS_BASE[Bp.k]) fail('Mixed pets cannot breed.');
     pay(me,BREED_COST); const ms=breedMs(bp[1].lvl); me.breed={a,b,ka:A.k,kb:Bp.k,start:now(),done:now()+ms}; return {ms}; },r=>{ snd('quest'); toast(`💞 Breeding started! The egg is ready in ${fmtT(r.ms/1000)}.`); renderPanel(true); }); }
-function breedHatch(){ act([],me=>{ const br=me.breed; if(!br) fail('Nothing is breeding.'); if(br.done>now()) fail('The egg is not ready yet.'); me.pets=me.pets||[]; if(me.pets.length>=PET_KEEP) fail('Your pet house is full. Sell a pet first.');
+function breedHatch(){ act([],me=>{ const br=me.breed; if(!br) fail('Nothing is breeding.'); if(br.done>now()) fail('The egg is not ready yet.'); me.pets=me.pets||[]; if(me.pets.length>=petCap(me)) fail('Your pet house is full. Sell a pet first.');
     const hyb=Math.random()<BREED_CHANCE, k=hyb?`x_${br.ka}_${br.kb}`:(Math.random()<.5?br.ka:br.kb), id=Math.random().toString(36).slice(2,9), name=pick(PET_NAMES[hyb?br.ka:k]||['Buddy']);
     me.pets.push({id,k,lvl:1,name}); delete me.breed; me.stats.bred=(me.stats.bred||0)+1; try{ bookAdd(me,'p',k); }catch(e){} return {k,hyb,name}; },
     r=>{ snd('quest'); if(r.hyb){ try{ confetti&&confetti(); }catch(e){} addNews(`🧬 ${P(ME).name} bred a rare ${PETS[r.k].name}!`,'good'); } toast(r.hyb?`🧬 WOW! ${r.name} is a rare mixed pet: ${aN(PETS[r.k].name)}!`:`🐣 ${r.name} the ${PETS[r.k].name} hatched!`); renderPanel(true); }); }
