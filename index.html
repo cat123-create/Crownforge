@@ -526,6 +526,11 @@ body.nightUI input,body.nightUI select{background:#1e1828;color:#ece6f5;border-c
 .petHero.ph_beach::before{content:'🌴🐚';}.petHero.ph_castle::before{content:'🏰🕯️';}.petHero.ph_night::before{content:'🌙⭐';}.petHero.ph_candy::before{content:'🍭🍬';}.petHero.ph_space::before{content:'🪐🚀';}
 .petHero[class*="ph_"]::before{position:absolute;right:8px;top:6px;font-size:1.4rem;z-index:2;pointer-events:none}
 @media (max-width:420px){.musGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+#skOv{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(20,12,4,.35);touch-action:none}#skOv .skBox{background:#fff6dc;border:3px solid #3b2412;border-radius:16px;padding:12px 16px;width:min(340px,calc(100vw - 32px));text-align:center;box-shadow:0 8px 20px rgba(0,0,0,.4)}#skOv b{font-family:"Lilita One",sans-serif;font-size:1.3rem;display:block;margin-bottom:8px}
+.skTrack{position:relative;height:26px;border:3px solid #3b2412;border-radius:14px;background:linear-gradient(90deg,#d8402f,#ffb020 30%,#ffb020 70%,#d8402f);overflow:hidden;margin:6px 0}.skZone{position:absolute;left:40%;width:20%;top:0;bottom:0;background:#5ad17a}.skNeedle{position:absolute;top:-4px;bottom:-4px;width:6px;margin-left:-3px;background:#2b1a0c;border-radius:3px}#skOv.win .skBox{background:#e3ffd6}#skOv.miss .skBox{background:#ffe1d6}
+.dlmX{font-size:1.02rem}.crGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.crPart{background:#fff6dc;border:2px solid #c9a24a;border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:4px}.crPart.down{opacity:.6}.crPart small{font-size:.72rem}
+@media (max-width:420px){.crGrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -642,7 +647,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 132;
+const GAME_VERSION = 133;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -761,7 +766,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const P=id=>G.players[id];
 const colorOf=id=>P(id)?.color||'#888888';
-const buildTime=(t,l)=>t==='breeder'?7200*l:t==='hall'?(l<=25?20*l*l:12500+120*(l-25)):8*l*l;
+const buildTime=(t,l)=>Math.max(1,Math.round((t==='breeder'?7200*l:t==='hall'?(l<=25?20*l*l:12500+120*(l-25)):8*l*l)*(typeof earlyMul==='function'?earlyMul(l):1)));
 const gemCost=sec=>Math.max(1,Math.ceil(sec/20));
 const PROD={farm:{res:'food',rate:15,cap:200},mine:{res:'gold',rate:20,cap:200},quarry:{res:'stone',rate:12,cap:120},smine:{res:'stone',rate:8,cap:600}};
 const collCap=p=>PROD[p.b]?PROD[p.b].cap*p.lvl*(typeof cropCap==='function'?cropCap(p):1):0;
@@ -1301,7 +1306,7 @@ async function attack(cell,opts){
         const A=atkOf(me,true,rage,!heroOn)+supA, D=tg.power, r=A*roll/D, win=r>1, z0=(me.brk=0), L=(win?Math.min(.6,.35*D/A):.6)*lossMul, lost=loseUnits(me,L,ATK)+brkN;
         if(win){ me.wk.wins++; me.wk.loot+=tg.gold+tg.stone; me.wk.stars+=r>1.6?3:r>1.25?2:1; }
         Object.assign(out,{npc:true,win,stars:win?(r>1.6?3:r>1.25?2:1):0,aLost:lost,dLost:0,gold:win?tg.gold:0,stone:win?tg.stone:0,tr:0});
-        if(win){ vetGain(me,units); out.card=cardDrop(me,.3); const lb=lootB(me); out.bonus=Math.round((tg.gold+tg.stone)*lb); me.gold+=Math.round(tg.gold*lb); me.stone+=Math.round(tg.stone*lb); out.tok=evGain(me,2); me.gold+=tg.gold; me.stone+=tg.stone; out.food=Math.round((tg.gold||0)*.5+40*(tg.lvl||1)); me.food=(me.food||0)+out.food; me.gems=(me.gems||0)+(tg.gems||0); me.stats.raids++; me.campBest=Math.max(me.campBest||0,tg.lvl||1); me.stats.looted+=tg.gold+tg.stone; t.setPlot(cell,{o:ME,b:null,lvl:0}); } else t.setPlot(cell,tg);
+        if(win){ vetGain(me,units); out.card=cardDrop(me,.3); const lb=lootB(me); out.bonus=Math.round((tg.gold+tg.stone)*lb); me.gold+=Math.round(tg.gold*lb); me.stone+=Math.round(tg.stone*lb); out.tok=evGain(me,2); me.gold+=tg.gold; me.stone+=tg.stone; out.food=Math.round((tg.gold||0)*.5+40*(tg.lvl||1)); me.food=(me.food||0)+out.food; me.gems=(me.gems||0)+(tg.gems||0); me.stats.raids++; me.lcw={c:cell,t:now()}; me.campBest=Math.max(me.campBest||0,tg.lvl||1); me.stats.looted+=tg.gold+tg.stone; t.setPlot(cell,{o:ME,b:null,lvl:0}); } else t.setPlot(cell,tg);
         out.text=(win?`You claimed the level ${tg.lvl} camp and its loot: ${f(tg.gold)} gold, ${f(tg.stone)} stone and ${f(out.food||0)} food${tg.gems?' and '+tg.gems+' gems':''}.${out.bonus?` Bonus loot: +${f(out.bonus)}.`:''}`:'The barbarians held their ground.')+(sup.length===1?' Your guard tower joined the fight.':sup.length?` ${sup.length} of your guard towers joined the fight.`:'');
         out.replay={...replay,npc:true,lvl:tg.lvl,win,stars:out.stars,aLost:lost,trapped:0};
         t.setPlayer(ME,me); return out;
@@ -1347,6 +1352,7 @@ async function attack(cell,opts){
   if(res.replay){ res.replay.emotes=lastEmotes.slice(0,20); liveEnd(res.replay); }
   if(res.win&&res.isHall) addNews(`👑 ${P(ME).name} conquered ${res.victim}'s kingdom!`,'bad'); if(res.boss&&res.win) addNews(`🐉 ${P(ME).name} brought down a Barbarian Fortress!`,'good');
   if(res.card) setTimeout(()=>toast(`🃏 New card: ${cardName(res.card)}!`),2600);
+  if(res.win&&tg0.o==='npc'&&tg0.b==='camp'&&typeof cbyClaimAt==='function') setTimeout(()=>cbyClaimAt(cell),2200);
   if(res.win){ const bk=tg0.o==='npc'?'camp':'king', ba=tg0.o==='npc'?cell:tg0.o; setTimeout(()=>{ try{ bbHit(bk,ba); }catch(e){} },1500); }
   report(ME,res.text,res.win?'good':'bad',cell,res.replay); if(res.vid) report(res.vid,res.vText,res.win?'bad':'good',cell,res.replay,{rv:1});
   if(res.tok) setTimeout(()=>toast(`+${res.tok} ${evNow()?.e.tok||''} for the event!`),1800);
@@ -3098,6 +3104,7 @@ function renderPanel(force){ if(sel&&G.plots[sel]&&(G.plots[sel].b==='hallx'||G.
     <p class="desc">${p.b==='hall'&&landLeft(p.o)>0?hallLockMsg(p.o):!exposedTile(sel,p.o)?`🛡️ This tile is surrounded by ${esc(cleanText(v.name))}'s land. Capture a tile on the edge of their kingdom first to open a path${p.b==='hall'?' to their Town Hall':''}.`:sh?shieldTxt(v):far?`Too far. Your army can march ${MARCH_RANGE} tiles from your borders.`:'No scouts can get close to a real kingdom. You will only find out how strong they are by attacking!'}</p>${sh||far||isNewbie(v)||!exposedTile(sel,p.o)||(p.b==='hall'&&landLeft(p.o)>0)?'':spellRow(m)+btn('Attack with your army',null,'attack','war')}${!online(v)&&!sh?'<p class="desc">They are offline: you can attack them once, then they are protected until they come back.</p>':''}`; } }
   if(myClan()&&sel) h+=`<div class="label">📍 Ping your clan here</div><div class="row">${Object.entries(PING).map(([k,q])=>btn(q.ic+' '+q.txt,null,'ping:'+k,'soft mini')).join('')}</div>`;
   if(sel&&typeof mnPanel==='function') h+=mnPanel(sel);
+  if(sel&&typeof v133Panel==='function') h+=v133Panel(sel);
   el.innerHTML=(isPhone()?'<button class="soft sheetX" data-act="desel" aria-label="Close">✕</button>':'')+h; refreshButtons(); sheetState();
 }
 const isPhone=()=>window.innerWidth<=900;
@@ -9454,13 +9461,13 @@ function gdnOf(m){ return (m.gdn||[]).slice(0,6); }
 var gdnPick='carrot';
 function gdnDialog(){ const m=P(ME), G2=gdnOf(m), n=gdnSlots(), k=1+HLX()*.15;
   fnOpen('🌱 Royal Garden',`<p class="desc">Plant seeds, water them and harvest food! Each plant can be watered <b>twice</b> while it grows, and every watering makes the harvest <b>50% bigger</b>. You get more garden plots as your Town Hall grows.</p>
-  <div class="row" style="flex-wrap:wrap">${Object.entries(GDN_SEEDS).map(([s,S])=>`<button class="${gdnPick===s?'prime':'soft'} mini" data-act="v126:seed:${s}">${S.ic} ${S.n} · ${S.min}m · ${f(S.cost)}🪙</button>`).join('')}</div>
+  <div class="row" style="flex-wrap:wrap">${Object.entries(GDN_SEEDS).filter(([s,S])=>!S.farm||(P(ME)||{}).job==='farm').map(([s,S])=>`<button class="${gdnPick===s?'prime':'soft'} mini" data-act="v126:seed:${s}">${S.ic} ${S.n} · ${S.min}m · ${f(S.cost)}🪙</button>`).join('')}</div>
   <div class="gdnGrid">${Array.from({length:n},(_,i)=>{ const p=G2[i]; if(!p) return `<button class="gdnPlot empty" data-act="v126:plant:${i}"><span>🟫</span><small>Plant ${GDN_SEEDS[gdnPick].ic}</small></button>`; const S=GDN_SEEDS[p.s], dur=S.min*60000, q=Math.min(1,(now()-p.t0)/dur), ready=q>=1, canW=!ready&&(p.w||0)<2&&now()-(p.wl||p.t0)>=dur/4;
     return `<div class="gdnPlot${ready?' ready':''}"><span>${ready?S.ic:q<.4?'🌱':'🌿'}</span><small>${S.n}${p.w?' · '+'💧'.repeat(p.w):''}</small><div class="bar"><i style="width:${q*100}%"></i></div>${ready?btn('Harvest',null,'v126:harvest:'+i,'prime mini'):canW?btn('💧 Water',null,'v126:water:'+i,'soft mini'):`<small>${fmtT((p.t0+dur-now())/1000)}</small>`}</div>`; }).join('')}</div>
   <p class="desc"><small>Food from a harvest: about ${f(Math.round(GDN_SEEDS[gdnPick].food*k))} ${GDN_SEEDS[gdnPick].ic} (more if watered).</small></p>`); }
-function gdnPlant(i){ i=+i; const S=GDN_SEEDS[gdnPick]; act([],me=>{ if(i>=gdnSlots()) fail('Grow your Town Hall for more plots.'); me.gdn=gdnOf(me); while(me.gdn.length<i) me.gdn.push(null); if(me.gdn[i]) fail('Something is already growing there.'); pay(me,{gold:S.cost}); me.gdn[i]={s:gdnPick,t0:now(),w:0,wl:0}; return {}; },()=>{ snd('plant'); gdnDialog(); }); }
+function gdnPlant(i){ i=+i; const S=GDN_SEEDS[gdnPick]; act([],me=>{ if(i>=gdnSlots()) fail('Grow your Town Hall for more plots.'); me.gdn=gdnOf(me); while(me.gdn.length<i) me.gdn.push(null); if(me.gdn[i]) fail('Something is already growing there.'); if(S.farm&&me.job!=='farm') fail('Only Farmers can grow Golden Wheat.'); me.seeds=me.seeds||{}; if((me.seeds[gdnPick]||0)>0) me.seeds[gdnPick]--; else pay(me,{gold:S.cost}); me.gdn[i]={s:gdnPick,t0:now(),w:0,wl:0}; return {}; },()=>{ snd('plant'); gdnDialog(); }); }
 function gdnWater(i){ i=+i; act([],me=>{ const p=(me.gdn||[])[i]; if(!p) fail('Nothing growing there.'); const dur=GDN_SEEDS[p.s].min*60000; if(now()-p.t0>=dur) fail('It is ready to harvest!'); if((p.w||0)>=2) fail('It has had enough water.'); if(now()-(p.wl||p.t0)<dur/4) fail('Wait a little before watering again.'); p.w=(p.w||0)+1; p.wl=now(); return {}; },()=>{ snd('water'); gdnDialog(); }); }
-function gdnHarvest(i){ i=+i; act([],me=>{ const p=(me.gdn||[])[i]; if(!p) fail('Nothing growing there.'); const S=GDN_SEEDS[p.s]; if(now()-p.t0<S.min*60000) fail('Not ready yet.'); const food=Math.round(S.food*(1+HLX()*.15)*(1+.5*(p.w||0))); me.food=(me.food||0)+food; me.gdn[i]=null; me.gdnN=(me.gdnN||0)+1; return {food,ic:S.ic}; },r=>{ snd('harvest'); toast(`${r.ic} Harvested ${f(r.food)} food!`); gdnDialog(); }); }
+function gdnHarvest(i){ i=+i; act([],me=>{ const p=(me.gdn||[])[i]; if(!p) fail('Nothing growing there.'); const S=GDN_SEEDS[p.s]; if(now()-p.t0<S.min*60000) fail('Not ready yet.'); const food=Math.round(S.food*(1+HLX()*.15)*(1+.5*(p.w||0))); me.food=(me.food||0)+food; const gg=S.gold?Math.round(S.gold*(1+HLX()*.15)*(1+.5*(p.w||0))):0; if(gg) me.gold=(me.gold||0)+gg; let sd=0; if(me.job==='farm'&&!S.farm){ sd=1+(Math.random()<.5?1:0); me.seeds=me.seeds||{}; me.seeds[p.s]=(me.seeds[p.s]||0)+sd; } me.gdn[i]=null; me.gdnN=(me.gdnN||0)+1; return {food,ic:S.ic,gg,sd}; },r=>{ snd('harvest'); toast(`${r.ic} Harvested ${r.gg?f(r.gg)+' gold':f(r.food)+' food'}!${r.sd?` +${r.sd} seed packet${r.sd>1?'s':''}`:''}`); gdnDialog(); }); }
 
 /* ---------- 🎣 seasonal rare fish ---------- */
 var SFISH={winter:[['icefish','Ice Fish','🧊'],['snowtrout','Snow Trout','❄️'],['aurora','Aurora Koi','🌌'],['frostcrab','Frost King Crab','🦀']],spring:[['blossomkoi','Blossom Koi','🌸'],['rainbowcarp','Rainbow Carp','🌈'],['frogfish','Lily Frogfish','🐸'],['petalray','Petal Ray','🪷']],summer:[['sunfish','Golden Sunfish','☀️'],['coralbass','Coral Bass','🪸'],['flyfish','Flying Fish','🐟'],['sharkpup','Baby Shark','🦈']],autumn:[['pumpkinpike','Pumpkin Pike','🎃'],['mapleperch','Maple Perch','🍁'],['ghostfish','Ghost Fish','👻'],['harvestcod','Harvest Cod','🌾']]};
@@ -9820,6 +9827,281 @@ settingsDialog=(o=>function(){ o.apply(this,arguments); try{ const d=document.qu
   else if(k==='lv') lvDialog(); else if(k==='lvclaim') lvClaim(); else if(k==='ph') phDialog(); else if(k==='phup') phUp(); else if(k==='pht') phTheme(r[2]);
   return true; }; })();
 
+/* ===== v133: kingdom dilemmas, jobs (with the Farmers Market), world events, hidden secrets,
+   clan fortress raids, skill taps and faster early upgrades ===== */
+function v133Open(title,body,back){ fkOpen(title,body,back===undefined?'v133:menu':back); }
+function sc133(n){ return Math.round(n*(1+HLX()*.25)); }
+function blk133(h){ return Math.floor(Date.now()/(h*3600000)); }
+function costHtml(c){ if(!c) return ''; const cc={}; for(const k in c) cc[k]=k==='gems'?c[k]:sc133(c[k]); return ` <small>(${costTxt(cc)})</small>`; }
+
+/* ---------- 8. Faster early upgrades ---------- */
+function earlyMul(l){ return l<=3?.3:l<=6?.45:l<=10?.65:l<=15?.85:1; }
+
+/* ---------- 7. Skill moments: a timing bar ---------- */
+var skBusy=false, skLast=0;
+function skillTap(label){ return new Promise(res=>{ if(skBusy) return res(.5); skBusy=true; const d=document.createElement('div'); d.id='skOv'; d.innerHTML=`<div class="skBox"><b>${label}</b><div class="skTrack"><i class="skZone"></i><i class="skNeedle"></i></div><small>Tap anywhere when the arrow is in the green!</small></div>`; document.body.appendChild(d);
+  const nd=d.querySelector('.skNeedle'), t0=performance.now(), per=1300; let pos=0, done=false, raf=0;
+  const step=t=>{ if(done) return; const ph=((t-t0)%per)/per; pos=ph<.5?ph*2:2-ph*2; nd.style.left=(pos*100)+'%'; raf=requestAnimationFrame(step); }; raf=requestAnimationFrame(step);
+  const end=q=>{ if(done) return; done=true; cancelAnimationFrame(raf); d.classList.add(q>=.8?'win':'miss'); d.querySelector('small').textContent=q>=.8?'⚡ PERFECT!':q>=.5?'👍 Good!':'😅 Missed!'; setTimeout(()=>{ d.remove(); skBusy=false; },650); res(q); };
+  d.addEventListener('pointerdown',e=>{ e.preventDefault(); e.stopPropagation(); end(Math.max(0,1-Math.abs(pos-.5)/.5)); }); setTimeout(()=>end(.2),4500); }); }
+collectCells=(o=>function(cells,quiet){ let one=null; try{ if(!quiet&&cells&&cells.length===1&&Date.now()-skLast>90000&&Math.random()<.3&&!skBusy){ const p=G.plots[cells[0]]; if(p&&p.o===ME&&PROD[p.b]){ const st=Math.floor(stored(p)); if(st>=20) one={c:cells[0],n:st,key:PROD[p.b].res}; } } }catch(e){}
+  const r=o.apply(this,arguments); if(one){ skLast=Date.now(); setTimeout(async()=>{ const q=await skillTap('⚡ Bonus tap!'); if(q<.8) return; const bonus=Math.min(Math.round(one.n*.3),sc133(3000)); act([],me=>{ if(now()-(me.skT||0)<60000) fail('Too soon for another bonus.'); me.skT=now(); me[one.key]=(me[one.key]||0)+bonus; return {}; },()=>{ try{ floatText(one.c,'⚡ +'+f(bonus),'#ffe14a'); }catch(e){} snd('coin'); }); },250); } return r; })(collectCells);
+
+/* ---------- 2. Jobs ---------- */
+var JOBS={war:{n:'Warrior',ic:'⚔️',d:'+10% attack. 📯 Battle Cry: once every 8 hours, your attacks are 25% stronger for 10 minutes. 🎯 Drill Yard: free soldiers once a day.'},
+  mer:{n:'Merchant',ic:'💰',d:'+3 market slots. 🐫 Trade Route: send gold away and get 30% more back after 2 hours. 🏦 Merchant Guild: swap stone for gold once a day.'},
+  farm:{n:'Farmer',ic:'🌾',d:'🧺 Sell seeds at the Farmers Market. Harvests give you seeds. 🌾 Grow Golden Wheat (Farmers only) that turns into gold. +1 garden plot.'},
+  exp:{n:'Explorer',ic:'🧭',d:'Find twice as many ✨ hidden secrets on the map, with 25% bigger rewards. 🔭 Scout Trip: every 4 hours, send scouts for treasure.'}};
+var JOB_TH=5, JOB_FEE=100000, JOB_MAXCH=5, jobOk=null;
+function jobOf(p){ return p&&JOBS[p.job]?p.job:null; }
+function jobChangeCost(m){ const n=(m&&m.jobN)||0; return !jobOf(m)||n<1?null:{gold:JOB_FEE,stone:JOB_FEE}; }
+function jobPick(k){ const m=P(ME); if(!JOBS[k]||!m) return; if(jobOf(m)&&jobOk!==k){ jobOk=k; const c=jobChangeCost(m); return toast(`Tap again to become a ${JOBS[k].name||JOBS[k].n}${c?' for '+costTxt(c):' (this change is free)'}. Changes used: ${m.jobN||0}/${JOB_MAXCH}.`); } jobOk=null;
+  act([],me=>{ if((stats(ME).hallLvl||1)<JOB_TH) fail(`Jobs unlock at Town Hall ${JOB_TH}.`); const cur=jobOf(me), n=me.jobN||0; if(cur===k) fail('That is already your job.');
+    if(cur){ if(n>=JOB_MAXCH) fail('You have changed jobs 5 times. Your job is locked forever now.'); if(n>=1){ settle(me); pay(me,{gold:JOB_FEE,stone:JOB_FEE}); } me.jobN=n+1; } me.job=k; me.jobT=now(); return {k,ch:!!cur}; },
+    r=>{ snd('quest'); confetti(); toast(`${JOBS[r.k].ic} You are now a ${JOBS[r.k].n}!`); jobDialog(); }); }
+function jobDialog(){ const m=P(ME)||{}, j=jobOf(m), th=stats(ME).hallLvl||1, n=m.jobN||0;
+  if(th<JOB_TH) return v133Open('🧑‍🌾 Jobs',`<p class="desc">At Town Hall ${JOB_TH} you can pick a job for your kingdom. Each job has its own special powers that only that job can use!</p>${Object.values(JOBS).map(J=>`<div class="setItem"><div><b>${J.ic} ${J.n}</b><small>${J.d}</small></div></div>`).join('')}`);
+  const rules=`<p class="desc"><small>Rules: your first change is free. After that, each change costs 100,000 gold and 100,000 stone. After 5 changes your job is locked forever. Changes used: <b>${n}/${JOB_MAXCH}</b>.</small></p>`;
+  const others=Object.entries(JOBS).filter(([k])=>k!==j).map(([k,J])=>`<div class="setItem"><div><b>${J.ic} ${J.n}</b><small>${J.d}</small></div>${j&&n>=JOB_MAXCH?'<button class="soft" disabled>Locked</button>':`<button class="${j?'soft':'prime'}" data-act="v133:jobp:${k}">${j?'Switch':'Pick'}</button>`}</div>`).join('');
+  if(!j) return v133Open('🧑‍🌾 Pick your job',`<p class="desc">Pick a job for your kingdom. Each one plays differently!</p><div class="setList">${others}</div>${rules}`);
+  const J=JOBS[j]; let pw='';
+  if(j==='war'){ const cd=Math.max(0,8*3600000-(now()-(m.bcryL||0))), on=(m.bcry||0)>now(); pw=`<div class="row"><button class="prime" data-act="v133:cry" ${cd&&!on?'disabled':''}>📯 Battle Cry${on?' (ON for '+fmtT(((m.bcry||0)-now())/1000)+')':cd?' (ready in '+fmtT(cd/1000)+')':''}</button><button class="soft" data-act="v133:drill" ${m.drill===dayNum()?'disabled':''}>🎯 Drill Yard${m.drill===dayNum()?' (tomorrow)':''}</button></div>`; }
+  if(j==='mer'){ const tr=m.trd; pw=tr?`<p class="desc">🐫 Your trade route is carrying ${f(tr.a)} gold. ${now()>=tr.t+2*3600000?'It is back!':'Back in '+fmtT((tr.t+2*3600000-now())/1000)+'.'}</p><div class="row"><button class="prime" data-act="v133:trc" ${now()<tr.t+2*3600000?'disabled':''}>Collect ${f(Math.round(tr.a*1.3))} gold</button></div>`
+      :`<div class="row"><input id="trAmt" type="number" min="1000" placeholder="Gold to send (1,000 to ${f(20000*HLX())})"><button class="prime" data-act="v133:trs">🐫 Send trade route</button></div>`;
+    pw+=`<div class="row"><button class="soft" data-act="v133:guild" ${m.guild===dayNum()?'disabled':''}>🏦 Guild: swap ${f(sc133(4000))} stone for gold${m.guild===dayNum()?' (tomorrow)':''}</button></div>`; }
+  if(j==='farm') pw=`<div class="row"><button class="prime" data-act="v133:fm">🧺 Farmers Market</button><button class="soft" data-act="v126:gdn">🌱 My garden</button></div><p class="desc">🌱 Your seeds: ${seedTxt(m)}</p>`;
+  if(j==='exp'){ const cd=Math.max(0,4*3600000-(now()-(m.scoutL||0))); pw=`<div class="row"><button class="prime" data-act="v133:scout" ${cd?'disabled':''}>🔭 Scout Trip${cd?' (ready in '+fmtT(cd/1000)+')':''}</button><button class="soft" data-act="v133:secl">✨ My secrets</button></div>`; }
+  v133Open(`${J.ic} ${J.n}`,`<p class="desc">${J.d}</p>${pw}<div class="label">Change job</div><div class="setList">${others}</div>${rules}`); }
+atkOf=(o=>function(p){ let v=o.apply(this,arguments); try{ if(p&&p.job==='war'){ v*=1.1; if((p.bcry||0)>now()) v*=1.25; } }catch(e){} return v; })(atkOf);
+gdnSlots=(o=>function(){ return o.apply(this,arguments)+((P(ME)||{}).job==='farm'?1:0); })(gdnSlots);
+function jwCry(){ act([],me=>{ if(me.job!=='war') fail('Only Warriors can do that.'); if(now()-(me.bcryL||0)<8*3600000) fail('Your Battle Cry is resting.'); me.bcryL=now(); me.bcry=now()+600000; return {}; },()=>{ snd('alarm'); toast('📯 BATTLE CRY! Your attacks are 25% stronger for 10 minutes!'); jobDialog(); }); }
+function jwDrill(){ act([],me=>{ if(me.job!=='war') fail('Only Warriors can do that.'); if(me.drill===dayNum()) fail('Come back tomorrow.'); const s=stats(ME), free=Math.floor(s.troopCap-armySp(me)); const n=Math.min(free,20*HLX()); if(n<=0) fail('Your barracks are full.'); me.drill=dayNum(); me.sol=(me.sol||0)+n; return {n}; },r=>{ snd('quest'); toast(`🎯 ${f(r.n)} free soldiers joined your army!`); jobDialog(); }); }
+function jmSend(a){ a=Math.floor(+a||0); act([],me=>{ if(me.job!=='mer') fail('Only Merchants can do that.'); if(me.trd) fail('Your trade route is already out.'); if(a<1000||a>20000*HLX()) fail(`Send between 1,000 and ${f(20000*HLX())} gold.`); settle(me); pay(me,{gold:a}); me.trd={a,t:now()}; return {}; },()=>{ snd('coin'); toast('🐫 Your caravan set off! Come back in 2 hours.'); jobDialog(); }); }
+function jmCollect(){ act([],me=>{ const tr=me.trd; if(me.job!=='mer') fail('Only Merchants can do that.'); if(!tr) fail('No trade route is out.'); if(now()<tr.t+2*3600000) fail('Not back yet.'); const g=Math.round(tr.a*1.3); me.gold+=g; delete me.trd; return {g}; },r=>{ snd('coin'); confetti(); toast(`🐫 Your trade route came back with ${f(r.g)} gold!`); jobDialog(); }); }
+function jmGuild(){ act([],me=>{ if(me.job!=='mer') fail('Only Merchants can do that.'); if(me.guild===dayNum()) fail('Come back tomorrow.'); const n=sc133(4000); settle(me); pay(me,{stone:n}); me.gold+=n; me.guild=dayNum(); return {n}; },r=>{ snd('coin'); toast(`🏦 Swapped ${f(r.n)} stone for ${f(r.n)} gold.`); jobDialog(); }); }
+function jeScout(){ act([],me=>{ if(me.job!=='exp') fail('Only Explorers can do that.'); if(now()-(me.scoutL||0)<4*3600000) fail('Your scouts are still out.'); me.scoutL=now(); const g=sc133(1500+Math.floor(Math.random()*2500)), s=sc133(800+Math.floor(Math.random()*1500)); me.gold+=g; me.stone+=s; let extra='';
+    const r=Math.random(); if(r<.12){ me.stash=me.stash||{}; me.stash.wood=(me.stash.wood||0)+1; extra=' and a crate!'; } else if(r<.27&&(me.tmapP||0)<4){ me.tmapP=(me.tmapP||0)+1; extra=' and a treasure map piece!'; } else if(r<.5){ gemsAdd(me,3); extra=' and some gems!'; } return {g,s,extra}; },
+    r=>{ snd('quest'); toast(`🔭 Your scouts found ${f(r.g)} gold, ${f(r.s)} stone${r.extra||'.'}`); jobDialog(); }); }
+
+/* ---------- 2b. Farmer seeds + Farmers Market ---------- */
+GDN_SEEDS.gwheat={n:'Golden Wheat',ic:'🌾',min:60,cost:2500,food:0,gold:5000,farm:1};
+function seedTxt(m){ const s=(m&&m.seeds)||{}, L=Object.entries(s).filter(([k,n])=>n>0&&GDN_SEEDS[k]); return L.length?L.map(([k,n])=>`${GDN_SEEDS[k].ic}×${n}`).join(' '):'none yet'; }
+var FMK_MAXL=6;
+function fmkLists(){ return Object.values(G.market||{}).filter(L=>L&&L.kind==='fm'&&GDN_SEEDS[L.k]&&(L.seller===ME||!blkAny(L.seller))).sort((a,b)=>(a.price/a.n)-(b.price/b.n)); }
+function fmkDialog(){ const m=P(ME)||{}, farm=m.job==='farm', L=fmkLists(), mine=L.filter(x=>x.seller===ME), own=Object.entries(m.seeds||{}).filter(([k,n])=>n>0&&GDN_SEEDS[k]&&!GDN_SEEDS[k].farm);
+  v133Open('🧺 Farmers Market',`<p class="desc">Farmers sell seed packets here. Anyone can buy them and plant them in their 🌱 garden for free (no gold needed to plant). Your seeds: ${seedTxt(m)}</p>
+    ${L.filter(x=>x.seller!==ME).length?`<div class="board">${L.filter(x=>x.seller!==ME).map(x=>`<div><span>${GDN_SEEDS[x.k].ic} ${f(x.n)} ${esc(GDN_SEEDS[x.k].n)} seeds</span><span>by ${esc(cleanText(x.sname||'?'))}</span><span>${btn('Buy '+f(x.price)+' gold',null,'v133:fmb:'+x.id,'prime')}</span></div>`).join('')}</div>`:'<p class="desc">No seeds for sale right now.</p>'}
+    ${farm?`<div class="label">🌾 Sell your seeds (Farmers only)</div>${own.length?`<div class="row"><select id="fmK">${own.map(([k,n])=>`<option value="${k}">${GDN_SEEDS[k].ic} ${esc(GDN_SEEDS[k].n)} (you have ${n})</option>`).join('')}</select><input id="fmN" type="number" min="1" max="50" placeholder="How many"><input id="fmP" type="number" min="1" placeholder="Price in gold"><button class="prime" data-act="v133:fms">List</button></div>`:'<p class="desc">Harvest crops in your garden to collect seeds.</p>'}
+      ${mine.length?`<div class="board">${mine.map(x=>`<div><span>${GDN_SEEDS[x.k].ic} ${f(x.n)} seeds for ${f(x.price)} gold</span><span>${btn('Take back',null,'v133:fmc:'+x.id,'soft')}</span></div>`).join('')}</div>`:''}`:'<p class="desc">🌾 Only Farmers can sell here. Pick the Farmer job to sell seeds!</p>'}`); }
+function fmkSell(k,n,price){ n=Math.floor(+n||0); price=Math.floor(+price||0); if(!GDN_SEEDS[k]||GDN_SEEDS[k].farm) return toast('Pick seeds to sell.',true); if(n<1||n>50) return toast('Sell 1 to 50 seeds at a time.',true); if(price<1||price>1e7) return toast('Pick a price.',true);
+  if(Object.values(G.market||{}).filter(L=>L&&L.kind==='fm'&&L.seller===ME).length>=FMK_MAXL) return toast(`You can have ${FMK_MAXL} seed listings at once.`,true);
+  const id='fm'+Math.random().toString(36).slice(2,10); mkTx(async(t,me)=>{ if(me.job!=='farm') fail('Only Farmers can sell at the Farmers Market.'); me.seeds=me.seeds||{}; if((me.seeds[k]||0)<n) fail('You do not have that many seeds.'); me.seeds[k]-=n; t.setMk(id,{seller:ME,sname:me.name,kind:'fm',k,n,price,cur:'gold',t:now()}); t.setPlayer(ME,me); },()=>{ snd('coin'); toast('🧺 Your seeds are for sale!'); setTimeout(fmkDialog,400); }); }
+function fmkBuy(id){ const L0=(G.market||{})[id]; if(L0&&blkAny(L0.seller)) return toast(blkMsg(L0.seller),true);
+  mkTx(async(t,me)=>{ const L=await t.getMk(id); if(!L||L.kind!=='fm') fail('Someone else bought it first.'); if(L.seller===ME) fail('That is your own listing.'); if(!GDN_SEEDS[L.k]||GDN_SEEDS[L.k].farm) fail('That cannot be bought.'); const sel2=await t.getPlayer(L.seller); settle(me); pay(me,{gold:L.price});
+    me.seeds=me.seeds||{}; me.seeds[L.k]=(me.seeds[L.k]||0)+L.n; if(sel2){ settle(sel2); sel2.gold=(sel2.gold||0)+L.price; t.setPlayer(L.seller,sel2); } t.setMk(id,null); t.setPlayer(ME,me); return {k:L.k,n:L.n}; },
+    r=>{ snd('coin'); toast(`🌱 You bought ${r.n} ${GDN_SEEDS[r.k].n} seeds! Plant them in your garden for free.`); setTimeout(fmkDialog,400); }); }
+function fmkCancel(id){ mkTx(async(t,me)=>{ const L=await t.getMk(id); if(!L||L.kind!=='fm'||L.seller!==ME) fail('That listing is gone.'); me.seeds=me.seeds||{}; me.seeds[L.k]=(me.seeds[L.k]||0)+L.n; t.setMk(id,null); t.setPlayer(ME,me); },()=>{ toast('Taken back.'); setTimeout(fmkDialog,400); }); }
+buyListing=(o=>function(id){ const L=(G.market||{})[id]; if(L&&L.kind==='fm') return fmkBuy(id); return o.apply(this,arguments); })(buyListing);
+cancelListing=(o=>function(id){ const L=(G.market||{})[id]; if(L&&L.kind==='fm') return fmkCancel(id); return o.apply(this,arguments); })(cancelListing);
+mkView=(o=>function(){ const l=o.apply(this,arguments); return Array.isArray(l)?l.filter(L=>!L||L.kind!=='fm'):l; })(mkView);
+gdnDialog=(o=>function(){ const r=o.apply(this,arguments); try{ const d=document.querySelector('#fkOv .dialog'), m=P(ME)||{}; if(d&&!d.querySelector('.seedLine')){ const p=document.createElement('p'); p.className='desc seedLine'; p.innerHTML=`🌱 Seed packets: ${seedTxt(m)} <small>(planting with a packet is free)</small> ${btn('🧺 Farmers Market',null,'v133:fm','soft mini')}`; const h=d.querySelector('h2'); if(h) h.after(p); else d.prepend(p); } }catch(e){} return r; })(gdnDialog);
+
+/* ---------- 1. Kingdom dilemmas ---------- */
+var DLM_H=4;
+function dGive(me,o){ const out=[]; for(const k of ['gold','stone','food']) if(o[k]){ const n=sc133(o[k]); me[k]=(me[k]||0)+n; out.push(f(n)+' '+k); } if(o.gems){ gemsAdd(me,o.gems); out.push('some gems'); } if(o.sol){ const n=Math.round(o.sol*HLX()); me.sol=(me.sol||0)+n; out.push(f(n)+' soldiers'); } if(o.crate){ me.stash=me.stash||{}; me.stash[o.crate]=(me.stash[o.crate]||0)+1; out.push('a crate'); } if(o.map&&(me.tmapP||0)<4){ me.tmapP=(me.tmapP||0)+1; out.push('a treasure map piece'); } return out.length?' You got '+out.join(', ')+'.':''; }
+function dLose(me,o){ const out=[]; for(const k of ['gold','stone','food']) if(o[k]){ const n=Math.min(me[k]||0,sc133(o[k])); me[k]=(me[k]||0)-n; out.push(f(n)+' '+k); } if(o.solP){ const n=Math.floor((me.sol||0)*o.solP); me.sol=(me.sol||0)-n; if(n) out.push(f(n)+' soldiers'); } return out.length?' You lost '+out.join(', ')+'.':''; }
+var DLM={
+  bandits:{ic:'🗡️',t:'Bandits at the gate!',x:'A gang of bandits demands gold or they will cause trouble.',c:[
+    {t:'Pay them',cost:{gold:600},fx:me=>'They take the gold and leave... for now.',nx:['bandits2',20]},
+    {t:'Fight them',fx:me=>{ if((me.sol||0)<10) return 'You had no soldiers! The bandits ran off with supplies.'+dLose(me,{gold:400}); return Math.random()<.6?'Your soldiers chased them away and found their loot!'+dGive(me,{gold:1200}):'The bandits fought hard.'+dLose(me,{solP:.08}); }},
+    {t:'Hire them',cost:{gold:1200},fx:me=>'They join your army!'+dGive(me,{sol:12}),nx:['bandits3',24]}]},
+  bandits2:{ic:'🗡️',t:'The bandits are back',x:'The same bandits return. Now they want twice as much!',c:[
+    {t:'Pay again',cost:{gold:1200},fx:me=>'They leave for good this time. Probably.'},
+    {t:'Set a trap',cost:{stone:800},fx:me=>'Your trap caught them all! Their hideout was full of treasure.'+dGive(me,{gold:2500,gems:4})}]},
+  bandits3:{ic:'🗺️',t:'A bandit\'s secret',x:'One of the bandits you hired tells you about a hidden stash in the hills.',c:[
+    {t:'Send a team',fx:me=>Math.random()<.7?'The stash was real!'+dGive(me,{gold:2000,stone:1500}):'Only an empty cave. The bandit just shrugs.'},{t:'Ignore it',fx:me=>'You stay focused on your kingdom.'}]},
+  traveler:{ic:'🧳',t:'A tired traveler',x:'A dusty traveler asks for food and a place to sleep.',c:[
+    {t:'Welcome them',cost:{food:400},fx:me=>'The traveler thanks you warmly and rides away.',nx:['traveler2',30]},{t:'Send them away',fx:me=>'The traveler walks off into the night.'}]},
+  traveler2:{ic:'👑',t:'The traveler returns',x:'The traveler is back... and they are a PRINCE in disguise! They bring a gift.',c:[{t:'Accept the gift',fx:me=>'What a reward for being kind!'+dGive(me,{gold:2500,gems:6,crate:'wood'})}]},
+  pup:{ic:'🐺',t:'A lost wolf pup',x:'Your guards found a lost wolf pup near the forest.',c:[
+    {t:'Raise it',cost:{food:500},fx:me=>'The pup sleeps by the fire. It looks happy.',nx:['pup2',36]},{t:'Sell it to a merchant',fx:me=>'The merchant pays well.'+dGive(me,{gold:900})},{t:'Return it to the forest',fx:me=>'Its mother howls a thank you.'+dGive(me,{food:300})}]},
+  pup2:{ic:'🐺',t:'Your wolf is grown!',x:'The pup grew into a huge wolf that guards your walls and brought friends.',c:[{t:'Good wolf!',fx:me=>'The wolf pack hunts for your kingdom.'+dGive(me,{food:2000,sol:6,gems:3})}]},
+  bridge:{ic:'🌉',t:'The bridge broke',x:'A storm broke the bridge to your quarry.',c:[
+    {t:'Fix it now',cost:{stone:700},fx:me=>'Your builders rebuild it even stronger.',nx:['bridge2',12]},{t:'Leave it',fx:me=>'The quarry workers carry stone the long way.'+dLose(me,{stone:500})}]},
+  bridge2:{ic:'🌉',t:'Busy bridge',x:'Your new bridge is so good that traders want to use it.',c:[{t:'Charge a small toll',fx:me=>'The coins roll in.'+dGive(me,{gold:1800,stone:600})},{t:'Let them cross free',fx:me=>'The traders spread the word about your kind kingdom.'+dGive(me,{gems:5})}]},
+  feast:{ic:'🍗',t:'Feast time?',x:'Your people ask for a big feast to celebrate.',c:[
+    {t:'Throw a feast',cost:{food:800,gold:300},fx:me=>'Everyone dances all night! Happy workers work harder.'+dGive(me,{stone:1200,gems:3})},{t:'Not today',fx:me=>Math.random()<.35?'The people grumble and work slowly.'+dLose(me,{gold:300}):'The people understand.'}]},
+  wizard:{ic:'🧙',t:'A strange wizard',x:'A wizard offers you a bubbling potion. "It will change your luck," he says.',c:[
+    {t:'Drink it (12 gems)',cost:{gems:12},fx:me=>{ const r=Math.random(); return r<.45?'Gold coins rain from the sky!'+dGive(me,{gold:4000}):r<.8?'Your soldiers feel super strong!'+dGive(me,{sol:20}):'You turn into a frog for an hour. Nothing else happens. Ribbit.'; }},{t:'No thanks',fx:me=>'The wizard vanishes in a puff of smoke.'}]},
+  miners:{ic:'⛏️',t:'Miners trapped!',x:'A tunnel collapsed and miners are trapped underground.',c:[
+    {t:'Rescue them',cost:{gold:700},fx:me=>'Everyone is saved!',nx:['miners2',24]},{t:'Dig slowly',fx:me=>'It takes days to reach them.'+dLose(me,{stone:600})}]},
+  miners2:{ic:'💎',t:'The miners say thanks',x:'The miners you saved found a cave full of shiny crystals.',c:[{t:'Take a look',fx:me=>'Wow, gems!'+dGive(me,{gems:8,stone:1500})}]},
+  egg:{ic:'🥚',t:'A giant egg',x:'Villagers found a huge, warm egg on the mountain.',c:[
+    {t:'Keep it warm',cost:{food:600},fx:me=>'You wrap it in blankets by the fire.',nx:['egg2',40]},{t:'Sell it',fx:me=>'A collector pays a lot for it.'+dGive(me,{gems:5})},{t:'Put it back',fx:me=>'Something big will remember your kindness...',nx:['egg3',60]}]},
+  egg2:{ic:'🐣',t:'It is hatching!',x:'The egg cracks open...',c:[{t:'Open your eyes',fx:me=>'A baby creature! It needs a home.'+dGive(me,{crate:'pet'})}]},
+  egg3:{ic:'🐉',t:'A visit from the sky',x:'A mighty dragon lands outside. It drops a gift and flies away.',c:[{t:'Take the gift',fx:me=>'Dragons never forget.'+dGive(me,{gems:12,gold:3000})}]},
+  tax:{ic:'📜',t:'Raise taxes?',x:'Your advisor says raising taxes would fill the treasury.',c:[
+    {t:'Raise them',fx:me=>'Gold pours in!'+dGive(me,{gold:2000}),nx:['tax2',24]},{t:'Keep them low',fx:me=>'Your people cheer for you.',nx:['tax3',24]}]},
+  tax2:{ic:'😠',t:'Angry farmers',x:'The farmers are upset about the high taxes.',c:[{t:'Lower taxes again',fx:me=>'They calm down, but some food went missing.'+dLose(me,{food:800})},{t:'Give them a bonus',cost:{gold:900},fx:me=>'The farmers are happy again!'+dGive(me,{food:1000})}]},
+  tax3:{ic:'😊',t:'Happy people',x:'Your happy people want to give you a present.',c:[{t:'Thank you!',fx:me=>'What a kind kingdom.'+dGive(me,{gold:1200,food:800})}]},
+  knight:{ic:'🛡️',t:'A knight\'s challenge',x:'A wandering knight challenges your best fighter to a duel.',c:[
+    {t:'Accept',fx:me=>Math.random()<.5?'Your champion wins! The knight pays up.'+dGive(me,{gold:1500,gems:4}):'Your champion lost the duel.'+dLose(me,{gold:600})},{t:'Decline',fx:me=>'The knight bows and rides on.'}]},
+  ghost:{ic:'👻',t:'A haunted tower',x:'People say the old tower is haunted. Nobody will go near it.',c:[
+    {t:'Explore it',fx:me=>Math.random()<.45?'Just bats! And a chest of old treasure.'+dGive(me,{gold:1800,gems:3}):'Spooky noises scared your soldiers away.'+dLose(me,{solP:.05})},{t:'Hire a ghost hunter',cost:{gold:500},fx:me=>'The ghost hunter finds a friendly ghost who shows you a secret room.'+dGive(me,{stone:1500})}]},
+  festival:{ic:'🎪',t:'Festival invite',x:'A neighbor kingdom invites you to their festival.',c:[{t:'Go and bring gifts',cost:{gold:500},fx:me=>'You make new friends and trade at the fair.'+dGive(me,{stone:1200,food:900})},{t:'Stay home',fx:me=>'You hear the music from far away.'}]}};
+var DLM_BASE=['bandits','traveler','pup','bridge','feast','wizard','miners','egg','tax','knight','ghost','festival'];
+function dlmCur(m){ if(!m) return null; const b=blk133(DLM_H); if(m.dlA===b) return null; const due=(m.dlF||[]).filter(x=>x&&DLM[x.id]&&x.at<=now()).sort((a,c)=>a.at-c.at)[0]; if(due) return {id:due.id,b,fol:1}; const seen=m.dlS||[]; const pool=DLM_BASE.filter(k=>!seen.includes(k)); const L=pool.length?pool:DLM_BASE; return {id:L[Math.floor(h32(ME+':'+b)*L.length)],b}; }
+function dlmDialog(res){ const m=P(ME)||{}, cur=dlmCur(m);
+  if(!cur) return v133Open('📜 Kingdom decisions',`${res?`<p class="desc">${esc(res)}</p>`:''}<p class="desc">No messengers right now. A new decision comes every ${DLM_H} hours, and some choices lead to surprises later!</p>`);
+  const D=DLM[cur.id]; v133Open(`${D.ic} ${esc(D.t)}`,`${res?`<p class="desc">${esc(res)}</p>`:''}<p class="desc dlmX">${esc(D.x)}</p><div class="dqs">${D.c.map((c,i)=>`<button class="soft" data-act="v133:dl:${cur.id}:${i}">${esc(c.t)}${costHtml(c.cost)}</button>`).join('')}</div>`); }
+function dlmChoose(id,i){ i=+i; act([],me=>{ const cur=dlmCur(me); if(!cur||cur.id!==id) fail('That decision is over. Check for a new one!'); const c=DLM[id].c[i]; if(!c) fail('Pick an answer.'); settle(me); if(c.cost){ const cc={}; for(const k in c.cost) cc[k]=k==='gems'?c.cost[k]:sc133(c.cost[k]); pay(me,cc); }
+    const txt=c.fx(me); me.dlA=cur.b; me.dlF=(me.dlF||[]).filter(x=>x&&x.id!==id); if(c.nx) me.dlF.push({id:c.nx[0],at:now()+c.nx[1]*3600000}); me.dlF=me.dlF.slice(-6); if(!cur.fol){ me.dlS=[...(me.dlS||[]).filter(x=>x!==id),id].slice(-8); } me.dlN=(me.dlN||0)+1; return {txt}; },
+    r=>{ snd('quest'); toast('📜 '+r.txt); dlmDialog(r.txt); }); }
+
+/* ---------- 4. World events (the same for everyone) ---------- */
+var WE_CELL=cid(-980,-260), WE_H=8, weSt=null;
+function weId(){ return blk133(WE_H); }
+function weKind(id){ const h=h32('we'+id); return h<.34?'dragon':h<.67?'plague':'rush'; }
+function weCenter(id){ const L=Object.values(G.players||{}).filter(p=>p&&!p.dead&&p.hall); if(!L.length) return null; L.sort((a,b)=>h32(a.id+':'+id)-h32(b.id+':'+id)); const [x,y]=xy(L[0].hall); return cid(x+Math.round((h32(id+'cx')-.5)*14),y+Math.round((h32(id+'cy')-.5)*14)); }
+function weSpot(id){ const st=weSt&&weSt.id===id&&weSt.c!=null?weSt.c:weCenter(id); if(st==null) return null; if(weKind(id)!=='dragon') return st; const step=Math.floor((Date.now()%(WE_H*3600000))/(30*60000)), [x,y]=xy(st); return cid(x+Math.round((h32(id+':'+step+'x')-.5)*20),y+Math.round((h32(id+':'+step+'y')-.5)*20)); }
+var WE_INFO={dragon:['🐉','A dragon is flying over the land!','It moves every 30 minutes. Attack it together! Attacks from close by (10 tiles) hit 50% harder. When it falls, everyone who helped gets a reward.'],
+  plague:['🤢','A plague is spreading!','Kingdoms within 10 tiles of the green cloud lose some food. Send medicine (food) to help cure it. When 25 medicine deliveries arrive, it is cured and every helper gets a reward.'],
+  rush:['💰','Gold rush!','Gold was found at the sparkling spot! The first 25 kingdoms to dig get a big pile of gold and stone. The first 5 also get gems. Hurry!']};
+function weLeft(){ return WE_H*3600000-(Date.now()%(WE_H*3600000)); }
+function weFresh(b,id){ if(b&&b.id===id) return {...b,by:{...(b.by||{})}}; const k=weKind(id); let hp=0; if(k==='dragon'){ const a=Object.values(G.players||{}).filter(p=>p&&!p.dead&&attackers(p)>0).map(p=>{ try{ return atkOf(p,false); }catch(e){ return 0; } }).sort((x,y)=>x-y); const med=a.length?a[Math.floor(a.length/2)]:5000; hp=Math.max(30000,Math.round(med*30)); }
+  return {o:'npc',b:'wevent',id,k,c:weCenter(id),hp,max:hp,n:0,by:{}}; }
+async function weDialog(){ weSt=await cellRead(WE_CELL); const id=weId(), k=weKind(id), I=WE_INFO[k], m=P(ME)||{}, b=weSt&&weSt.id===id?weSt:null, spot=weSpot(id), my=b&&b.by[ME];
+  let body=`<p class="desc"><b>${I[1]}</b> ${I[2]}</p><p class="desc">⏳ Ends in ${fmtT(weLeft()/1000)}.</p>`;
+  if(k==='dragon'){ const hp=b?b.hp:null, mx=b?b.max:1, cd=Math.max(0,15*60000-(now()-(m.weA||0))); body+=b?`<div class="lvBar"><i style="width:${Math.max(0,hp/mx*100)}%;background:linear-gradient(90deg,#d8402f,#ff8a3d)"></i></div><p class="desc">${hp<=0?'🎉 The dragon was defeated!':'❤️ '+f(Math.max(0,hp))+' / '+f(mx)+' health'}</p>`:'<p class="desc">❤️ Full health. Be the first to attack!</p>';
+    if(!b||b.hp>0) body+=`<div class="row"><button class="prime" data-act="v133:weatk" ${cd?'disabled':''}>⚔️ Attack the dragon${cd?' ('+fmtT(cd/1000)+')':''}</button></div>`; }
+  if(k==='plague'){ const n=b?b.n:0, cd=Math.max(0,30*60000-(now()-(m.weA||0))); body+=`<div class="lvBar"><i style="width:${Math.min(100,n/25*100)}%;background:linear-gradient(90deg,#5ad17a,#2f9b4c)"></i></div><p class="desc">💊 ${n}/25 medicine deliveries${n>=25?' · Cured! 🎉':''}</p>`;
+    if(n<25) body+=`<div class="row"><button class="prime" data-act="v133:wemed" ${cd?'disabled':''}>💊 Send medicine (${f(sc133(800))} food)${cd?' ('+fmtT(cd/1000)+')':''}</button></div>`; }
+  if(k==='rush'){ const n=b?b.n:0; body+=`<p class="desc">⛏️ ${n}/25 kingdoms have dug.</p>${my?'<p class="desc">✅ You already dug here!</p>':n<25?'<div class="row"><button class="prime" data-act="v133:wedig">⛏️ Dig for gold!</button></div>':'<p class="desc">All the gold is gone. Next time, be faster!</p>'}`; }
+  const done=b&&((k==='dragon'&&b.hp<=0)||(k==='plague'&&b.n>=25)); if(done&&my&&m.weC!==id) body+='<div class="row"><button class="gemb" data-act="v133:weclaim">🎁 Collect your reward</button></div>';
+  if(spot!=null) body+=`<div class="row">${btn('📍 Show on map',null,'ping:go:'+spot,'soft')}</div>`;
+  v133Open(`${I[0]} World event`,body); }
+function weAct(fn,after){ act([WE_CELL],(me,pl)=>{ const id=weId(), b=weFresh(pl[WE_CELL],id); b.o='npc'; b.b='wevent'; const r=fn(me,b,id); trimMap(b.by,400); pl[WE_CELL]=b; return r||{}; },r=>{ if(after) after(r); weDialog(); }); }
+function weAttack(){ weAct((me,b,id)=>{ if(b.k!=='dragon') fail('There is no dragon right now.'); if(b.hp<=0) fail('The dragon is already defeated!'); if(now()-(me.weA||0)<15*60000) fail('Your army is resting.'); if(!attackers(me)&&!heroReady(me)) fail('You need an army.');
+    const spot=weSpot(id), near=spot!=null&&stats(ME).hall&&dist(stats(ME).hall,spot)<=10, A=Math.round(atkOf(me,false)*(.8+Math.random()*.4)*(near?1.5:1)), lost=loseUnits(me,.05,ATK); b.hp=Math.max(0,b.hp-A); b.by[ME]=(b.by[ME]||0)+A; me.weA=now(); return {A,lost,near,down:b.hp<=0}; },
+    r=>{ snd(r.down?'quest':'click'); if(r.down) confetti(); toast(`🐉 You hit the dragon for ${f(r.A)}${r.near?' (close-up bonus!)':''}! ${r.lost} troops fell.${r.down?' THE DRAGON FELL!':''}`); }); }
+function weMedicine(){ weAct((me,b)=>{ if(b.k!=='plague') fail('There is no plague right now.'); if(b.n>=25) fail('The plague is already cured!'); if(now()-(me.weA||0)<30*60000) fail('Your healers are resting.'); settle(me); pay(me,{food:sc133(800)}); b.n++; b.by[ME]=(b.by[ME]||0)+1; me.weA=now(); return {n:b.n}; },r=>{ snd('quest'); toast(`💊 Medicine delivered! ${r.n}/25.`); }); }
+function weDig(){ weAct((me,b,id)=>{ if(b.k!=='rush') fail('There is no gold rush right now.'); if(b.by[ME]) fail('You already dug here!'); if(b.n>=25) fail('All the gold is gone!'); b.n++; b.by[ME]=b.n; me.weC=id; const first=b.n<=5; me.gold+=sc133(5000); me.stone+=sc133(3000); if(first) gemsAdd(me,10); return {n:b.n,first}; },r=>{ snd('coin'); confetti(); toast(`⛏️ You were digger #${r.n}! Gold and stone${r.first?' and gems':''} for you!`); }); }
+function weClaim(){ weAct((me,b,id)=>{ const done=(b.k==='dragon'&&b.hp<=0)||(b.k==='plague'&&b.n>=25); if(!done) fail('Not finished yet.'); if(!b.by[ME]) fail('You did not help this time.'); if(me.weC===id) fail('Already collected.'); me.weC=id; me.gold+=sc133(3000); gemsAdd(me,b.k==='dragon'?15:10);
+    let top=false; if(b.k==='dragon'){ const t=Object.entries(b.by).sort((x,y)=>y[1]-x[1])[0]; if(t&&t[0]===ME){ top=true; me.stash=me.stash||{}; me.stash.royal=(me.stash.royal||0)+1; } } return {top}; },r=>{ snd('quest'); confetti(); toast(`🎁 Thanks for helping!${r.top?' You did the most damage and got a Royal Crate!':''}`); }); }
+setInterval(()=>{ try{ const m=P(ME); if(!m||m.dead||busy||!stats(ME).hall) return; const id=weId(); if(weKind(id)!=='plague'||m.plg===id) return; const c=weSpot(id); if(c==null||dist(stats(ME).hall,c)>10) return;
+  act([],me=>{ if(me.plg===id) return {}; me.plg=id; const n=Math.floor((me.food||0)*.1); me.food=(me.food||0)-n; return {n}; },r=>{ if(r&&r.n) toast(`🤢 The plague reached your kingdom! You lost ${f(r.n)} food. Send medicine to help cure it!`,true); }); }catch(e){} },20000);
+setTimeout(()=>{ cellRead(WE_CELL).then(v=>weSt=v); },4000); setInterval(()=>{ if(P(ME)&&!document.hidden) cellRead(WE_CELL).then(v=>weSt=v); },120000);
+
+/* ---------- 5. Hidden secrets ---------- */
+var SEC_T={ruins:['🏚️','Old ruins','Crumbling walls hide forgotten treasure.'],cave:['🕳️','Secret cave','A dark cave... something glitters inside.'],fairy:['🧚','Fairy ring','A circle of glowing mushrooms. Fairies leave gifts here!'],chest:['🧰','Buried chest','The ground looks freshly dug here...'],giant:['😴','Sleeping giant','A HUGE giant is snoring on a pile of treasure.']};
+function secList(m){ m=m||P(ME); if(!m) return []; const hall=stats(m.id||ME).hall; if(!hall) return []; const b=blk133(3), n=m.job==='exp'?2:1, out=[], [hx,hy]=xy(hall), ks=Object.keys(SEC_T);
+  for(let k=0;k<n;k++){ const key=b+':'+k; if(h32(ME+'s'+key)>.8&&m.job!=='exp') continue; const a=h32(ME+'a'+key)*Math.PI*2, r=6+Math.floor(h32(ME+'r'+key)*9), x=Math.max(0,Math.min(N-1,Math.round(hx+Math.cos(a)*r))), y=Math.max(0,Math.min(N-1,Math.round(hy+Math.sin(a)*r)));
+    out.push({key,c:cid(x,y),t:ks[Math.floor(h32(ME+'t'+key)*ks.length)],got:(m.secC||[]).includes(key)}); } return out; }
+function secAt(c){ return secList().find(s=>!s.got&&String(s.c)===String(c)); }
+function secPanel(c){ const s=secAt(c); if(!s) return ''; const T=SEC_T[s.t]; return `<div class="label">✨ You found a secret!</div><p class="desc"><b>${T[0]} ${T[1]}</b>: ${T[2]}</p><div class="row">${s.t==='giant'?`${btn('🤫 Sneak past',null,'v133:sec:'+s.key+':0','soft')}${btn('⚔️ Fight it',null,'v133:sec:'+s.key+':1','war')}`:btn('🔍 Explore',null,'v133:sec:'+s.key+':0','prime')}</div>`; }
+function secOpen(key,mode){ act([],me=>{ const s=secList(me).find(x=>x.key===key); if(!s) fail('That secret has vanished.'); me.secC=me.secC||[]; if(me.secC.includes(key)) fail('You already explored it.'); me.secC=[...me.secC,key].slice(-20); const bo=me.job==='exp'?1.25:1, G2=o=>{ const q={}; for(const k in o) q[k]=['gems','crate','sol'].includes(k)?o[k]:Math.round(o[k]*bo); return dGive(me,q); };
+    if(s.t==='ruins') return {t:'🏚️ You dug through the ruins!'+G2({gold:1500,stone:2000})}; if(s.t==='cave') return {t:'🕳️ Deep in the cave...'+(Math.random()<.35?G2({stone:1500,crate:'wood'}):G2({stone:2500}))};
+    if(s.t==='fairy') return {t:'🧚 The fairies like you!'+G2({gems:4+Math.floor(Math.random()*4)})}; if(s.t==='chest') return {t:'🧰 A buried chest!'+G2({gold:3500})};
+    if(+mode!==1) return {t:'🤫 You tiptoe past and grab a little gold.'+G2({gold:900})}; if(!attackers(me)&&!heroReady(me)) fail('You need an army to fight a giant!');
+    if(Math.random()<.6) return {t:'⚔️ You beat the giant!'+G2({gold:3000,gems:6})}; return {t:'😵 The giant woke up angry and swatted your soldiers.'+dLose(me,{solP:.1})}; },
+    r=>{ snd('quest'); toast(r.t); renderPanel(true); }); }
+function secDialog(){ const L=secList(); v133Open('✨ Hidden secrets',`<p class="desc">Secrets appear near your kingdom every few hours. Look for the ✨ sparkle on the map, tap that tile, and explore it! Explorers find two at a time.</p>${L.length?`<div class="board">${L.map(s=>`<div><span>${s.got?'✅ Explored':'✨ Something is out there...'}</span><span>${s.got?'':btn('Search nearby',null,'v133:secgo:'+s.key,'soft')}</span></div>`).join('')}</div>`:'<p class="desc">Nothing right now. Check back later!</p>'}<p class="desc"><small>New secrets in ${fmtT((3*3600000-(Date.now()%(3*3600000)))/1000)}.</small></p>`); }
+function secGo(key){ const s=secList().find(x=>x.key===key); if(!s) return; const [x,y]=xy(s.c), c=cid(x+Math.round((h32(key+'jx')-.5)*6),y+Math.round((h32(key+'jy')-.5)*6)); $('ov').innerHTML=''; setTab('map'); if(cam.z<.8) cam.z=.8; centerOn(c); draw(); toast('✨ The secret is somewhere around here. Look for the sparkle!'); }
+
+/* ---------- 6. Clan fortress raid ---------- */
+var CR_PARTS={wall:{n:'🧱 Walls',weak:['giant','brk','cat']},tower:{n:'🗼 Towers',weak:['cat','drg','cav']},gate:{n:'🚪 Gate',weak:['ram','kn','giant']},keep:{n:'🏰 Keep',weak:['sol','kn','drg']}}, CR_PER_DAY=3, crPickU=null;
+function crHP(c){ const s=(c.members||[]).map(P).filter(p=>p&&!p.dead).reduce((a,p)=>{ try{ return a+atkOf(p,false); }catch(e){ return a; } },0); return Math.max(6000,Math.round(s*.8)); }
+function crOf(c){ return c&&c.raid&&c.raid.wk===weekId()?c.raid:null; }
+function crDialog(){ const c=myClan(), m=P(ME)||{}; if(!c) return v133Open('🏰 Clan fortress raid','<p class="desc">Every week your clan can raid a huge fortress together. Join a clan to take part!</p>');
+  const R=crOf(c), hp=R?R.hp:null, mx=R?R.max:crHP(c), used=m.crA&&m.crA.d===dayNum()?m.crA.n:0, outer=['wall','tower','gate'].every(k=>hp&&hp[k]<=0);
+  const have=ATK.filter(u=>(m[u]||0)>0&&UNITS[u]&&UNITS[u].atk>0); if(!crPickU||!have.includes(crPickU)) crPickU=have[0]||null;
+  const parts=Object.entries(CR_PARTS).map(([k,P2])=>{ const h=hp?hp[k]:(k==='keep'?mx*1.5:mx), M=k==='keep'?(R?R.max*1.5:mx*1.5):(R?R.max:mx), locked=k==='keep'&&!outer; return `<div class="crPart${h<=0?' down':''}"><b>${P2.n}</b><div class="lvBar"><i style="width:${Math.max(0,h/M*100)}%;background:linear-gradient(90deg,#d8402f,#ff8a3d)"></i></div><small>${h<=0?'💥 Destroyed!':locked?'🔒 Break the walls, towers and gate first':'Weak to: '+P2.weak.map(u=>UNITS[u]?UNITS[u].name:u).join(', ')}</small>${h>0&&!locked&&crPickU&&used<CR_PER_DAY&&!(R&&R.dn)?btn('Attack with '+UNITS[crPickU].name,null,'v133:crhit:'+k,'war'):''}</div>`; }).join('');
+  const top=R?Object.entries(R.by||{}).sort((a,b)=>b[1]-a[1]).slice(0,6):[];
+  v133Open('🏰 Clan fortress raid',`<p class="desc">Your whole clan attacks the same fortress this week. Pick the right troops for each part: troops hit weak spots <b>twice as hard</b>, but other parts only take 60%. Then aim! You get ${CR_PER_DAY} attacks a day, and each one sends all your troops of that kind (30% don't come back).</p>
+    ${R&&R.dn?`<p class="desc">🎉 The fortress has fallen!</p>${(R.by||{})[ME]&&m.crC!==R.wk?'<div class="row"><button class="gemb" data-act="v133:crclaim">🎁 Collect raid reward</button></div>':''}`:''}
+    ${have.length?`<div class="row">${have.map(u=>`<button class="${u===crPickU?'prime':'soft'} mini" data-act="v133:cru:${u}">${UNITS[u].name} ×${f(m[u])}</button>`).join('')}</div>`:'<p class="desc">Train some attacking troops first!</p>'}
+    <p class="desc">Attacks left today: <b>${CR_PER_DAY-used}</b></p><div class="crGrid">${parts}</div>${top.length?`<div class="label">Top raiders</div><div class="board">${top.map(([u,d])=>`<div><span>${esc(cleanText((P(u)||{}).name||'?'))}</span><span>${f(d)}</span></div>`).join('')}</div>`:''}`); }
+async function crHit(part){ const c=myClan(), u=crPickU, m=P(ME); if(!c||!u||!CR_PARTS[part]||!m) return; if(!((m[u]||0)>0)) return toast('You have none of those troops.',true);
+  const q=await skillTap('🎯 Aim your attack!'), aim=.6+.9*Math.max(0,Math.min(1,q));
+  mkTx(async(t,me)=>{ const cc=await t.getClan(c.id); if(!cc||!(cc.members||[]).includes(ME)) fail('You are not in that clan.'); const wk=weekId(), d=dayNum(); if(!me.crA||me.crA.d!==d) me.crA={d,n:0}; if(me.crA.n>=CR_PER_DAY) fail('No raid attacks left today. Come back tomorrow!');
+    let R=cc.raid&&cc.raid.wk===wk?cc.raid:null; if(!R){ const mx=crHP(cc); R={wk,max:mx,hp:{wall:mx,tower:mx,gate:mx,keep:Math.round(mx*1.5)},by:{}}; } R={...R,hp:{...R.hp},by:{...(R.by||{})}}; if(R.dn) fail('The fortress already fell this week!');
+    if(R.hp[part]<=0) fail('That part is already destroyed.'); if(part==='keep'&&['wall','tower','gate'].some(k=>R.hp[k]>0)) fail('Break the walls, towers and gate first!');
+    const n=Math.floor(me[u]||0); if(n<=0) fail('You have none of those troops.'); settle(me); let um=1; try{ um=unitMult(me,u)||1; }catch(e){}
+    const dmg=Math.round(n*Math.max(4,UNITS[u].atk)*um*(CR_PARTS[part].weak.includes(u)?2:.6)*aim*(me.job==='war'?1.1:1)), lost=Math.ceil(n*(UNITS[u].tough?.15:.3));
+    me[u]=n-lost; R.hp[part]=Math.max(0,R.hp[part]-dmg); R.by[ME]=(R.by[ME]||0)+dmg; trimMap(R.by,60); if(R.hp.keep<=0) R.dn=now(); me.crA.n++; cc.raid=R; t.setClan(c.id,cc); t.setPlayer(ME,me); return {dmg,lost,weak:CR_PARTS[part].weak.includes(u),dn:!!R.dn}; },
+    r=>{ snd(r.dn?'quest':'click'); if(r.dn) confetti(); toast(`🏰 ${f(r.dmg)} damage${r.weak?' (weak spot! x2)':''}! ${f(r.lost)} troops fell.${r.dn?' THE FORTRESS HAS FALLEN!':''}`); setTimeout(crDialog,300); }); }
+function crClaim(){ const c=myClan(); if(!c) return; act([],me=>{ const R=crOf(G.clans[c.id]); if(!R||!R.dn) fail('The fortress is still standing.'); if(!(R.by||{})[ME]) fail('You did not help this week.'); if(me.crC===R.wk) fail('Already collected.'); me.crC=R.wk; me.stash=me.stash||{}; me.stash.royal=(me.stash.royal||0)+1; gemsAdd(me,25); me.gold+=sc133(4000); me.crW=(me.crW||0)+1; return {}; },()=>{ snd('quest'); confetti(); toast('🏰 Raid reward: a Royal Crate, gems and gold!'); crDialog(); }); }
+
+/* ---------- map drawing + tile panel ---------- */
+drawPings=(o=>function(v){ o.apply(this,arguments); try{ const u=TW, T=NOWT||performance.now(), inV=(cx,cy,pad)=>!(cx<v.x0-pad||cx>v.x1+pad||cy<v.y0-pad||cy>v.y1+pad);
+  const id=weId(), k=weKind(id), sp=weSpot(id); if(sp!=null){ const [x,y]=xy(sp), [cx,cy]=ctr(x,y);
+    if(k==='plague'){ const R=u*10; if(inV(cx,cy,R)){ ctx.globalAlpha=.16+.04*Math.sin(T/700); ctx.fillStyle='#5ad17a'; ctx.beginPath(); ctx.ellipse(cx,cy,R,R/2,0,0,7); ctx.fill(); ctx.globalAlpha=1; } }
+    if(inV(cx,cy,u*3)&&cam.z>=.2){ const fs=Math.max(u*(k==='dragon'?.9:.6),18/cam.z), bob=RM?0:Math.sin(T/400)*u*.08; ctx.font=`${fs}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(k==='dragon'?'🐉':k==='plague'?'🤢':'💰',cx,cy-u*.6+bob); if(k==='rush'&&!RM){ for(let i=0;i<5;i++){ const a=T/500+i*1.26; ctx.fillText('✨',cx+Math.cos(a)*u*.5,cy-u*.4+Math.sin(a)*u*.25); } } } }
+  if(cam.z>=.35) for(const s of secList()){ if(s.got) continue; const [x,y]=xy(s.c), [cx,cy]=ctr(x,y); if(!inV(cx,cy,u)) continue; const tw=RM?1:.6+.4*Math.sin(T/300+x); ctx.globalAlpha=tw; ctx.font=`${Math.max(u*.32,12/cam.z)}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(cam.z>=.9?SEC_T[s.t][0]:'✨',cx,cy-u*.2); ctx.globalAlpha=1; } }catch(e){} })(drawPings);
+function v133Panel(c){ let h=''; try{ h+=secPanel(c); const id=weId(), sp=weSpot(id); if(sp!=null&&dist(c,sp)<=1){ const I=WE_INFO[weKind(id)]; h+=`<div class="label">${I[0]} World event</div><p class="desc">${I[1]}</p><div class="row">${btn('Open',null,'v133:we','prime')}</div>`; } }catch(e){} return h; }
+
+/* ---------- menu, ready list, profile, router ---------- */
+var NEW133=[['📜','Decisions','v133:dlm'],['🧑‍🌾','My job','v133:job'],['🌍','World event','v133:we'],['✨','Secrets','v133:secl'],['🏰','Clan raid','v133:cr'],['🧺','Farmers Market','v133:fm']];
+function v133Menu(){ v133Open('🆕 Newest',`<div class="playRow">${NEW133.map(([ic,t,a])=>`<button class="soft playIt" data-act="${a}"><span>${ic}</span>${t}</button>`).join('')}</div>`,null); }
+setTimeout(()=>{ try{ PLAY_SECTIONS.unshift(['🔥 Newest',NEW133]); }catch(e){} },0);
+readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const m=P(ME); if(m&&!m.dead){ if(dlmCur(m)) L.unshift({ic:'📜',t:'A messenger needs your decision!',act:'v133:dlm'});
+  if(!jobOf(m)&&(stats(ME).hallLvl||1)>=JOB_TH) L.push({ic:'🧑‍🌾',t:'Pick a job for your kingdom',act:'v133:job'});
+  if(m.job==='exp'&&now()-(m.scoutL||0)>=4*3600000) L.push({ic:'🔭',t:'Send your scouts',act:'v133:job'}); if(m.job==='war'&&m.drill!==dayNum()) L.push({ic:'🎯',t:'Free soldiers at the Drill Yard',act:'v133:job'}); if(m.job==='mer'&&m.trd&&now()>=m.trd.t+2*3600000) L.push({ic:'🐫',t:'Your trade route is back',act:'v133:job'});
+  if(secList(m).some(s=>!s.got)) L.push({ic:'✨',t:'A secret appeared near your kingdom',act:'v133:secl'});
+  const id=weId(); L.push({ic:WE_INFO[weKind(id)][0],t:'World event: '+WE_INFO[weKind(id)][1],act:'v133:we'});
+  const c=myClan(); if(c){ const R=crOf(c), used=m.crA&&m.crA.d===dayNum()?m.crA.n:0; if(!(R&&R.dn)&&used<CR_PER_DAY) L.push({ic:'🏰',t:'Raid the clan fortress',act:'v133:cr'}); } } }catch(e){} return L; })(readyList);
+profileDialog=(o=>function(uid){ const r=o.apply(this,arguments); try{ const p=P(uid), w=document.querySelector('#profOv .v132prof .desc'); if(p&&w&&jobOf(p)&&!w.querySelector('.jobTag')){ const s=document.createElement('span'); s.className='jobTag'; s.textContent=` · ${JOBS[p.job].ic} ${JOBS[p.job].n}`; w.appendChild(s); } }catch(e){} return r; })(profileDialog);
+var dlmToastB=null; setInterval(()=>{ try{ const m=P(ME); if(!m||m.dead||(stats(ME).hallLvl||1)<2) return; const cur=dlmCur(m); if(!cur||dlmToastB===cur.b+cur.id) return; dlmToastB=cur.b+cur.id; let seen=null; try{ seen=localStorage.getItem('cf-dlm-'+ME); }catch(e){} if(seen===String(dlmToastB)) return; try{ localStorage.setItem('cf-dlm-'+ME,String(dlmToastB)); }catch(e){} toast(`📜 ${DLM[cur.id].ic} A messenger has arrived! Open 🎮 Play → 📜 Decisions.`); }catch(e){} },15000);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v133:')) return va(a,b); const r=a.split(':'), k=r[1];
+  if(k==='menu') v133Menu(); else if(k==='dlm') dlmDialog(); else if(k==='dl') dlmChoose(r[2],r[3]);
+  else if(k==='job') jobDialog(); else if(k==='jobp') jobPick(r[2]); else if(k==='cry') jwCry(); else if(k==='drill') jwDrill(); else if(k==='trs') jmSend(($('trAmt')||{}).value); else if(k==='trc') jmCollect(); else if(k==='guild') jmGuild(); else if(k==='scout') jeScout();
+  else if(k==='fm') fmkDialog(); else if(k==='fms') fmkSell(($('fmK')||{}).value,($('fmN')||{}).value,($('fmP')||{}).value); else if(k==='fmb') fmkBuy(r[2]); else if(k==='fmc') fmkCancel(r[2]);
+  else if(k==='we') weDialog(); else if(k==='weatk') weAttack(); else if(k==='wemed') weMedicine(); else if(k==='wedig') weDig(); else if(k==='weclaim') weClaim();
+  else if(k==='secl') secDialog(); else if(k==='secgo') secGo(r.slice(2).join(':')); else if(k==='sec') secOpen(r[2]+':'+r[3],r[4]);
+  else if(k==='cr') crDialog(); else if(k==='cru'){ crPickU=r[2]; crDialog(); } else if(k==='crhit') crHit(r[2]); else if(k==='crclaim') crClaim();
+  return true; }; })();
+
+/* ---------- polls: saved in the owner's own kingdom data (the server refused the old settings spot), live vote counts, and a new built-in poll every week ---------- */
+var POLL_LIB=[['What should come next in Crownforge?',['More pets','More dungeons','More clan stuff','More mini-games']],['Which job is the best?',['⚔️ Warrior','💰 Merchant','🌾 Farmer','🧭 Explorer']],['What is the most fun part?',['Battles','Building','Pets','Clans']],['What feels too slow?',['Upgrades','Getting gold','Getting gems','Nothing!']],['Best world event?',['🐉 Dragon','🤢 Plague','💰 Gold rush','Can\'t pick']],['Favorite troop?',['Soldiers','Giants','Knights','Dragons']],['What should the next event be?',['Snow festival','Pirate week','Monster invasion','Space week']],['How often do you play?',['Every day','A few times a week','Weekends','First time!']]];
+function pollAuto(){ const w=weekId(), L=POLL_LIB[w%POLL_LIB.length]; return {id:'w'+w,q:L[0],opts:L[1],t:w*7*864e5}; }
+pollNow=function(){ const c=[]; if(POLL&&POLL.id&&Array.isArray(POLL.opts)&&POLL.opts.length>=2) c.push(POLL); const a=ADMIN&&P(ADMIN), d=a&&a.pollDef; if(d&&d.id&&Array.isArray(d.opts)&&d.opts.length>=2) c.push(d);
+  const fresh=c.filter(x=>(x.t||0)>now()-7*864e5).sort((x,y)=>(y.t||0)-(x.t||0)); return fresh[0]||pollAuto(); };
+pollNew=function(){ const q=cleanText(($('pollQ')||{}).value||'').trim().slice(0,80), o=cleanText(($('pollO')||{}).value||'').split(',').map(s=>s.trim().slice(0,40)).filter(Boolean).slice(0,4); if(q.length<4||o.length<2) return toast('Type a question and 2 to 4 answers.',true); if(!isAdmin()) return toast('Only the owner can start polls.',true);
+  const d={id:'p'+now().toString(36),q,opts:o,t:now()}; act([],me=>{ me.pollDef=d; return {}; },()=>{ toast('🗳️ New poll started! Everyone can vote now.'); try{ DB.setConfig('poll',d).catch(()=>{}); }catch(e){} setTimeout(pollDialog,500); }); };
+setInterval(()=>{ try{ const h=document.querySelector('#fkOv h2'); if(h&&h.textContent.startsWith('🗳️')&&!(document.activeElement&&/INPUT|TEXTAREA/.test(document.activeElement.tagName))) pollDialog(); }catch(e){} },4000);
+
+/* ---------- camp bounties: players put gold on a barbarian camp; whoever beats it collects ---------- */
+var CBY_MIN=500, CBY_MAX=1000000, CBY_PER=5;
+function cbyList(cell){ return Object.values(G.market||{}).filter(L=>L&&L.kind==='cbty'&&L.gold>0&&(cell==null||String(L.cell)===String(cell))); }
+function cbyIsCamp(c){ const p=G.plots[c]; return !!(p&&p.o==='npc'&&p.b==='camp'); }
+function cbyPanel(c){ const L=cbyList(c), camp=cbyIsCamp(c); if(!camp&&!L.some(x=>x.seller===ME)) return ''; const tot=L.reduce((a,x)=>a+x.gold,0), mine=L.filter(x=>x.seller===ME);
+  return `<div class="label">💰 Camp bounty</div>${tot?`<p class="desc">💰 <b>${f(tot)} gold</b> bounty on this camp from ${[...new Set(L.map(x=>cleanText(x.sname||'?')))].slice(0,4).map(esc).join(', ')}. Beat the camp to collect it!</p>`:camp?'<p class="desc">Put gold on this camp. Whoever beats it gets the gold!</p>':''}
+    ${camp?`<div class="row"><input id="cbAmt" type="number" min="${CBY_MIN}" max="${CBY_MAX}" placeholder="Gold (${f(CBY_MIN)}+)"><button class="gemb mini" data-act="v133:cbput">💰 Put bounty</button></div>`:''}
+    ${mine.map(x=>`<div class="row"><small>Your bounty: ${f(x.gold)} gold</small>${btn('Take back',null,'v133:cbtake:'+x.id,'soft mini')}</div>`).join('')}`; }
+function cbyPost(cell,a){ a=Math.floor(+a||0); if(!cbyIsCamp(cell)) return toast('Pick a barbarian camp first.',true); if(a<CBY_MIN||a>CBY_MAX) return toast(`Pick ${f(CBY_MIN)} to ${f(CBY_MAX)} gold.`,true); if(cbyList().filter(x=>x.seller===ME).length>=CBY_PER) return toast(`You can have ${CBY_PER} bounties at once.`,true);
+  const id='cb'+Math.random().toString(36).slice(2,10); mkTx(async(t,me)=>{ const r=await t.getRegion(regionOf(cell)), p=r[cell]; if(!p||p.o!=='npc'||p.b!=='camp') fail('That camp is gone.'); settle(me); pay(me,{gold:a}); t.setMk(id,{seller:ME,sname:me.name,kind:'cbty',cell,gold:a,lvl:p.lvl||1,price:0,cur:'gold',t:now()}); t.setPlayer(ME,me); },
+    ()=>{ snd('coin'); toast(`💰 You put a ${f(a)} gold bounty on the camp! Whoever beats it gets the gold.`); setTimeout(()=>renderPanel(true),500); }); }
+function cbyTake(id){ mkTx(async(t,me)=>{ const L=await t.getMk(id); if(!L||L.kind!=='cbty'||L.seller!==ME) fail('That bounty is gone.'); settle(me); me.gold+=L.gold; t.setMk(id,null); t.setPlayer(ME,me); return {g:L.gold}; },r=>{ toast(`Took back your ${f(r.g)} gold bounty.`); setTimeout(()=>{ renderPanel(true); if($('fkOv')) cbyDialog(); },500); }); }
+async function cbyClaimAt(cell,tries){ tries=tries||0; const ids=cbyList(cell).map(x=>x.id); if(!ids.length) return; if(busy){ if(tries<40) setTimeout(()=>cbyClaimAt(cell,tries+1),500); return; }
+  mkTx(async(t,me)=>{ const w=me.lcw; if(!w||String(w.c)!==String(cell)||now()-w.t>20*60000) fail('You need to beat that camp first.'); let g=0; const who=[];
+    for(const id of ids){ const L=await t.getMk(id); if(!L||L.kind!=='cbty'||String(L.cell)!==String(cell)||(L.t||0)>w.t) continue; g+=L.gold; if(L.seller!==ME) who.push([L.seller,L.gold]); t.setMk(id,null); }
+    if(!g) return {g:0}; settle(me); me.gold+=g; me.cbW=(me.cbW||0)+g; t.setPlayer(ME,me); return {g,who}; },
+    r=>{ if(!r||!r.g) return; snd('coin'); confetti(); toast(`💰 You collected a ${f(r.g)} gold camp bounty!`); for(const [u,g] of r.who) try{ report(u,`💰 ${P(ME).name} beat the camp and collected your ${f(g)} gold bounty!`,'good'); }catch(e){} }); }
+function cbyDialog(){ const L=cbyList(), by={}; for(const x of L){ const k=String(x.cell); (by[k]=by[k]||{c:x.cell,g:0,lvl:x.lvl,n:0,mine:[]}); by[k].g+=x.gold; by[k].n++; if(x.seller===ME) by[k].mine.push(x); }
+  const rows=Object.values(by).sort((a,b)=>b.g-a.g).slice(0,30);
+  v133Open('💰 Camp bounties',`<p class="desc">Players put gold on barbarian camps. Beat the camp and the gold is yours! To put your own bounty, tap a red camp on the map.</p>${rows.length?`<div class="board">${rows.map(r=>`<div><span>💰 ${f(r.g)} gold · level ${r.lvl||'?'} camp${r.mine.length?' (yours)':''}${cbyIsCamp(r.c)?'':' · ⚠️ camp gone'}</span><span>${btn('Show',null,'ping:go:'+r.c,'soft')}</span>${r.mine.map(x=>`<span>${btn('Take back',null,'v133:cbtake:'+x.id,'soft')}</span>`).join('')}</div>`).join('')}</div>`:'<p class="desc">No bounties right now. Be the first!</p>'}`); }
+buyListing=(o=>function(id){ const L=(G.market||{})[id]; if(L&&L.kind==='cbty') return toast('That is not for sale.',true); return o.apply(this,arguments); })(buyListing);
+cancelListing=(o=>function(id){ const L=(G.market||{})[id]; if(L&&L.kind==='cbty') return cbyTake(id); return o.apply(this,arguments); })(cancelListing);
+mkView=(o=>function(){ const l=o.apply(this,arguments); return Array.isArray(l)?l.filter(L=>!L||L.kind!=='cbty'):l; })(mkView);
+v133Panel=(o=>function(c){ let h=o.apply(this,arguments); try{ h+=cbyPanel(c); }catch(e){} return h; })(v133Panel);
+drawPings=(o=>function(v){ o.apply(this,arguments); try{ if(cam.z<.3) return; const seen={}; for(const L of cbyList()){ const k=String(L.cell); seen[k]=(seen[k]||0)+L.gold; }
+  for(const k in seen){ const c=isNaN(+k)?k:+k; if(!cbyIsCamp(c)) continue; const [x,y]=xy(c), [cx,cy]=ctr(x,y); if(cx<v.x0-TW*2||cx>v.x1+TW*2||cy<v.y0-TW*2||cy>v.y1+TW*2) continue; const u=TW, fs=Math.max(u*.17,11/cam.z), bob=RM?0:Math.sin((NOWT||0)/300)*u*.03;
+    ctx.font=`${fs}px "Lilita One",sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.lineWidth=fs*.25; ctx.strokeStyle='#2b1a0c'; const tx='💰 '+f(seen[k]); ctx.strokeText(tx,cx,cy-u*.95+bob); ctx.fillStyle='#ffe14a'; ctx.fillText(tx,cx,cy-u*.95+bob); } }catch(e){} })(drawPings);
+NEW133.push(['💰','Camp bounties','v133:cb']);
+readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const h=stats(ME).hall; if(h&&cbyList().some(x=>x.seller!==ME&&cbyIsCamp(x.cell)&&dist(h,x.cell)<=MARCH_RANGE)) L.push({ic:'💰',t:'A camp near you has a bounty!',act:'v133:cb'}); }catch(e){} return L; })(readyList);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v133:cb')) return va(a,b); const r=a.split(':'), k=r[1];
+  if(k==='cb') cbyDialog(); else if(k==='cbput'){ if(sel) cbyPost(sel,($('cbAmt')||{}).value); } else if(k==='cbtake') cbyTake(r[2]); return true; }; })();
+
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
 var SITES={vein:{name:'Gold Vein',ic:'⛏️',desc:'+25% gold from your Town Hall and Gold Mines.'},well:{name:'Magic Well',ic:'🔮',desc:'+25% food from your Town Hall and Farms.'},ruins:{name:'Ancient Ruins',ic:'🏛️',desc:'Search them once a day for 10 gems.'},grove:{name:'Crystal Grove',ic:'💎',desc:'+10% attack for your whole army.'}};
@@ -10012,6 +10294,7 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  133:['📜 Kingdom decisions: messengers bring choices, and some choices come back days later!','🧑‍🌾 Jobs at Town Hall 5: Warrior, Merchant, Farmer or Explorer, each with its own powers. Farmers can sell seeds at the new 🧺 Farmers Market','🌍 World events for everyone: dragons, plagues and gold rushes','✨ Hidden secrets near your kingdom, 🏰 clan fortress raids, ⚡ bonus taps and 🎯 aiming','⏩ Early upgrades are much faster. Find it all in 🎮 Play → 🔥 Newest','💰 Camp bounties: put gold on a barbarian camp, and whoever beats it gets the gold!','🗳️ Polls work now: new polls show up for everyone, votes update live, and there is a new question every week'],
   132:['⚔️ Clan Wars have their own screen now, and winners also get a Royal Crate','⭐ Player levels with rewards (the weekly Tournament is now in the Play menu too)','🌦️ Weather now matters (rain and snow slow armies) with a forecast','👍 React to messages, ⚠️ report a mean message, 🔇 mute someone for a day','🎨 Building skins, 👗 hero outfits, 🏠 bigger pet house with decorations, and museums show more','🧠 Daily trivia, 📌 map notes, 📺 watch your clanmates\' battles. Find it all in 🎮 Play → 🆕 New'],
   131:['🚫 Blocking now works everywhere: blocked players cannot message you, gift, trade, send caravans, stamps or pet visits, and you can block right from a private chat','🚫 New Blocked players list in Settings to see and unblock people'],
   130:['💬 Fixed private messages and group chats: they used to say "the server refused that move". Now they send!'],
@@ -10521,7 +10804,7 @@ function doPrestige(){ const s=stats(ME); if(!s.hall) return; if(!presOk){ presO
     r=>{ snd('win'); toast(`🌟 Prestige ${r.n}! Your Town Hall is back to level 1 and you are stronger forever. +${PRES_GEMS} gems`); try{ DB.addNews&&DB.addNews({by:ME,t:now(),text:`🌟 ${P(ME).name} reached Town Hall ${HALL_MAX} and earned prestige star ${r.n}!`}); }catch(e){} renderPanel(true); }); }
 
 /* ----- market space grows with your Town Hall ----- */
-const mkMax=()=>Math.min(40,4+Math.floor((stats(ME).hallLvl||1)/2));
+const mkMax=()=>Math.min(40,4+Math.floor((stats(ME).hallLvl||1)/2))+((P(ME)||{}).job==='mer'?3:0);
 const mkNext=()=>{ const L=stats(ME).hallLvl||1; if(mkMax()>=40) return ''; const n=L%2?L+1:L+2; return ` Town Hall ${n} gives you ${mkMax()+1}.`; };
 
 /* ----- messages: text one player or a group, like texting ----- */
