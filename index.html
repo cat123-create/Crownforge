@@ -532,7 +532,7 @@ body.nightUI input,body.nightUI select{background:#1e1828;color:#ece6f5;border-c
 .dlmX{font-size:1.02rem}.crGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.crPart{background:#fff6dc;border:2px solid #c9a24a;border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:4px}.crPart.down{opacity:.6}.crPart small{font-size:.72rem}
 @media (max-width:420px){.crGrid{grid-template-columns:1fr}}
 #txSpin{position:fixed;top:8px;left:50%;transform:translateX(-50%) translateY(-60px);z-index:90;background:#2b1a0c;color:#fff6dc;border-radius:12px;padding:4px 12px;font-weight:800;font-size:.85rem;transition:transform .15s;pointer-events:none}#txSpin.on{transform:translateX(-50%) translateY(0)}
-button:active{transform:scale(.96)}.jgChips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}.jgChips button{padding:3px 8px;font-size:.78rem}.jlvTask{margin:4px 0}.jlvTask span{display:block;font-size:.85rem;font-weight:700}.setItem.lock{opacity:.6}.shopBody{margin-top:6px}</style>
+button:active{transform:scale(.96)}.jgChips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}.jgChips button{padding:3px 8px;font-size:.78rem}.jlvTask{margin:4px 0}.jlvTask span{display:block;font-size:.85rem;font-weight:700}.setItem.lock{opacity:.6}.shopBody{margin-top:6px}.jgSearch{width:100%;margin:4px 0 6px}.jgRow{background:#fff6dc;border:2px solid #e2c48a;border-radius:10px;padding:6px 8px;margin:5px 0}.jgTop{display:flex;align-items:center;gap:6px}.jgName{flex:1;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis}.jgBy{font-size:.75rem;color:var(--muted);white-space:nowrap}.jgQ{border:0!important;box-shadow:none!important;background:transparent!important;min-height:0!important;transform:none!important;color:#8a5a2b;font-size:.78rem;font-weight:800;padding:2px 0;cursor:pointer;text-decoration:underline}.jgWhat{font-size:.82rem;background:#fff;border-radius:8px;padding:5px 7px;margin-top:3px}.fairBan{background:linear-gradient(90deg,#ffd13b,#ff8ad8);border-radius:10px;padding:6px 8px;font-weight:800;color:#3b2412}.jmLinks{flex-wrap:wrap}</style>
 </head>
 <body>
 <div class="wrap">
@@ -648,7 +648,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 135;
+const GAME_VERSION = 137;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -1146,7 +1146,7 @@ function build(cell,t){
     pay(me,bCost(t,0)); const done=now()+myBT(t,1)*1000; pl[cell]={o:ME,b:t,lvl:0,bt:{lvl:1,start:now(),done}}; if(PROD[t]) pl[cell].ct=done; },
     r=>{ snd(r.hut?'gem':'build'); if(r.hut) floatText(cell,'New builder!','#ffd13b'); if(r.wall) floatText(cell,'Wall','#eef4f7'); if(r.road) floatText(cell,'Road','#eef4f7'); }); }
 function upgrade(cell){ if(!cell) return toast('Tap a building first.',true); if(G.plots[cell]&&(G.plots[cell].b==='hallx'||G.plots[cell].b==='gbx')&&G.plots[cell].r) cell=G.plots[cell].r; const upT0=now();
-  act([cell],(me,pl)=>{ const p=pl[cell], s=stats(ME); upWhy(p,upT0); if(!p||p.o!==ME||!p.b||p.bt||p.b==='hut'||p.b==='deco'||p.b==='wonder'||p.b==='pethouse'||p.b==='trophyhall'||p.b==='gbanner'||p.b==='gbx'||p.b==='museum'||p.b==='mega'||p.b==='road'||p.b==='bridge'||p.b==='dock') fail('That cannot be upgraded right now.'); if(p.b!=='wall') me.stats.built=(me.stats.built||0)+1;
+  act([cell],(me,pl)=>{ const p=pl[cell], s=stats(ME); upWhy(p,upT0); if(!p||p.o!==ME||!p.b||p.bt||p.b==='hut'||p.b==='deco'||p.b==='wonder'||p.b==='pethouse'||p.b==='stall'||p.b==='trophyhall'||p.b==='gbanner'||p.b==='gbx'||p.b==='museum'||p.b==='mega'||p.b==='road'||p.b==='bridge'||p.b==='dock') fail('That cannot be upgraded right now.'); if(p.b!=='wall') me.stats.built=(me.stats.built||0)+1;
     if(p.b==='hall'){ if(p.lvl>=HALL_MAX) fail('Your Town Hall is at max level.'); if([5,10,25,50,75,100].includes(p.lvl+1)) diaryAdd(me,'🏰',`Started building Town Hall level ${p.lvl+1}`); } else if(p.lvl>=s.maxLvl) fail('Upgrade your Town Hall first.');
     if(p.b==='wall'){ pay(me,bCost('wall',p.lvl)); p.lvl++; return; }
     if(!freeBuilder()) fail('All your builders are busy.');
@@ -2029,6 +2029,7 @@ function drawCell0(x,y,t){
   if(p.b==='deco'){ decoPlot=p; drawDeco(p.d,cx,cy,colorOf(p.o)); decoPlot=null; return; }
   if(p.b==='wonder'){ pad(); drawWonder(p.w,cx,cy,colorOf(p.o),!!p.bt); return; }
   if(p.b==='pethouse'){ pad(); drawPetHouse(p,x,y,cx,cy,colorOf(p.o)); return; }
+  if(p.b==='stall'&&typeof drawStall==='function'){ pad(); drawStall(p,cx,cy,colorOf(p.o)); return; }
   if(p.b==='trophyhall'){ pad(); try{ drawTrophyHall(p,x,y,cx,cy,colorOf(p.o)); }catch(e){} return; }
   if(p.b==='museum'){ pad(); overDraw.push([cy+.1,()=>{ try{ drawMuseum(p,cx,cy); }catch(e){} }]); return; }
   if(p.b==='mega'){ pad(); overDraw.push([cy+.1,()=>{ try{ drawMega(p,cx,cy); }catch(e){} }]); return; }
@@ -3062,13 +3063,13 @@ function renderPanel(force){ if(sel&&G.plots[sel]&&(G.plots[sel].b==='hallx'||G.
     if(tmapOn(m)&&m.tmap.cell===sel) h+=`<div class="tmapBox">🗺️ <b>X marks the spot!</b> Treasure is buried here.</div>`+btn('Dig up the treasure',null,'dig','prime big');
     if(p.ob){ h+=`<h2>${OBS[p.ob].name}</h2><p class="desc">Clear it to free the land. Builders often find gems underneath.</p>${btn('Clear '+OBS[p.ob].name.toLowerCase(),OBS[p.ob].cost,'clear','prime')}`; }
     else if(!p.b){ h+=`<h2>Your empty land</h2><div class="build">${BUILDABLE.map(buildBtn).join('')}
-      ${s.hut<HUT_MAX?btn('Builder Hut',{gems:hutGems(s.hut)},'b:hut','gemb'):''}${btn('🏛️ Wonder',null,'wonder:open','gemb')}${btn('🏠 Pet house',PH_COST,'ph:build','soft')}${btn('🏆 Trophy hall',TH_COST,'v88:th','soft')}${btn('🚩 Great Banner (3×3)',GB_COST,'v103:gb','war')}${btn('🖼️ Museum',MUS_COST,'v107:musb','soft')}${btn('🌉 Mega Project',null,'v107:megah','gemb')}</div><div class="label">Decorate</div><div class="build">${decoBtns(m)}</div>${(tip('build','Tap a building to build it on this land. Decorations at the bottom are just for looks, and everyone who visits can see them.'),'')}
+      ${s.hut<HUT_MAX?btn('Builder Hut',{gems:hutGems(s.hut)},'b:hut','gemb'):''}${btn('🏛️ Wonder',null,'wonder:open','gemb')}${btn('🏠 Pet house',PH_COST,'ph:build','soft')}${btn('🏪 Market stall',typeof STALL_COST!=='undefined'?STALL_COST:null,'v137:stallb','soft')}${btn('🏆 Trophy hall',TH_COST,'v88:th','soft')}${btn('🚩 Great Banner (3×3)',GB_COST,'v103:gb','war')}${btn('🖼️ Museum',MUS_COST,'v107:musb','soft')}${btn('🌉 Mega Project',null,'v107:megah','gemb')}</div><div class="label">Decorate</div><div class="build">${decoBtns(m)}</div>${(tip('build','Tap a building to build it on this land. Decorations at the bottom are just for looks, and everyone who visits can see them.'),'')}
       <p class="desc">${s.busy>=s.builders?'All builders are busy right now. Walls do not need a builder.':`${s.builders-s.busy} of ${s.builders} builders free.`}</p>`; }
     else if(p.bt){ const left=(p.bt.done-now())/1000, q=Math.min(1,(now()-p.bt.start)/(p.bt.done-p.bt.start));
       h+=`<h2>${B[p.b].name}</h2><p class="desc">Builders are working on level ${p.bt.lvl}.</p><div class="bar"><i id="bprog" style="width:${q*100}%"></i></div>
       <div class="stat"><span>Time left</span><span id="bleft">${fmtT(left)}</span></div>${btn('Finish now',{gems:gemCost(left)},'finish','gemb')}`; }
     else if(p.b==='wonder'){ h+=wonderPanel(p)+btn('Demolish',null,'demo','soft'); }
-    else if(p.b==='pethouse'){ h+=petHouseHtml(p); }
+    else if(p.b==='pethouse'){ h+=petHouseHtml(p); } else if(p.b==='stall'&&typeof stallHtml==='function'){ h+=stallHtml(p); }
     else if(p.b==='trophyhall'){ h+=trophyHallHtml(p); }
     else if(p.b==='museum'){ h+='<h2>🖼️ Kingdom Museum</h2>'+museumHtml(p.o); }
     else if(p.b==='mega'){ h+=megaTileHtml(p); }
@@ -9674,7 +9675,7 @@ settingsDialog=(o=>function(){ o.apply(this,arguments); try{ const d=document.qu
 
 /* ===== v132: Clan Wars, Tournament, weather effects, message reactions/report/mute, building skins,
    hero outfits, museum, daily trivia, map notes, watch clan battles, player level, pet house upgrade ===== */
-function h32(s){ let h=2166136261; s=String(s); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0)/4294967296; }
+function h32(s){ let h=2166136261; s=String(s); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } h^=h>>>16; h=Math.imul(h,0x85ebca6b); h^=h>>>13; h=Math.imul(h,0xc2b2ae35); h^=h>>>16; return (h>>>0)/4294967296; }
 function dowNow(){ return (Math.floor(Date.now()/864e5)+3)%7; } /* 0 = Monday ... 6 = Sunday (same weeks as weekId) */
 function nkOpen(title,body,back){ fkOpen(title,body,back===undefined?'v132:menu':back); }
 async function cellRead(c){ let v=null; try{ await DB.tx(async t=>{ const r=await t.getRegion(regionOf(c)); v=r[c]||null; }); }catch(e){} return v; }
@@ -9970,7 +9971,7 @@ var WE_INFO={dragon:['🐉','A dragon is flying over the land!','It moves every 
   plague:['🤢','A plague is spreading!','Kingdoms within 10 tiles of the green cloud lose some food. Send medicine (food) to help cure it. When 25 medicine deliveries arrive, it is cured and every helper gets a reward.'],
   rush:['💰','Gold rush!','Gold was found at the sparkling spot! The first 25 kingdoms to dig get a big pile of gold and stone. The first 5 also get gems. Hurry!']};
 function weLeft(){ return WE_H*3600000-(Date.now()%(WE_H*3600000)); }
-function weFresh(b,id){ if(b&&b.id===id) return {...b,by:{...(b.by||{})}}; const k=weKind(id); let hp=0; if(k==='dragon'){ const a=Object.values(G.players||{}).filter(p=>p&&!p.dead&&attackers(p)>0).map(p=>{ try{ return atkOf(p,false); }catch(e){ return 0; } }).sort((x,y)=>x-y); const med=a.length?a[Math.floor(a.length/2)]:5000; hp=Math.max(30000,Math.round(med*30)); }
+function weFresh(b,id){ if(b&&b.id===id&&b.k===weKind(id)) return {...b,by:{...(b.by||{})}}; const k=weKind(id); let hp=0; if(k==='dragon'){ const a=Object.values(G.players||{}).filter(p=>p&&!p.dead&&attackers(p)>0).map(p=>{ try{ return atkOf(p,false); }catch(e){ return 0; } }).sort((x,y)=>x-y); const med=a.length?a[Math.floor(a.length/2)]:5000; hp=Math.max(30000,Math.round(med*30)); }
   return {o:'npc',b:'wevent',id,k,c:weCenter(id),hp,max:hp,n:0,by:{}}; }
 async function weDialog(){ weSt=await cellRead(WE_CELL); const id=weId(), k=weKind(id), I=WE_INFO[k], m=P(ME)||{}, b=weSt&&weSt.id===id?weSt:null, spot=weSpot(id), my=b&&b.by[ME];
   let body=`<p class="desc"><b>${I[1]}</b> ${I[2]}</p><p class="desc">⏳ Ends in ${fmtT(weLeft()/1000)}.</p>`;
@@ -10345,6 +10346,151 @@ ordDialog=(o=>function(){ if($('shopOv')) return shopDialog('orders'); if(typeof
   if(k==='lvup') jobLvUp(); else if(k==='make') jgMake2(r[2]); else if(k==='filt'){ jgFilt=r[2]; shopDialog('jobs'); } else if(k==='sellpick'){ jmSellK=r[2]; shopDialog('jobs'); setTimeout(()=>{ const i=$('jmN'); if(i) i.focus(); },50); } else if(k==='sell') jmSell2(jmSellK,($('jmN')||{}).value,($('jmP')||{}).value);
   return true; }; })();
 
+/* ===== v136: simpler Job Market (only what is for sale, a search box, and "What is this?" buttons), its own home button ===== */
+var jgQ='', jgWhat={}, jgMineOpen=false;
+function jgMatch(k,q){ const G0=GOODS[k]; if(!G0) return false; if(!q) return true; q=q.toLowerCase(); const J=JOBS[G0.job]||{}; return G0.n.toLowerCase().includes(q)||(J.n||'').toLowerCase().includes(q); }
+function jgWhatHtml(key,k){ const G0=GOODS[k]; return jgWhat[key]?`<div class="jgWhat">${G0.ic} <b>${esc(G0.n)}</b>: ${esc(G0.d)} <small>(made only by ${JOBS[G0.job].ic} ${JOBS[G0.job].n}s, level ${G0.lv})</small></div>`:''; }
+function jgListHtml(){ const m=P(ME)||{}, L=jmLists(), sale=L.filter(x=>x.seller!==ME&&jgMatch(x.k,jgQ)), mine=L.filter(x=>x.seller===ME);
+  const row=(x,own)=>`<div class="jgRow"><div class="jgTop"><span class="jgName">${GOODS[x.k].ic} ${f(x.n)} ${esc(GOODS[x.k].n)}</span><span class="jgBy">${own?'yours':'by '+esc(cleanText(x.sname||'?'))}</span>${own?btn('Take back',null,'v134:jmc:'+x.id,'soft mini'):btn(f(x.price)+' gold',null,'v134:jmb:'+x.id,'prime mini')}</div><button class="jgQ" data-act="v136:what:${x.id}:${x.k}">❓ What is this?</button>${jgWhatHtml(x.id,x.k)}</div>`;
+  return `${sale.length?sale.map(x=>row(x,false)).join(''):`<p class="desc">${jgQ?'Nothing matches "'+esc(jgQ)+'" right now.':'Nothing for sale right now.'}</p>`}${mine.length?`<div class="label">🏷️ Your listings</div>${mine.map(x=>row(x,true)).join('')}`:''}`; }
+jgShopHtml=function(){ const m=P(ME)||{}, own=Object.entries(m.goods||{}).filter(([k,n])=>n>0&&GOODS[k]), act0=Object.entries(m.jfx||{}).filter(([k,t])=>t>now()&&GOODS[k]);
+  return `<input id="jgSearch" class="jgSearch" placeholder="🔍 Search a job or good (like Warrior or Potion)" value="${esc(jgQ)}">
+    ${act0.length?`<p class="desc">✨ Active: ${act0.map(([k,t])=>`${GOODS[k].ic} ${fmtT((t-now())/1000)}`).join(' · ')}</p>`:''}
+    <div id="jgList">${jgListHtml()}</div>
+    <div class="row"><button class="soft" data-act="v136:mine">🎒 My goods (${own.reduce((a,x)=>a+x[1],0)}) ${jgMineOpen?'▲':'▼'}</button>${btn('🧺 Seeds',null,'v133:fm','soft')}</div>
+    ${jgMineOpen?(own.length?own.map(([k,n])=>`<div class="jgRow"><div class="jgTop"><span class="jgName">${GOODS[k].ic} ${esc(GOODS[k].n)} ×${n}</span>${btn('Use',null,'v134:use:'+k,'prime mini')}${btn('Sell',null,'v135:sellpick:'+k,'soft mini')}</div><button class="jgQ" data-act="v136:what:my${k}:${k}">❓ What is this?</button>${jgWhatHtml('my'+k,k)}</div>`).join(''):'<p class="desc">You have no goods yet.</p>')
+      +(jmSellK&&(m.goods||{})[jmSellK]>0?`<div class="label">💰 Sell ${GOODS[jmSellK].ic} ${esc(GOODS[jmSellK].n)}s</div><div class="row"><input id="jmN" type="number" min="1" max="${Math.min(30,m.goods[jmSellK])}" placeholder="How many (you have ${m.goods[jmSellK]})"><input id="jmP" type="number" min="1" placeholder="Price in gold"><button class="prime" data-act="v135:sell">List</button></div>`:''):''}`; };
+shopDialog=(o=>function(){ const r=o.apply(this,arguments); try{ const s=$('jgSearch'); if(s&&!s.dataset.b){ s.dataset.b=1; s.oninput=()=>{ jgQ=s.value; const l=$('jgList'); if(l){ l.innerHTML=jgListHtml(); refreshButtons(); } }; } }catch(e){} return r; })(shopDialog);
+setTimeout(()=>{ try{ if(!$('bJM')){ const k=$('bMsg')||$('bRew')||$('bKing'); const b=document.createElement('button'); b.id='bJM'; b.className='soft hbtn'; b.dataset.act='v134:jm'; b.textContent='🏪 Job Market'; if(k&&k.parentNode) k.parentNode.insertBefore(b,k.nextSibling); } }catch(e){} },1200);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v136:')) return va(a,b); const r=a.split(':'), k=r[1];
+  if(k==='what'){ jgWhat[r[2]]=!jgWhat[r[2]]; const l=$('jgList'); if(l&&!r[2].startsWith('my')){ l.innerHTML=jgListHtml(); refreshButtons(); } else shopDialog('jobs'); }
+  else if(k==='mine'){ jgMineOpen=!jgMineOpen; shopDialog('jobs'); } return true; }; })();
+v82Act=(o=>function(a,b){ if(a&&a.startsWith('v135:sellpick:')) jgMineOpen=true; return o.apply(this,arguments); })(v82Act);
+
+/* ===== v137: job orders, market stalls, apprentices, job titles, weekly top sellers, price tags, Kingdom Fair,
+   job guilds, job quests, combo goods, Royal Requests, and job goods matter more ===== */
+/* ---------- goods matter more: boosts last 50% longer, and using goods gives player XP ---------- */
+for(const k in GOODS){ const G0=GOODS[k]; if(G0.dur&&!G0.d0){ G0.d0=G0.dur; G0.dur=+(G0.dur*1.5).toFixed(1); G0.d=G0.d.replace(/for (\d+(?:\.\d+)?) hours?/,'for '+G0.dur+' hours'); } }
+lvXP=(o=>function(m){ return o.apply(this,arguments)+((m&&m.jgU)||0)*15+((m&&m.rrN)||0)*40; })(lvXP);
+
+/* ---------- 7. Kingdom Fair: first weekend of every month, goods are twice as strong ---------- */
+function fairOn(){ const d=new Date(), dw=d.getDay(); if(dw!==6&&dw!==0) return false; const sat=dw===6?d.getDate():d.getDate()-1; return sat>=1&&sat<=7; }
+var L1FX={sharp:{atk:.1},guard:{def:.15},potion:{loss:.25},blue:{build:.25},luck:{loot:.25},feast:{food:.2},pick:{stone:.2},stamp:{gold:.2},shoe:{march:.25},fire:{camp:.15},ration:{fcost:.3},treat:{pet:.25},poster:{prod:.1},bait:{boss:.25},bless:{def:.1,loss:.1},elixir:{garden:.5},song:{clan:.05}};
+fxSum=(o=>function(p,st){ let v=o.apply(this,arguments); try{ v+=comboSum(p,st); if(fairOn()){ v*=2; const J=p&&p.jfx, t=Date.now(); if(J) for(const k in L1FX) if(J[k]>t&&L1FX[k][st]) v+=L1FX[k][st]; } }catch(e){} return v; })(fxSum);
+var JM_MAXL0=JM_MAXL; setInterval(()=>{ try{ JM_MAXL=fairOn()?JM_MAXL0*2:JM_MAXL0; }catch(e){} },5000); try{ JM_MAXL=fairOn()?JM_MAXL0*2:JM_MAXL0; }catch(e){}
+
+/* ---------- 10. Combo goods ---------- */
+var COMBOS=[['sharp','wbanner','atk',.05,'⚔️ Sharp Banner'],['guard','beads','def',.05,'🛡️ Holy Guard'],['potion','herbs','loss',.1,'🌿 Healing Herbs'],['feast','fert','food',.1,'🍲 Big Harvest'],['bond','ledger','gold',.1,'💰 Rich Ledger'],
+  ['shoe','carrot','march',.1,'🐎 Speedy Steed'],['fire','bolt','camp',.1,'🔥 Storm Fire'],['treat','ball','pet',.1,'🐾 Happy Pet'],['bait','trap','boss',.1,'🎯 Perfect Hunt'],['blue','crane','build',.1,'🏗️ Fast Build'],['song','drums','clan',.03,'🎶 Big Band'],['pick','lantern','stone',.1,'⛏️ Deep Dig']];
+function comboSum(p,st){ const J=p&&p.jfx; if(!J) return 0; const t=Date.now(); let s=0; for(const [a,b,k,v] of COMBOS) if(k===st&&J[a]>t&&J[b]>t) s+=v; return s; }
+function combosOf(k){ return COMBOS.filter(c=>c[0]===k||c[1]===k); }
+function comboTxt(k){ const L=combosOf(k); return L.length?' Combo: use with '+L.map(c=>{ const o=GOODS[c[0]===k?c[1]:c[0]]; return o?o.ic+' '+o.n:''; }).join(' or ')+' for an extra bonus!':''; }
+jgWhatHtml=(o=>function(key,k){ const h=o.apply(this,arguments); if(!h) return h; const c=comboTxt(k), pr=priceOf(k); return h.replace('</div>',`${c?`<br><small>✨${esc(c)}</small>`:''}${pr?`<br><small>🏷️ Usually sells for about ${f(pr)} gold each.</small>`:''}</div>`); })(jgWhatHtml);
+
+/* ---------- 5/6. Sales records (kept in the buyer's own data), weekly top sellers, price tags ---------- */
+function saleRec(me,s,k,n,p){ me.jbuy=(me.jbuy||[]).filter(x=>x&&x.w>=weekId()-1); me.jbuy.push({s,k,n,p,w:weekId(),t:now()}); if(me.jbuy.length>40) me.jbuy=me.jbuy.slice(-40); }
+jmBuy=function(id){ const L0=(G.market||{})[id]; if(L0&&blkAny(L0.seller)) return toast(blkMsg(L0.seller),true);
+  mkTx(async(t,me)=>{ const L=await t.getMk(id); if(!L||L.kind!=='jm'||!GOODS[L.k]) fail('Someone else bought it first.'); if(L.seller===ME) fail('That is your own listing.'); const sel2=await t.getPlayer(L.seller); settle(me); pay(me,{gold:L.price}); me.goods=me.goods||{}; me.goods[L.k]=(me.goods[L.k]||0)+L.n; saleRec(me,L.seller,L.k,L.n,L.price);
+    if(sel2){ settle(sel2); sel2.gold=(sel2.gold||0)+L.price; t.setPlayer(L.seller,sel2); } t.setMk(id,null); t.setPlayer(ME,me); return {k:L.k,n:L.n,s:L.seller}; },
+    r=>{ snd('coin'); toast(`${GOODS[r.k].ic} You bought ${r.n} ${GOODS[r.k].n}${r.n>1?'s':''}! Tap Use when you need it.`); try{ report(r.s,`🏪 ${P(ME).name} bought your ${GOODS[r.k].n}s!`,'good'); }catch(e){} setTimeout(jmRefresh,400); }); };
+function salesOf(wk){ const out=[]; for(const p of Object.values(G.players||{})) for(const x of (p&&p.jbuy)||[]) if(x&&x.w===wk&&GOODS[x.k]) out.push({...x,b:p.id}); return out; }
+var prC={}, prT=0;
+function priceOf(k){ if(Date.now()-prT>10000){ prT=Date.now(); prC={}; const s={}; for(const x of salesOf(weekId()).concat(salesOf(weekId()-1))){ const a=s[x.k]=s[x.k]||[0,0]; a[0]+=x.p; a[1]+=x.n; } for(const k2 in s) if(s[k2][1]) prC[k2]=Math.round(s[k2][0]/s[k2][1]); } return prC[k]||0; }
+function topSellers(wk){ const by={}; for(const x of salesOf(wk)){ const j=GOODS[x.k].job, key=j+'|'+x.s; by[key]=(by[key]||0)+x.p; } const best={}; for(const [key,g] of Object.entries(by)){ const [j,s]=key.split('|'); if(!best[j]||g>best[j][1]) best[j]=[s,g]; } return best; }
+function tsDialog(){ const wk=weekId(), now0=topSellers(wk), last=topSellers(wk-1), m=P(ME)||{}, mine=Object.entries(last).filter(([j,[s]])=>s===ME).map(([j])=>j);
+  const rows=(T)=>Object.entries(JOBS).map(([j,J])=>T[j]?`<div><span>${J.ic} ${J.n}</span><span>👑 ${esc(cleanText((P(T[j][0])||{}).name||'?'))}</span><span>${f(T[j][1])} gold</span></div>`:'').join('');
+  v133Open('👑 Top sellers',`<p class="desc">Every week, whoever sells the most of their job's goods (in gold) wins a crown and a prize!</p><div class="label">This week so far</div>${rows(now0)?`<div class="board">${rows(now0)}</div>`:'<p class="desc">No sales yet this week.</p>'}
+    <div class="label">Last week's winners</div>${rows(last)?`<div class="board">${rows(last)}</div>`:'<p class="desc">Nobody yet.</p>'}${mine.length&&m.tsC!==wk-1?'<div class="row"><button class="gemb" data-act="v137:tsclaim">👑 Collect your top seller prize</button></div>':''}`); }
+function tsClaim(){ const wk=weekId()-1, T=topSellers(wk), jobs=Object.keys(T).filter(j=>T[j][0]===ME); act([],me=>{ if(!jobs.length) fail('You were not a top seller last week.'); if(me.tsC===wk) fail('Already collected.'); me.tsC=wk; me.tsW=(me.tsW||0)+jobs.length; gemsAdd(me,25*jobs.length); me.gold+=sc133(5000)*jobs.length; return {n:jobs.length}; },r=>{ snd('quest'); confetti(); toast(`👑 Top seller prize collected (${r.n} crown${r.n>1?'s':''})!`); tsDialog(); }); }
+
+/* ---------- 1. Job orders: ask for goods, anyone who has them can deliver ---------- */
+function joLists(){ return Object.values(G.market||{}).filter(L=>L&&L.kind==='jord'&&GOODS[L.k]&&(L.seller===ME||!blkAny(L.seller))); }
+function joPost(k,n,price){ n=Math.floor(+n||0); price=Math.floor(+price||0); if(!GOODS[k]) return toast('Pick a good.',true); if(n<1||n>30) return toast('Ask for 1 to 30.',true); if(price<1||price>5e6) return toast('Pick a price.',true); if(joLists().filter(x=>x.seller===ME).length>=5) return toast('You can have 5 job orders at once.',true);
+  const id='jo'+Math.random().toString(36).slice(2,10); mkTx(async(t,me)=>{ settle(me); pay(me,{gold:price}); t.setMk(id,{seller:ME,sname:me.name,kind:'jord',k,n,price,cur:'gold',t:now()}); t.setPlayer(ME,me); },()=>{ snd('coin'); toast(`📋 Job order posted! The ${f(price)} gold is held until someone delivers.`); joDialog(); }); }
+function joFill(id){ const L0=(G.market||{})[id]; if(L0&&blkAny(L0.seller)) return toast(blkMsg(L0.seller),true);
+  mkTx(async(t,me)=>{ const O=await t.getMk(id); if(!O||O.kind!=='jord') fail('Someone already delivered it.'); if(O.seller===ME) fail('That is your own order.'); me.goods=me.goods||{}; if((me.goods[O.k]||0)<O.n) fail(`You need ${O.n} ${GOODS[O.k].n}s.`);
+    me.goods[O.k]-=O.n; if(!me.goods[O.k]) delete me.goods[O.k]; settle(me); me.gold+=O.price; t.setMk(id,null); t.setMk('jd'+id.slice(2),{seller:ME,sname:me.name,kind:'jdel',to:O.seller,k:O.k,n:O.n,price:O.price,cur:'gold',t:now()}); t.setPlayer(ME,me); return {O}; },
+    r=>{ snd('coin'); toast(`📦 Delivered! You earned ${f(r.O.price)} gold.`); try{ report(r.O.seller,`📦 ${P(ME).name} delivered your ${r.O.n} ${GOODS[r.O.k].n}s!`,'good'); }catch(e){} joDialog(); }); }
+function joCancel(id){ mkTx(async(t,me)=>{ const O=await t.getMk(id); if(!O||O.kind!=='jord'||O.seller!==ME) fail('That order is gone.'); settle(me); me.gold+=O.price; t.setMk(id,null); t.setPlayer(ME,me); },()=>{ toast('Order cancelled. Your gold is back.'); joDialog(); }); }
+var joClaiming=false; setInterval(()=>{ try{ if(joClaiming||busy||!P(ME)) return; const L=Object.values(G.market||{}).filter(x=>x&&x.kind==='jdel'&&x.to===ME); if(!L.length) return; joClaiming=true; const L0=L[0];
+  mkTx(async(t,me)=>{ const D=await t.getMk(L0.id); if(!D||D.to!==ME||D.kind!=='jdel') return {}; me.goods=me.goods||{}; me.goods[D.k]=(me.goods[D.k]||0)+D.n; saleRec(me,D.seller,D.k,D.n,D.price); t.setMk(L0.id,null); t.setPlayer(ME,me); return {D}; },r=>{ if(r&&r.D) toast(`📦 Your job order arrived: ${r.D.n} ${GOODS[r.D.k].ic} ${GOODS[r.D.k].n}s!`); }).finally(()=>{ joClaiming=false; }); }catch(e){ joClaiming=false; } },2500);
+var joPick='guard';
+function joDialog(){ const m=P(ME)||{}, L=joLists(), mine=L.filter(x=>x.seller===ME), open=L.filter(x=>x.seller!==ME), own=m.goods||{};
+  v133Open('📋 Job orders',`<p class="desc">Ask for goods you need. You pay now, and the gold is held safe. Anyone who has the goods can deliver them and get the gold.</p>
+    <div class="label">🙋 Orders you can deliver</div>${open.length?open.map(x=>`<div class="jgRow"><div class="jgTop"><span class="jgName">${GOODS[x.k].ic} ${x.n} ${esc(GOODS[x.k].n)}</span><span class="jgBy">by ${esc(cleanText(x.sname||'?'))}</span>${(own[x.k]||0)>=x.n?btn('Deliver',null,'v137:jofill:'+x.id,'prime mini'):'<small>need '+x.n+'</small>'}</div><small>Pays ${f(x.price)} gold</small></div>`).join(''):'<p class="desc">No job orders right now.</p>'}
+    <div class="label">📝 Ask for goods</div><div class="row"><select id="joK">${Object.entries(GOODS).sort((a,b)=>a[1].n.localeCompare(b[1].n)).map(([k,G0])=>`<option value="${k}"${k===joPick?' selected':''}>${G0.ic} ${esc(G0.n)} (${JOBS[G0.job].n})</option>`).join('')}</select></div><div class="row"><input id="joN" type="number" min="1" max="30" placeholder="How many"><input id="joP" type="number" min="1" placeholder="Total gold you pay"><button class="prime" data-act="v137:jopost">Post</button></div>
+    ${mine.length?`<div class="label">Your orders</div>${mine.map(x=>`<div class="jgRow"><div class="jgTop"><span class="jgName">${GOODS[x.k].ic} ${x.n} ${esc(GOODS[x.k].n)}</span>${btn('Cancel',null,'v137:jocancel:'+x.id,'soft mini')}</div><small>You pay ${f(x.price)} gold</small></div>`).join('')}`:''}`,'v134:jm'); }
+
+/* ---------- 2. Market stalls on the map ---------- */
+B.stall={name:'Market Stall',desc:'Visitors can buy your job goods right here.'}; var STALL_COST={gold:20000,stone:10000};
+function buildStall(cell){ act([cell],(me,pl)=>{ const p=pl[cell]; if(!p||p.o!==ME||p.b||p.ob) fail('Build it on your own empty land.'); if(Object.values(G.plots).some(q=>q.o===ME&&q.b==='stall')) fail('You already have a Market Stall.'); if((stats(ME).hallLvl||1)<5) fail('The Market Stall needs Town Hall 5.'); pay(me,STALL_COST); pl[cell]={o:ME,b:'stall',lvl:1}; return {}; },()=>{ snd('build'); toast('🏪 Your Market Stall is open! Visitors can buy your listed goods here.'); }); }
+function drawStall(p,cx,cy,col){ const u=TW; ell(cx,cy+u*.02,u*.34,u*.14,'rgba(0,0,0,.22)',false); box(cx,cy,u*.36,u*.16,'#c98a4a','wood'); const T=NOWT||0; for(let i=0;i<5;i++){ const x0=cx-u*.24+i*u*.12; ctx.fillStyle=i%2?'#fff6dc':col; ctx.beginPath(); ctx.moveTo(x0,cy-u*.3); ctx.lineTo(x0+u*.12,cy-u*.3); ctx.lineTo(x0+u*.12,cy-u*.22); ctx.lineTo(x0,cy-u*.22); ctx.closePath(); ctx.fill(); }
+  ctx.strokeStyle='#3b2412'; ctx.lineWidth=Math.max(LW,.6/cam.z); ctx.strokeRect(cx-u*.24,cy-u*.3,u*.6,u*.08); if(cam.z>.6){ ctx.font=`${u*.16}px sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText('🏪',cx+u*.06,cy-u*.42+(RM?0:Math.sin(T/500)*u*.02)); } }
+function stallHtml(p){ const o=P(p.o), L=jmLists().filter(x=>x.seller===p.o); return `<h2>🏪 ${esc(cleanText((o||{}).name||'?'))}'s Market Stall</h2><p class="desc">${o&&jobOf(o)?`${JOBS[o.job].ic} ${jobTitle(o)}`:'A small stall full of goods.'}</p>${L.length?L.map(x=>`<div class="jgRow"><div class="jgTop"><span class="jgName">${GOODS[x.k].ic} ${f(x.n)} ${esc(GOODS[x.k].n)}</span>${p.o===ME?btn('Take back',null,'v134:jmc:'+x.id,'soft mini'):btn(f(x.price)+' gold',null,'v134:jmb:'+x.id,'prime mini')}</div><small>${esc(GOODS[x.k].d)}</small></div>`).join(''):`<p class="desc">${p.o===ME?'List goods in 🏪 Job Market and they show up here too.':'Nothing for sale right now.'}</p>`}`; }
+
+/* ---------- 3. Apprentices ---------- */
+function myApprs(m){ m=m||P(ME); return Object.values(G.players||{}).filter(p=>p&&p.mentor===m.id&&(m.appr||[]).includes(p.id)); }
+function mentorOf(m){ const t=m&&m.mentor&&P(m.mentor); return t&&(t.appr||[]).includes(m.id)&&t.job===m.job?t:null; }
+jobProg=(o=>function(m){ const r=o.apply(this,arguments); try{ if(r&&!r.max&&mentorOf(m)){ r.need=Math.max(1,Math.ceil(r.need/1.5)); r.mk=Math.max(1,Math.ceil(r.mk/1.5)); r.ok=r.have>=r.need&&r.made>=r.mk; r.mentor=1; } }catch(e){} return r; })(jobProg);
+function apAsk(uid){ const t=P(uid), m=P(ME); if(!t||!m) return; if(!jobOf(m)||t.job!==m.job) return toast('Your mentor needs the same job as you.',true); if(jobLvOf(t)<3) return toast('Mentors need job level 3 or more.',true);
+  act([],me=>{ me.mentor=uid; return {}; },()=>{ toast(`🎓 You asked ${cleanText(t.name)} to be your mentor. They need to accept.`); try{ report(uid,`🎓 ${P(ME).name} wants to be your apprentice! Open 🧑‍🌾 My job → Apprentices to accept.`,'good'); }catch(e){} }); }
+function apAccept(uid,yes){ act([],me=>{ me.appr=(me.appr||[]).filter(x=>x!==uid); if(yes){ if(me.appr.length>=3) fail('You can teach 3 apprentices at once.'); me.appr.push(uid); } return {}; },()=>{ toast(yes?'🎓 You have a new apprentice!':'Removed.'); jobDialog(); }); }
+function apClaim(uid){ const a=P(uid); act([],me=>{ if(!(me.appr||[]).includes(uid)||!a) fail('That is not your apprentice.'); const lv=Math.max(1,((a.jobLv||{})[me.job])||1); me.mcl=Object.assign({},me.mcl); const got=me.mcl[uid]||1; if(lv<=got) fail('They have not leveled up since last time.'); const n=lv-got; me.mcl[uid]=lv; me.gold+=sc133(4000)*n; gemsAdd(me,10*n); return {n}; },r=>{ snd('quest'); toast(`🎓 Mentor reward for ${r.n} level${r.n>1?'s':''}!`); jobDialog(); }); }
+
+/* ---------- 4. Job titles ---------- */
+var JOB_TITLE=['','','Skilled','Expert','Master'];
+function jobTitle(p){ const j=jobOf(p); if(!j) return ''; const lv=jobLvOf(p); return (JOB_TITLE[lv]?JOB_TITLE[lv]+' ':'')+JOBS[j].n; }
+profileDialog=(o=>function(uid){ const r=o.apply(this,arguments); try{ const p=P(uid), w=document.querySelector('#profOv .v132prof .desc'); if(p&&w){ const tg=w.querySelector('.jobTag'); if(tg&&jobOf(p)) tg.textContent=` · ${JOBS[p.job].ic} ${jobTitle(p)}${jobLvOf(p)>=4?' 👑':''}${p.tsW?' · 🏆 Top seller ×'+p.tsW:''}`;
+  const row=document.querySelector('#profOv .v132prof .row'), m=P(ME); if(row&&uid!==ME&&m&&jobOf(m)&&p.job===m.job&&jobLvOf(p)>=3&&!row.querySelector('.apBtn')){ const b=document.createElement('button'); b.className='soft mini apBtn'; b.dataset.act='v137:apask:'+uid; b.textContent='🎓 Ask to be their apprentice'; row.appendChild(b); }
+  if(row&&uid!==ME&&Object.values(G.plots).some(q=>q&&q.o===uid&&q.b==='stall')&&!row.querySelector('.stBtn')){ const b=document.createElement('button'); b.className='soft mini stBtn'; b.dataset.act='v137:stall:'+uid; b.textContent='🏪 Visit their stall'; row.appendChild(b); } } }catch(e){} return r; })(profileDialog);
+
+/* ---------- 9. Job quests (3 per job, one after another) ---------- */
+var JQ_T={war:['Clear the bandit road','Defend the border','Win the great tournament'],mer:['Open a new trade route','Strike a big deal','Become the richest trader'],farm:['Plant the spring fields','Feed the village','Win the harvest fair'],exp:['Map the dark forest','Find the lost temple','Reach the edge of the world'],
+  smith:['Fix the old armor','Forge for the army','Make the king\'s sword'],medic:['Heal the wounded','Stop the fever','Save the whole army'],bldr:['Repair the walls','Build a new tower','Raise a great castle'],spy:['Watch the enemy camp','Steal the battle plans','Uncover the traitor'],
+  fish:['Catch dinner','Fill the market','Catch the legendary fish'],miner:['Dig a new tunnel','Find the silver seam','Reach the crystal caves'],bank:['Count the coins','Lend to the king','Fill the royal vault'],stable:['Train a pony','Win the horse race','Tame the wild stallion'],
+  wiz:['Light the magic lamp','Banish the storm','Defeat the dark mage'],baker:['Bake morning bread','Bake for the army','Bake for the king\'s feast'],tamer:['Train a puppy','Teach a pet tricks','Tame a dragon'],artist:['Paint the town square','Hold a concert','Paint the royal portrait'],
+  hunter:['Track the giant boar','Hunt the wolf pack','Track the legendary beast'],priest:['Bless the village','Calm the storm','Light the great temple'],alch:['Brew a simple potion','Turn lead to gold','Find the elixir of life'],bard:['Sing at the tavern','Play for the army','Sing the legend of the land']};
+var JQ_MUL=[1,2,4];
+function jqCur(m){ const j=jobOf(m); if(!j) return null; const q=((m.jq||{})[j])||0; if(q>=3) return {done:1,j}; const R=JLV_REQ[j], base=(m.jqB&&m.jqB.j===j&&m.jqB.q===q)?m.jqB.b:null, need=R[2][0]*JQ_MUL[q], have=base==null?0:Math.max(0,R[1](m)-base); return {j,q,t:JQ_T[j][q],need,have,lab:R[0],started:base!=null,ok:base!=null&&have>=need}; }
+function jqStart(){ act([],me=>{ const c=jqCur(me); if(!c||c.done) fail('No quest to start.'); me.jqB={j:c.j,q:c.q,b:JLV_REQ[c.j][3]?0:JLV_REQ[c.j][1](me)}; return {t:c.t}; },r=>{ snd('click'); toast('📜 Quest started: '+r.t+'!'); jobDialog(); }); }
+function jqClaim(){ act([],me=>{ const c=jqCur(me); if(!c||!c.ok) fail('Not finished yet.'); me.jq=Object.assign({},me.jq,{[c.j]:c.q+1}); delete me.jqB; me.gold+=sc133(3000)*(c.q+1); me.stash=me.stash||{}; const cr=['wood','stone','iron'][c.q]; me.stash[cr]=(me.stash[cr]||0)+1; if(c.q===2) gemsAdd(me,20); return {t:c.t}; },r=>{ snd('quest'); confetti(); toast('📜 Quest complete: '+r.t+'! Gold and a crate for you!'); jobDialog(); }); }
+
+/* ---------- Royal Requests: the King wants job goods ---------- */
+function rrToday(){ const d=dayNum(), ks=Object.keys(GOODS).filter(k=>GOODS[k].lv<=2), out=[]; for(let i=0;i<3;i++){ const k=ks[Math.floor(h32('rr'+d+':'+i)*ks.length)], n=1+Math.floor(h32('rn'+d+':'+i)*3); out.push({i,k,n}); } return out; }
+function rrDialog(){ const m=P(ME)||{}, d=dayNum(), got=(m.rr&&m.rr.d===d)?m.rr.got:[], own=m.goods||{};
+  v133Open('👑 Royal Requests',`<p class="desc">The King needs goods from every job! Bring what he asks for and he pays well. New requests every day.</p>${rrToday().map(r=>`<div class="jgRow"><div class="jgTop"><span class="jgName">${GOODS[r.k].ic} ${r.n} ${esc(GOODS[r.k].n)}${r.n>1&&!/s$/.test(GOODS[r.k].n)?'s':''}</span>${got.includes(r.i)?'<span>✅ Done</span>':(own[r.k]||0)>=r.n?btn('Give',null,'v137:rr:'+r.i,'prime mini'):`<small>you have ${own[r.k]||0}</small>`}</div><small>Made by ${JOBS[GOODS[r.k].job].ic} ${JOBS[GOODS[r.k].job].n}s · Reward: ${f(sc133(2500*r.n))} gold, ${f(sc133(1500*r.n))} stone${r.i===2?' and a crate':''}</small></div>`).join('')}<div class="row">${btn('🏪 Job Market',null,'v134:jm','soft')}${btn('📋 Job orders',null,'v137:jo','soft')}</div>`); }
+function rrGive(i){ i=+i; const R=rrToday()[i]; if(!R) return; act([],me=>{ const d=dayNum(); if(!me.rr||me.rr.d!==d) me.rr={d,got:[]}; if(me.rr.got.includes(i)) fail('Already done today.'); me.goods=me.goods||{}; if((me.goods[R.k]||0)<R.n) fail('You do not have enough.'); me.goods[R.k]-=R.n; if(!me.goods[R.k]) delete me.goods[R.k];
+    me.rr={d,got:[...me.rr.got,i]}; me.gold+=sc133(2500*R.n); me.stone+=sc133(1500*R.n); if(i===2){ me.stash=me.stash||{}; me.stash.iron=(me.stash.iron||0)+1; } me.rrN=(me.rrN||0)+1; return {}; },()=>{ snd('quest'); confetti(); toast('👑 The King is pleased! Rewards are yours.'); rrDialog(); }); }
+
+/* ---------- 8. Job guilds: chat + leaderboard ---------- */
+pmMembers=(o=>function(id,groups){ if(String(id).startsWith('jg:')){ const j=id.slice(3); return Object.values(G.players||{}).filter(p=>p&&!p.dead&&p.job===j).map(p=>p.id); } return o.apply(this,arguments); })(pmMembers);
+pmConvos=(o=>function(uid){ const L=o.apply(this,arguments); try{ const m=P(uid); const j=jobOf(m); if(j){ const id='jg:'+j; let c=L.find(x=>x.id===id); if(!c){ const ms=pmAllMsgs(id), last=ms[0], mem=pmMembers(id); c={id,members:mem,names:{},title:JOBS[j].ic+' '+JOBS[j].n+' Guild',by:mem[0],t:last?last.t:0,last:last?last.text:'',lastBy:last?last.uid:'',lastName:last?last.name:'',read:{[uid]:Math.max((m.pmr||{})[id]||0,pmRead[id]||0)}}; L.push(c); } else c.title=JOBS[j].ic+' '+JOBS[j].n+' Guild'; } }catch(e){} return L.filter(c=>!String(c.id).startsWith('jg:')||c.id==='jg:'+(P(uid)||{}).job); })(pmConvos);
+function guildDialog(){ const m=P(ME)||{}, j=jobOf(m); if(!j) return v133Open('🏛️ Job guild','<p class="desc">Pick a job to join its guild!</p>'); const mem=Object.values(G.players||{}).filter(p=>p&&!p.dead&&p.job===j).sort((a,b)=>jobLvOf(b)-jobLvOf(a)||(b.jgU||0)-(a.jgU||0));
+  v133Open(`${JOBS[j].ic} ${JOBS[j].n} Guild`,`<p class="desc">Everyone with your job is in this guild. Chat, trade tips and see who is the best!</p><div class="row"><button class="prime" data-act="v137:gchat">💬 Open guild chat</button></div><div class="label">🏆 Members (${mem.length})</div><div class="board">${mem.slice(0,25).map((p,i)=>`<div><span>${i+1}. ${plink(p.id,esc(cleanText(p.name)))}</span><span>${JOB_TITLE[jobLvOf(p)]||'Lv 1'} · Lv ${jobLvOf(p)}</span></div>`).join('')}</div>`); }
+function guildChat(){ const j=(P(ME)||{}).job; if(!j) return; const id='jg:'+j; $('ov').innerHTML=''; msgDialog('list'); setTimeout(()=>{ try{ if(!convos[id]){ convos[id]={id,members:pmMembers(id),names:{},title:JOBS[j].ic+' '+JOBS[j].n+' Guild',t:0,read:{}}; } openConvo(id); }catch(e){} },300); }
+
+/* ---------- job page extras: quests, apprentices ---------- */
+jobDialog=(o=>function(){ o.apply(this,arguments); try{ const m=P(ME)||{}, j=jobOf(m), box=document.querySelector('#fkOv .jgBox'); if(!j||!box||box.querySelector('.v137')) return; const w=document.createElement('div'); w.className='v137';
+  const pr=jobProg(m); let h=pr&&pr.mentor?'<p class="desc">🎓 Your mentor helps you: level tasks are easier!</p>':''; const q=jqCur(m);
+  h+=`<div class="label">📜 Job quest</div>${q.done?'<p class="desc">✅ You finished every quest for your job!</p>':`<p class="desc"><b>${esc(q.t)}</b> (${q.q+1}/3): ${esc(q.lab)} ${q.started?f(Math.min(q.have,q.need))+'/'+f(q.need):'0/'+f(q.need)}</p>${!q.started?'<div class="row"><button class="soft" data-act="v137:jqs">▶️ Start quest</button></div>':q.ok?'<div class="row"><button class="gemb" data-act="v137:jqc">🎁 Finish quest</button></div>':`<div class="lvBar"><i style="width:${Math.min(100,q.have/q.need*100)}%"></i></div>`}`}`;
+  const asks=Object.values(G.players||{}).filter(p=>p&&p.mentor===ME&&!(m.appr||[]).includes(p.id)), ap=myApprs(m);
+  if(jobLvOf(m)>=3||ap.length||asks.length){ h+=`<div class="label">🎓 Apprentices (${ap.length}/3)</div>${asks.map(p=>`<div class="row"><small>${esc(cleanText(p.name))} wants to learn from you</small>${btn('Accept',null,'v137:apok:'+p.id,'prime mini')}${btn('No',null,'v137:apno:'+p.id,'soft mini')}</div>`).join('')}${ap.map(p=>{ const lv=Math.max(1,((p.jobLv||{})[j])||1), got=((m.mcl||{})[p.id])||1; return `<div class="row"><small>${esc(cleanText(p.name))} · Lv ${lv}</small>${lv>got?btn('🎁 Reward',null,'v137:apcl:'+p.id,'gemb mini'):''}${btn('Remove',null,'v137:apno:'+p.id,'soft mini')}</div>`; }).join('')}${!ap.length&&!asks.length?'<p class="desc">Newer players with your job can ask you to be their mentor from your profile.</p>':''}`; }
+  h+=`<div class="row">${btn('🏛️ Guild',null,'v137:guild','soft')}${btn('📋 Job orders',null,'v137:jo','soft')}${btn('👑 Royal Requests',null,'v137:rr','soft')}${btn('🏆 Top sellers',null,'v137:ts','soft')}</div>`;
+  w.innerHTML=h; box.appendChild(w); }catch(e){} })(jobDialog);
+/* Job Market page: fair banner, links, price tags */
+jgShopHtml=(o=>function(){ let h=o.apply(this,arguments); const bar=`${fairOn()?'<p class="desc fairBan">🎪 KINGDOM FAIR this weekend! All job goods are twice as strong, and you can list twice as much!</p>':''}<div class="row jmLinks">${btn('📋 Job orders',null,'v137:jo','soft mini')}${btn('👑 Royal Requests',null,'v137:rr','soft mini')}${btn('🏆 Top sellers',null,'v137:ts','soft mini')}</div>`; return bar+h; })(jgShopHtml);
+mkView=(o=>function(){ const l=o.apply(this,arguments); return Array.isArray(l)?l.filter(L=>!L||(L.kind!=='jord'&&L.kind!=='jdel')):l; })(mkView);
+buyListing=(o=>function(id){ const L=(G.market||{})[id]; if(L&&(L.kind==='jord'||L.kind==='jdel')) return toast('That is not for sale.',true); return o.apply(this,arguments); })(buyListing);
+cancelListing=(o=>function(id){ const L=(G.market||{})[id]; if(L&&L.kind==='jord') return joCancel(id); if(L&&L.kind==='jdel') return toast('That is a delivery.',true); return o.apply(this,arguments); })(cancelListing);
+NEW133.push(['📋','Job orders','v137:jo'],['👑','Royal Requests','v137:rr'],['🏛️','Job guild','v137:guild'],['🏆','Top sellers','v137:ts']);
+readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const m=P(ME); if(m){ const d=dayNum(), got=(m.rr&&m.rr.d===d)?m.rr.got:[]; if(rrToday().some(r=>!got.includes(r.i)&&((m.goods||{})[r.k]||0)>=r.n)) L.push({ic:'👑',t:'You can fill a Royal Request',act:'v137:rr'}); const q=jqCur(m); if(q&&q.ok) L.push({ic:'📜',t:'Your job quest is done',act:'v133:job'}); if(fairOn()) L.push({ic:'🎪',t:'Kingdom Fair: job goods are twice as strong!',act:'v134:jm'}); } }catch(e){} return L; })(readyList);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v137:')) return va(a,b); const r=a.split(':'), k=r[1];
+  if(k==='jo') joDialog(); else if(k==='jopost'){ joPick=($('joK')||{}).value||joPick; joPost(joPick,($('joN')||{}).value,($('joP')||{}).value); } else if(k==='jofill') joFill(r[2]); else if(k==='jocancel') joCancel(r[2]);
+  else if(k==='stallb'){ if(sel) buildStall(sel); } else if(k==='stall'){ const c=Object.keys(G.plots).find(c2=>G.plots[c2]&&G.plots[c2].o===r[2]&&G.plots[c2].b==='stall'); if(c){ $('ov').innerHTML=''; setTab('map'); centerOn(c); sel=c; renderPanel(true); draw(); } }
+  else if(k==='apask') apAsk(r[2]); else if(k==='apok') apAccept(r[2],true); else if(k==='apno') apAccept(r[2],false); else if(k==='apcl') apClaim(r[2]);
+  else if(k==='jqs') jqStart(); else if(k==='jqc') jqClaim(); else if(k==='rr'){ if(r[2]!=null) rrGive(r[2]); else rrDialog(); } else if(k==='guild') guildDialog(); else if(k==='gchat') guildChat(); else if(k==='ts') tsDialog(); else if(k==='tsclaim') tsClaim();
+  return true; }; })();
+
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
 var SITES={vein:{name:'Gold Vein',ic:'⛏️',desc:'+25% gold from your Town Hall and Gold Mines.'},well:{name:'Magic Well',ic:'🔮',desc:'+25% food from your Town Hall and Farms.'},ruins:{name:'Ancient Ruins',ic:'🏛️',desc:'Search them once a day for 10 gems.'},grove:{name:'Crystal Grove',ic:'💎',desc:'+10% attack for your whole army.'}};
@@ -10537,6 +10683,8 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  137:['📋 Job orders: ask for job goods, anyone who has them can deliver','🏪 Market stalls: build one and visitors buy your goods from it','🎓 Apprentices and mentors, ⭐ job titles (Skilled, Expert, Master), 🏆 weekly top sellers, 🏷️ price tags','🎪 Kingdom Fair on the first weekend of every month: goods twice as strong','🏛️ Job guilds with their own chat, 📜 job quests, ✨ combo goods','👑 Royal Requests, and job goods matter more: they last 50% longer and give XP'],
+  136:['🌍 World events now really change: dragons, plagues and gold rushes take turns (it was stuck on gold rush)','🏪 Job Market has its own button on the home screen, shows only what is for sale, has a search box, and a ❓ What is this? button on every item'],
   135:['⭐ Job levels! Finish job tasks to level up (up to level 4). Each new level unlocks a brand new good that only your job can make (60 new goods!)','💰 You can now resell any goods you own','🛍️ The Shop has two new tabs: 🏪 Job goods (sorted by job) and 📦 Orders'],
   134:['🧑‍🌾 20 jobs now! New: Blacksmith, Healer, Builder, Spy, Fisher, Miner, Banker, Stablemaster, Wizard, Baker, Pet Trainer, Artist, Hunter, Priest, Alchemist and Bard','🏭 Each job is the ONLY maker of one special good, so jobs need each other. Bards boost their whole clan, Spies sabotage, and Warrior bodyguards block it','🏪 New Job Market to buy and sell goods','⚡ Taps no longer get lost: if you tap something while the game is saving, it waits its turn and then goes through'],
   133:['📜 Kingdom decisions: messengers bring choices, and some choices come back days later!','🧑‍🌾 Jobs at Town Hall 5: Warrior, Merchant, Farmer or Explorer, each with its own powers. Farmers can sell seeds at the new 🧺 Farmers Market','🌍 World events for everyone: dragons, plagues and gold rushes','✨ Hidden secrets near your kingdom, 🏰 clan fortress raids, ⚡ bonus taps and 🎯 aiming','⏩ Early upgrades are much faster. Find it all in 🎮 Play → 🔥 Newest','💰 Camp bounties: put gold on a barbarian camp, and whoever beats it gets the gold!','🗳️ Polls work now: new polls show up for everyone, votes update live, and there is a new question every week'],
