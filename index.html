@@ -531,7 +531,8 @@ body.nightUI input,body.nightUI select{background:#1e1828;color:#ece6f5;border-c
 .skTrack{position:relative;height:26px;border:3px solid #3b2412;border-radius:14px;background:linear-gradient(90deg,#d8402f,#ffb020 30%,#ffb020 70%,#d8402f);overflow:hidden;margin:6px 0}.skZone{position:absolute;left:40%;width:20%;top:0;bottom:0;background:#5ad17a}.skNeedle{position:absolute;top:-4px;bottom:-4px;width:6px;margin-left:-3px;background:#2b1a0c;border-radius:3px}#skOv.win .skBox{background:#e3ffd6}#skOv.miss .skBox{background:#ffe1d6}
 .dlmX{font-size:1.02rem}.crGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.crPart{background:#fff6dc;border:2px solid #c9a24a;border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:4px}.crPart.down{opacity:.6}.crPart small{font-size:.72rem}
 @media (max-width:420px){.crGrid{grid-template-columns:1fr}}
-</style>
+#txSpin{position:fixed;top:8px;left:50%;transform:translateX(-50%) translateY(-60px);z-index:90;background:#2b1a0c;color:#fff6dc;border-radius:12px;padding:4px 12px;font-weight:800;font-size:.85rem;transition:transform .15s;pointer-events:none}#txSpin.on{transform:translateX(-50%) translateY(0)}
+button:active{transform:scale(.96)}.jgChips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}.jgChips button{padding:3px 8px;font-size:.78rem}.jlvTask{margin:4px 0}.jlvTask span{display:block;font-size:.85rem;font-weight:700}.setItem.lock{opacity:.6}.shopBody{margin-top:6px}</style>
 </head>
 <body>
 <div class="wrap">
@@ -647,7 +648,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 133;
+const GAME_VERSION = 135;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -766,7 +767,7 @@ const pick=a=>a[Math.floor(Math.random()*a.length)];
 const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const P=id=>G.players[id];
 const colorOf=id=>P(id)?.color||'#888888';
-const buildTime=(t,l)=>Math.max(1,Math.round((t==='breeder'?7200*l:t==='hall'?(l<=25?20*l*l:12500+120*(l-25)):8*l*l)*(typeof earlyMul==='function'?earlyMul(l):1)));
+const buildTime=(t,l)=>Math.max(1,Math.round((t==='breeder'?7200*l:t==='hall'?(l<=25?20*l*l:12500+120*(l-25)):8*l*l)*(typeof earlyMul==='function'?earlyMul(l):1)*(typeof jbBuildMul==='function'?jbBuildMul():1)));
 const gemCost=sec=>Math.max(1,Math.ceil(sec/20));
 const PROD={farm:{res:'food',rate:15,cap:200},mine:{res:'gold',rate:20,cap:200},quarry:{res:'stone',rate:12,cap:120},smine:{res:'stone',rate:8,cap:600}};
 const collCap=p=>PROD[p.b]?PROD[p.b].cap*p.lvl*(typeof cropCap==='function'?cropCap(p):1):0;
@@ -860,7 +861,7 @@ setInterval(()=>{ try{ const m=P(ME); if(!m||m.dead) return; const c=cur(m);
 function foodUse(p){ if(!p) return 0; let u=0; try{ u=armySp(p)*.025; for(const pt of (p.pets||[])) u+=.1+.03*(pt.lvl||1); }catch(e){} return u; }
 function settle(p){ const c=cur(p); p.gold=c.gold; p.stone=c.stone; if(p.id===ME||p.id===undefined){ p.food=c.food; p.ft=now();
     if(c.starve>0){ const k=Math.min(.9,c.starve*.0012), kt=Math.min(.9,c.starve*.0006); p.gold=Math.floor(p.gold*(1-k)); p.stone=Math.floor(p.stone*(1-k)); for(const u of ALLU) if(p[u]) p[u]=Math.floor(p[u]*(1-kt)); p.starveT=(p.starveT||0)+c.starve; } else if(c.food>0) p.starveT=0; } p.t=now(); if(p.research&&p.research.done<=now()){ p.lab=p.lab||{}; p.lab[p.research.u]=p.research.lvl; delete p.research; } return p; }
-const rateOf=p=>(p.dmg?.25:1)*PROD[p.b].rate*p.lvl*(1+gearBonus(P(p.o),'mine')+.05*skl(P(p.o),'mine')+bookB(P(p.o),'mine'))*presProd(P(p.o))*holMult()*(PROD[p.b].res==='gold'?1+.25*siteBonus(p.o,'vein'):PROD[p.b].res==='food'?1+.25*siteBonus(p.o,'well'):1)*(typeof wspMult==='function'?wspMult(p.o,PROD[p.b].res):1)*(typeof cropMult==='function'?cropMult(p):1)*(PROD[p.b].res==='food'&&typeof wHas==='function'&&wHas(p.o,'garden')?1.3:1);
+const rateOf=p=>(p.dmg?.25:1)*PROD[p.b].rate*p.lvl*(1+gearBonus(P(p.o),'mine')+.05*skl(P(p.o),'mine')+bookB(P(p.o),'mine'))*presProd(P(p.o))*holMult()*(PROD[p.b].res==='gold'?1+.25*siteBonus(p.o,'vein'):PROD[p.b].res==='food'?1+.25*siteBonus(p.o,'well'):1)*(typeof wspMult==='function'?wspMult(p.o,PROD[p.b].res):1)*(typeof cropMult==='function'?cropMult(p):1)*(PROD[p.b].res==='food'&&typeof wHas==='function'&&wHas(p.o,'garden')?1.3:1)*(typeof jobProd==='function'?jobProd(p.o,PROD[p.b].res):1);
 function stored(p){ if(!p||!PROD[p.b]||!p.lvl) return 0; const end=p.o?activeEnd(P(p.o)):now(); return Math.min(collCap(p),rateOf(p)*Math.max(0,end-(p.ct||now()))/60000); }
 const myBT=(t,l)=>Math.max(1,Math.round(buildTime(t,l)*(1-gearBonus(P(ME),'build')-.05*skl(P(ME),'build'))*(typeof wHas==='function'&&wHas(ME,'workshop')?.85:1)*(typeof resB==='function'?1-resB(P(ME),'build'):1)));
 const army=p=>ALLU.reduce((a,u)=>a+(p[u]||0),0);
@@ -1306,7 +1307,7 @@ async function attack(cell,opts){
         const A=atkOf(me,true,rage,!heroOn)+supA, D=tg.power, r=A*roll/D, win=r>1, z0=(me.brk=0), L=(win?Math.min(.6,.35*D/A):.6)*lossMul, lost=loseUnits(me,L,ATK)+brkN;
         if(win){ me.wk.wins++; me.wk.loot+=tg.gold+tg.stone; me.wk.stars+=r>1.6?3:r>1.25?2:1; }
         Object.assign(out,{npc:true,win,stars:win?(r>1.6?3:r>1.25?2:1):0,aLost:lost,dLost:0,gold:win?tg.gold:0,stone:win?tg.stone:0,tr:0});
-        if(win){ vetGain(me,units); out.card=cardDrop(me,.3); const lb=lootB(me); out.bonus=Math.round((tg.gold+tg.stone)*lb); me.gold+=Math.round(tg.gold*lb); me.stone+=Math.round(tg.stone*lb); out.tok=evGain(me,2); me.gold+=tg.gold; me.stone+=tg.stone; out.food=Math.round((tg.gold||0)*.5+40*(tg.lvl||1)); me.food=(me.food||0)+out.food; me.gems=(me.gems||0)+(tg.gems||0); me.stats.raids++; me.lcw={c:cell,t:now()}; me.campBest=Math.max(me.campBest||0,tg.lvl||1); me.stats.looted+=tg.gold+tg.stone; t.setPlot(cell,{o:ME,b:null,lvl:0}); } else t.setPlot(cell,tg);
+        if(win){ vetGain(me,units); out.card=cardDrop(me,.3); const lb=lootB(me)+(typeof jfxOn==='function'&&jfxOn(me,'luck')?.25:0)+(typeof fxSum==='function'?fxSum(me,'loot'):0); out.bonus=Math.round((tg.gold+tg.stone)*lb); me.gold+=Math.round(tg.gold*lb); me.stone+=Math.round(tg.stone*lb); out.tok=evGain(me,2); me.gold+=tg.gold; me.stone+=tg.stone; out.food=Math.round((tg.gold||0)*.5+40*(tg.lvl||1)); me.food=(me.food||0)+out.food; me.gems=(me.gems||0)+(tg.gems||0); me.stats.raids++; me.lcw={c:cell,t:now()}; me.campBest=Math.max(me.campBest||0,tg.lvl||1); me.stats.looted+=tg.gold+tg.stone; t.setPlot(cell,{o:ME,b:null,lvl:0}); } else t.setPlot(cell,tg);
         out.text=(win?`You claimed the level ${tg.lvl} camp and its loot: ${f(tg.gold)} gold, ${f(tg.stone)} stone and ${f(out.food||0)} food${tg.gems?' and '+tg.gems+' gems':''}.${out.bonus?` Bonus loot: +${f(out.bonus)}.`:''}`:'The barbarians held their ground.')+(sup.length===1?' Your guard tower joined the fight.':sup.length?` ${sup.length} of your guard towers joined the fight.`:'');
         out.replay={...replay,npc:true,lvl:tg.lvl,win,stars:out.stars,aLost:lost,trapped:0};
         t.setPlayer(ME,me); return out;
@@ -3100,7 +3101,7 @@ function renderPanel(force){ if(sel&&G.plots[sel]&&(G.plots[sel].b==='hallx'||G.
     else { h+=`<p class="desc">${p.b==='hall'?'Capture this to take their whole kingdom.':'Capture it to steal 35% of their resources and keep the tile.'} Watch out for hidden traps.</p>
     <div class="stat"><span>Player</span><span>${online(v)?'Online now':afkDays(v)>=1?'Offline '+Math.floor(afkDays(v))+'d':'Offline'} · ${f(v.tr||0)} trophies</span></div>${tr?'<div class="stat"><span>Peace treaty</span><span>Protected while offline</span></div>':inClan(v)&&afkDays(v)>=TREATY_AFK_DAYS?'<div class="stat"><span>Peace treaty</span><span>Lost: inactive over a week</span></div>':''}
     
-    <div class="stat"><span>Their army</span><span>Unknown</span></div>${isNewbie(v)?`<div class="stat"><span>Newcomer protection</span><span>${fmtT(newbieLeft(v)*60)} left</span></div>`:''}<div class="stat"><span>Distance</span><span>${range} tiles</span></div>
+    ${typeof spySees==='function'&&spySees()?`<div class="stat"><span>Their army</span><span>👁️ ${f(army(v))} troops</span></div>`:'<div class="stat"><span>Their army</span><span>Unknown</span></div>'}${isNewbie(v)?`<div class="stat"><span>Newcomer protection</span><span>${fmtT(newbieLeft(v)*60)} left</span></div>`:''}<div class="stat"><span>Distance</span><span>${range} tiles</span></div>
     <p class="desc">${p.b==='hall'&&landLeft(p.o)>0?hallLockMsg(p.o):!exposedTile(sel,p.o)?`🛡️ This tile is surrounded by ${esc(cleanText(v.name))}'s land. Capture a tile on the edge of their kingdom first to open a path${p.b==='hall'?' to their Town Hall':''}.`:sh?shieldTxt(v):far?`Too far. Your army can march ${MARCH_RANGE} tiles from your borders.`:'No scouts can get close to a real kingdom. You will only find out how strong they are by attacking!'}</p>${sh||far||isNewbie(v)||!exposedTile(sel,p.o)||(p.b==='hall'&&landLeft(p.o)>0)?'':spellRow(m)+btn('Attack with your army',null,'attack','war')}${!online(v)&&!sh?'<p class="desc">They are offline: you can attack them once, then they are protected until they come back.</p>':''}`; } }
   if(myClan()&&sel) h+=`<div class="label">📍 Ping your clan here</div><div class="row">${Object.entries(PING).map(([k,q])=>btn(q.ic+' '+q.txt,null,'ping:'+k,'soft mini')).join('')}</div>`;
   if(sel&&typeof mnPanel==='function') h+=mnPanel(sel);
@@ -8853,10 +8854,11 @@ msgHead=(o=>function(){ o.apply(this,arguments); try{ const c=convos[msgOpen], e
 /* purchases: if the game was busy with a background save when you tapped, your tap used to be ignored. Now it waits its turn (a quick moment) and then goes through.
    A second tap while YOUR first purchase is still going is still ignored, so you can't buy twice by accident. */
 var BUSY_USER=false;
-function txQueue(o){ return async function(){ const user=Date.now()-lastInput<700;
+function txQueue(o){ return async function(){ if(typeof txQueue2==='function') return o.apply(this,arguments); const user=Date.now()-lastInput<700;
   if(busy){ if(BUSY_USER||!user) return; const t0=performance.now(); while(busy&&performance.now()-t0<6000) await new Promise(r=>setTimeout(r,40)); if(busy) return toast('The game is busy. Try again in a moment.',true); }
   BUSY_USER=user; try{ return await o.apply(this,arguments); } finally{ BUSY_USER=false; } }; }
 act=txQueue(act); mkTx=txQueue(mkTx); clanTx=txQueue(clanTx); openStashed=txQueue(openStashed); buyListing=txQueue(buyListing);
+setTimeout(()=>{ try{ act=txQueue2(act); mkTx=txQueue2(mkTx); clanTx=txQueue2(clanTx); openStashed=txQueue2(openStashed); buyListing=txQueue2(buyListing); }catch(e){} },0);
 
 /* ===== v119: lots more banner choices ===== */
 Object.assign(BANNER_SYMS,{heart:'❤️',shield:'🛡️',eagle:'🦅',horse:'🐴',anchor:'⚓',flame:'🔥',flower:'🌸',paw:'🐾',bolt:'⚡',key:'🗝️',axe:'🪓',mountain:'⛰️',gem:'💎',snow:'❄️',leaf:'🍁',fish:'🐟'});
@@ -9018,7 +9020,7 @@ setInterval(()=>{ try{ if(Object.keys(MYTH_OWN).length<Object.keys(MYTHS).length
 function fnOpen(title,body,back){ fkOpen(title,body,back===undefined?'v124:hub':back); }
 var fnTileDots={};
 function fnHub(){ const m=P(ME); if(!m) return; const T=[['boss','👹','Daily Boss','A new monster every day'],['book','📖','Monster Book','Collect every dungeon monster'],['cup','🏆','Mini-game Cup','Weekly mini-game contest'],['tricks','🎪','Pet Tricks','Teach your pet tricks'],['photo','📸','Photo Mode','Save a picture of your kingdom'],['season','🍂','Season Shop','Castle skins for this season'],['titles','🎖️','Titles','Show a title next to your name'],['guide','📋','First Day Guide','Fun goals for new rulers'],['away','📰','News','What happened lately'],['v125:orders','📦','Orders','Ask for things, deliver for gold'],['v125:rush','💀','Boss Rush','All 10 bosses in a row'],['v125:pb','🐾','Pet Battles','Battle a friend\'s pet'],['v125:map','🗺️','Treasure Map','Find 4 pieces, dig a chest'],['v125:ev','📜','Kingdom Events','Make a choice'],['v125:pvis','🏡','Pet Visits','Send your pet to a friend'],['v125:kotw','🏅','Kingdom of the Week','Vote for the coolest kingdom'],['v125:fl','👫','Friend Leaderboard','You vs your friends'],['v125:ach','🏆','Achievements','Everything you collected'],['v126:isl','⛰️','Crown Island','Clans fight for it every month'],['v126:gdn','🌱','Royal Garden','Plant, water, harvest'],['v126:sf','🎣','Seasonal Fish','Rare fish for each season'],['v126:cards','📇','Kingdom Cards','Collect a card from every kingdom'],['v127:cal','📅','Events Calendar','What\'s on now and soon'],['v127:tour','🧭','Kingdom Tour','Visit a cool kingdom'],['v127:poll','🗳️','Vote','What should come next?']];
-  const d={}; try{ d.boss=dbCan(m); d.book=mbClaimable(m).length>0; d.cup=!!mgtPrize(m); d.guide=fdgClaimable(m).length>0; d['v125:ev']=kevOpen(m); d['v125:map']=(m.tmapP||0)>=4; d['v125:rush']=brRec(m).d!==dayNum()||!!brPrize(m); d['v125:pvis']=!!(pvOf(m)&&now()>=pvOf(m).t1); d['v125:orders']=ordList().some(O=>O.seller!==ME); d['v126:isl']=(islOn()&&!!myClan()&&now()-(m.islA||0)>=ISL_CD)||!!islClaimable(m); d['v126:gdn']=gdnOf(m).some(p=>p&&now()-p.t0>=GDN_SEEDS[p.s].min*60000); }catch(e){}
+  const d={}; try{ d.boss=dbCan(m); d.book=mbClaimable(m).length>0; d.cup=!!mgtPrize(m); d.guide=fdgClaimable(m).length>0; d['v125:ev']=kevOpen(m); d['v125:map']=(m.tmapP||0)>=4; d['v125:rush']=brRec(m).d!==dayNum()||!!brPrize(m); d['v125:pvis']=!!(pvOf(m)&&now()>=pvOf(m).t1); d['v125:orders']=ordList().some(O=>O.seller!==ME); d['v126:isl']=(islOn()&&!!myClan()&&now()-(m.islA||0)>=ISL_CD)||!!islClaimable(m); d['v126:gdn']=gdnOf(m).some(p=>p&&now()-p.t0>=GDN_SEEDS[p.s].min*60000*(typeof gdnMul==='function'?gdnMul():1)); }catch(e){}
   $('ov').innerHTML=`<div class="overlay" id="fkOv"><div class="dialog wide lgDlg"><h2>✨ Fun &amp; Collect</h2><p class="desc">Daily bosses, collecting monsters, pet tricks, photos and more!</p><div class="lgGrid">${T.map(([k,ic,n,s])=>`<button class="lgTile" data-act="${k.includes(':')?k:'v124:'+k}">${d[k]?'<i class="lgDot"></i>':''}<span>${ic}</span><b>${n}</b><small>${s}</small></button>`).join('')}</div><div class="row"><button class="soft" data-act="v113:hub">🏰 Kingdom Life</button><button class="soft" data-act="ov:close">Close</button></div></div></div>`; }
 
 /* ---------- 1. pets look stronger as they grow up ---------- */
@@ -9187,7 +9189,7 @@ function nwDialog(since){ since=since||(now()-3*864e5); const L=nwItems(since), 
   ${G2.gift.length?`<div class="label">🎁 Gifts (${G2.gift.length})</div><ul class="awayL">${G2.gift.slice(0,8).map(line).join('')}</ul>`:''}
   ${G2.other.length?`<div class="label">📜 Other news (${G2.other.length})</div><ul class="awayL">${G2.other.slice(0,10).map(line).join('')}</ul>`:''}
   ${btn('🔔 Things ready for you',null,'ready:open','soft')}`); }
-readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const m=P(ME); if(m&&!m.dead){ if(dbCan(m)&&(stats(ME).hallLvl||1)>=5) L.push({ic:'👹',t:'Fight today\'s Daily Boss',act:'v124:boss'}); if(mbClaimable(m).length) L.push({ic:'📖',t:'Monster Book page prize',act:'v124:book:'+mbClaimable(m)[0]}); if(mgtPrize(m)) L.push({ic:'🏆',t:'Mini-game Cup prize',act:'v124:cup'}); if(!m.fdgAll&&fdgClaimable(m).length) L.push({ic:'📋',t:'First Day Guide reward',act:'v124:guide'}); if(kevOpen(m)) L.push({ic:'📜',t:'A Kingdom Event needs your choice',act:'v125:ev'}); if((m.tmapP||0)>=4) L.push({ic:'🗺️',t:'Dig up your treasure!',act:'v125:map'}); if(pvOf(m)&&now()>=pvOf(m).t1) L.push({ic:'🐾',t:'Your pet is home from its visit',act:'v125:pvis'}); if(brPrize(m)) L.push({ic:'💀',t:'Boss Rush prize',act:'v125:rush'}); if(islClaimable(m)) L.push({ic:'⛰️',t:'Crown Island prize',act:'v126:isl'}); else if(islOn()&&myClan()&&now()-(m.islA||0)>=ISL_CD) L.push({ic:'⛰️',t:'Crown Island is open! Attack for your clan',act:'v126:isl'}); if(gdnOf(m).some(p=>p&&now()-p.t0>=GDN_SEEDS[p.s].min*60000)) L.push({ic:'🌱',t:'Your garden is ready to harvest',act:'v126:gdn'}); if(!(m.pv&&m.pv.id===pollNow().id)&&(stats(ME).hallLvl||1)>=3) L.push({ic:'🗳️',t:'Vote: '+pollNow().q,act:'v127:poll'}); } }catch(e){} return L; })(readyList);
+readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const m=P(ME); if(m&&!m.dead){ if(dbCan(m)&&(stats(ME).hallLvl||1)>=5) L.push({ic:'👹',t:'Fight today\'s Daily Boss',act:'v124:boss'}); if(mbClaimable(m).length) L.push({ic:'📖',t:'Monster Book page prize',act:'v124:book:'+mbClaimable(m)[0]}); if(mgtPrize(m)) L.push({ic:'🏆',t:'Mini-game Cup prize',act:'v124:cup'}); if(!m.fdgAll&&fdgClaimable(m).length) L.push({ic:'📋',t:'First Day Guide reward',act:'v124:guide'}); if(kevOpen(m)) L.push({ic:'📜',t:'A Kingdom Event needs your choice',act:'v125:ev'}); if((m.tmapP||0)>=4) L.push({ic:'🗺️',t:'Dig up your treasure!',act:'v125:map'}); if(pvOf(m)&&now()>=pvOf(m).t1) L.push({ic:'🐾',t:'Your pet is home from its visit',act:'v125:pvis'}); if(brPrize(m)) L.push({ic:'💀',t:'Boss Rush prize',act:'v125:rush'}); if(islClaimable(m)) L.push({ic:'⛰️',t:'Crown Island prize',act:'v126:isl'}); else if(islOn()&&myClan()&&now()-(m.islA||0)>=ISL_CD) L.push({ic:'⛰️',t:'Crown Island is open! Attack for your clan',act:'v126:isl'}); if(gdnOf(m).some(p=>p&&now()-p.t0>=GDN_SEEDS[p.s].min*60000*(typeof gdnMul==='function'?gdnMul():1))) L.push({ic:'🌱',t:'Your garden is ready to harvest',act:'v126:gdn'}); if(!(m.pv&&m.pv.id===pollNow().id)&&(stats(ME).hallLvl||1)>=3) L.push({ic:'🗳️',t:'Vote: '+pollNow().q,act:'v127:poll'}); } }catch(e){} return L; })(readyList);
 
 /* ---------- 14. simple mode ---------- */
 try{ SET_TOGGLES.push(['simple','🧸 Simple mode','Bigger text and buttons, and fewer busy things moving on the map.'],['clanFlag','🚩 Clan banners on castles','Show each clan\'s banner next to its members\' castles.']); }catch(e){ setTimeout(()=>{ try{ SET_TOGGLES.push(['simple','🧸 Simple mode','Bigger text and buttons, and fewer busy things moving on the map.'],['clanFlag','🚩 Clan banners on castles','Show each clan\'s banner next to its members\' castles.']); }catch(e2){} },0); }
@@ -9462,12 +9464,12 @@ var gdnPick='carrot';
 function gdnDialog(){ const m=P(ME), G2=gdnOf(m), n=gdnSlots(), k=1+HLX()*.15;
   fnOpen('🌱 Royal Garden',`<p class="desc">Plant seeds, water them and harvest food! Each plant can be watered <b>twice</b> while it grows, and every watering makes the harvest <b>50% bigger</b>. You get more garden plots as your Town Hall grows.</p>
   <div class="row" style="flex-wrap:wrap">${Object.entries(GDN_SEEDS).filter(([s,S])=>!S.farm||(P(ME)||{}).job==='farm').map(([s,S])=>`<button class="${gdnPick===s?'prime':'soft'} mini" data-act="v126:seed:${s}">${S.ic} ${S.n} · ${S.min}m · ${f(S.cost)}🪙</button>`).join('')}</div>
-  <div class="gdnGrid">${Array.from({length:n},(_,i)=>{ const p=G2[i]; if(!p) return `<button class="gdnPlot empty" data-act="v126:plant:${i}"><span>🟫</span><small>Plant ${GDN_SEEDS[gdnPick].ic}</small></button>`; const S=GDN_SEEDS[p.s], dur=S.min*60000, q=Math.min(1,(now()-p.t0)/dur), ready=q>=1, canW=!ready&&(p.w||0)<2&&now()-(p.wl||p.t0)>=dur/4;
+  <div class="gdnGrid">${Array.from({length:n},(_,i)=>{ const p=G2[i]; if(!p) return `<button class="gdnPlot empty" data-act="v126:plant:${i}"><span>🟫</span><small>Plant ${GDN_SEEDS[gdnPick].ic}</small></button>`; const S=GDN_SEEDS[p.s], dur=S.min*60000*(typeof gdnMul==='function'?gdnMul():1), q=Math.min(1,(now()-p.t0)/dur), ready=q>=1, canW=!ready&&(p.w||0)<2&&now()-(p.wl||p.t0)>=dur/4;
     return `<div class="gdnPlot${ready?' ready':''}"><span>${ready?S.ic:q<.4?'🌱':'🌿'}</span><small>${S.n}${p.w?' · '+'💧'.repeat(p.w):''}</small><div class="bar"><i style="width:${q*100}%"></i></div>${ready?btn('Harvest',null,'v126:harvest:'+i,'prime mini'):canW?btn('💧 Water',null,'v126:water:'+i,'soft mini'):`<small>${fmtT((p.t0+dur-now())/1000)}</small>`}</div>`; }).join('')}</div>
   <p class="desc"><small>Food from a harvest: about ${f(Math.round(GDN_SEEDS[gdnPick].food*k))} ${GDN_SEEDS[gdnPick].ic} (more if watered).</small></p>`); }
 function gdnPlant(i){ i=+i; const S=GDN_SEEDS[gdnPick]; act([],me=>{ if(i>=gdnSlots()) fail('Grow your Town Hall for more plots.'); me.gdn=gdnOf(me); while(me.gdn.length<i) me.gdn.push(null); if(me.gdn[i]) fail('Something is already growing there.'); if(S.farm&&me.job!=='farm') fail('Only Farmers can grow Golden Wheat.'); me.seeds=me.seeds||{}; if((me.seeds[gdnPick]||0)>0) me.seeds[gdnPick]--; else pay(me,{gold:S.cost}); me.gdn[i]={s:gdnPick,t0:now(),w:0,wl:0}; return {}; },()=>{ snd('plant'); gdnDialog(); }); }
-function gdnWater(i){ i=+i; act([],me=>{ const p=(me.gdn||[])[i]; if(!p) fail('Nothing growing there.'); const dur=GDN_SEEDS[p.s].min*60000; if(now()-p.t0>=dur) fail('It is ready to harvest!'); if((p.w||0)>=2) fail('It has had enough water.'); if(now()-(p.wl||p.t0)<dur/4) fail('Wait a little before watering again.'); p.w=(p.w||0)+1; p.wl=now(); return {}; },()=>{ snd('water'); gdnDialog(); }); }
-function gdnHarvest(i){ i=+i; act([],me=>{ const p=(me.gdn||[])[i]; if(!p) fail('Nothing growing there.'); const S=GDN_SEEDS[p.s]; if(now()-p.t0<S.min*60000) fail('Not ready yet.'); const food=Math.round(S.food*(1+HLX()*.15)*(1+.5*(p.w||0))); me.food=(me.food||0)+food; const gg=S.gold?Math.round(S.gold*(1+HLX()*.15)*(1+.5*(p.w||0))):0; if(gg) me.gold=(me.gold||0)+gg; let sd=0; if(me.job==='farm'&&!S.farm){ sd=1+(Math.random()<.5?1:0); me.seeds=me.seeds||{}; me.seeds[p.s]=(me.seeds[p.s]||0)+sd; } me.gdn[i]=null; me.gdnN=(me.gdnN||0)+1; return {food,ic:S.ic,gg,sd}; },r=>{ snd('harvest'); toast(`${r.ic} Harvested ${r.gg?f(r.gg)+' gold':f(r.food)+' food'}!${r.sd?` +${r.sd} seed packet${r.sd>1?'s':''}`:''}`); gdnDialog(); }); }
+function gdnWater(i){ i=+i; act([],me=>{ const p=(me.gdn||[])[i]; if(!p) fail('Nothing growing there.'); const dur=GDN_SEEDS[p.s].min*60000*(typeof gdnMul==='function'?gdnMul():1); if(now()-p.t0>=dur) fail('It is ready to harvest!'); if((p.w||0)>=2) fail('It has had enough water.'); if(now()-(p.wl||p.t0)<dur/4) fail('Wait a little before watering again.'); p.w=(p.w||0)+1; p.wl=now(); return {}; },()=>{ snd('water'); gdnDialog(); }); }
+function gdnHarvest(i){ i=+i; act([],me=>{ const p=(me.gdn||[])[i]; if(!p) fail('Nothing growing there.'); const S=GDN_SEEDS[p.s]; if(now()-p.t0<S.min*60000*(typeof gdnMul==='function'?gdnMul():1)) fail('Not ready yet.'); const food=Math.round(S.food*(1+HLX()*.15)*(1+.5*(p.w||0))); me.food=(me.food||0)+food; const gg=S.gold?Math.round(S.gold*(1+HLX()*.15)*(1+.5*(p.w||0))):0; if(gg) me.gold=(me.gold||0)+gg; let sd=0; if(me.job==='farm'&&!S.farm){ sd=1+(Math.random()<.5?1:0); me.seeds=me.seeds||{}; me.seeds[p.s]=(me.seeds[p.s]||0)+sd; } me.gdn[i]=null; me.gdnN=(me.gdnN||0)+1; return {food,ic:S.ic,gg,sd}; },r=>{ snd('harvest'); toast(`${r.ic} Harvested ${r.gg?f(r.gg)+' gold':f(r.food)+' food'}!${r.sd?` +${r.sd} seed packet${r.sd>1?'s':''}`:''}`); gdnDialog(); }); }
 
 /* ---------- 🎣 seasonal rare fish ---------- */
 var SFISH={winter:[['icefish','Ice Fish','🧊'],['snowtrout','Snow Trout','❄️'],['aurora','Aurora Koi','🌌'],['frostcrab','Frost King Crab','🦀']],spring:[['blossomkoi','Blossom Koi','🌸'],['rainbowcarp','Rainbow Carp','🌈'],['frogfish','Lily Frogfish','🐸'],['petalray','Petal Ray','🪷']],summer:[['sunfish','Golden Sunfish','☀️'],['coralbass','Coral Bass','🪸'],['flyfish','Flying Fish','🐟'],['sharkpup','Baby Shark','🦈']],autumn:[['pumpkinpike','Pumpkin Pike','🎃'],['mapleperch','Maple Perch','🍁'],['ghostfish','Ghost Fish','👻'],['harvestcod','Harvest Cod','🌾']]};
@@ -9771,7 +9773,7 @@ drawPings=(o=>function(v){ o.apply(this,arguments); try{ if(cam.z<.3) return; co
 
 /* ---------- 12. Watch clan battles ---------- */
 var lvSeen={}, lvPrimed=false;
-report=(o=>function(uid,text,kind,cell,replay){ const r=o.apply(this,arguments); try{ if(replay&&uid&&uid!==ME&&P(uid)){ const rj=JSON.stringify(replay); if(rj.length<90000){ const vn=String(P(uid).name||'').slice(0,24); pmSave(me=>{ me.lb={t:now(),vs:uid,vn,rj}; }).catch(()=>{}); } } }catch(e){} return r; })(report);
+report=(o=>function(uid,text,kind,cell,replay){ const r=o.apply(this,arguments); try{ if(replay&&uid&&uid!==ME&&P(uid)){ const rj=JSON.stringify(replay); if(rj.length<25000){ const vn=String(P(uid).name||'').slice(0,24); pmSave(me=>{ me.lb={t:now(),vs:uid,vn,rj}; }).catch(()=>{}); } } }catch(e){} return r; })(report);
 function lvList(){ const c=myClan(); if(!c) return []; return (c.members||[]).filter(u=>u!==ME).map(P).filter(p=>p&&p.lb&&p.lb.rj&&p.lb.t>now()-30*60000).sort((a,b)=>b.lb.t-a.lb.t); }
 function lvWatch(uid){ const p=P(uid); if(!p||!p.lb||!p.lb.rj) return toast('That battle is gone.',true); let rp=null; try{ rp=JSON.parse(p.lb.rj); }catch(e){} if(!rp) return toast('That battle cannot be shown.',true); $('ov').innerHTML=''; const b=$('lvBan'); if(b) b.remove(); playBattle(rp).then(()=>{ if($('batOv')) $('ov').innerHTML=''; }); }
 function lbDialog(){ const L=lvList(); nkOpen('📺 Watch clan battles',`<p class="desc">Watch your clanmates' attacks right after they happen (from the last 30 minutes).</p>${myClan()?'':'<p class="desc">Join a clan to watch your clanmates fight!</p>'}${L.length?`<div class="board">${L.map(p=>`<div><span>⚔️ ${esc(cleanText(p.name))} vs ${esc(cleanText(p.lb.vn||'?'))}</span><span>${fmtT((now()-p.lb.t)/1000)} ago</span><span>${btn('▶️ Watch',null,'v132:lvw:'+p.id,'prime')}</span></div>`).join('')}</div>`:'<p class="desc">No clan battles right now.</p>'}`); }
@@ -9857,7 +9859,7 @@ function jobOf(p){ return p&&JOBS[p.job]?p.job:null; }
 function jobChangeCost(m){ const n=(m&&m.jobN)||0; return !jobOf(m)||n<1?null:{gold:JOB_FEE,stone:JOB_FEE}; }
 function jobPick(k){ const m=P(ME); if(!JOBS[k]||!m) return; if(jobOf(m)&&jobOk!==k){ jobOk=k; const c=jobChangeCost(m); return toast(`Tap again to become a ${JOBS[k].name||JOBS[k].n}${c?' for '+costTxt(c):' (this change is free)'}. Changes used: ${m.jobN||0}/${JOB_MAXCH}.`); } jobOk=null;
   act([],me=>{ if((stats(ME).hallLvl||1)<JOB_TH) fail(`Jobs unlock at Town Hall ${JOB_TH}.`); const cur=jobOf(me), n=me.jobN||0; if(cur===k) fail('That is already your job.');
-    if(cur){ if(n>=JOB_MAXCH) fail('You have changed jobs 5 times. Your job is locked forever now.'); if(n>=1){ settle(me); pay(me,{gold:JOB_FEE,stone:JOB_FEE}); } me.jobN=n+1; } me.job=k; me.jobT=now(); return {k,ch:!!cur}; },
+    if(cur){ if(n>=JOB_MAXCH) fail('You have changed jobs 5 times. Your job is locked forever now.'); if(n>=1){ settle(me); pay(me,{gold:JOB_FEE,stone:JOB_FEE}); } me.jobN=n+1; } me.job=k; me.jobT=now(); me.jobP={j:k,b:(typeof jobBase==='function'?jobBase(me,k):0),m:0}; return {k,ch:!!cur}; },
     r=>{ snd('quest'); confetti(); toast(`${JOBS[r.k].ic} You are now a ${JOBS[r.k].n}!`); jobDialog(); }); }
 function jobDialog(){ const m=P(ME)||{}, j=jobOf(m), th=stats(ME).hallLvl||1, n=m.jobN||0;
   if(th<JOB_TH) return v133Open('🧑‍🌾 Jobs',`<p class="desc">At Town Hall ${JOB_TH} you can pick a job for your kingdom. Each job has its own special powers that only that job can use!</p>${Object.values(JOBS).map(J=>`<div class="setItem"><div><b>${J.ic} ${J.n}</b><small>${J.d}</small></div></div>`).join('')}`);
@@ -9877,7 +9879,7 @@ gdnSlots=(o=>function(){ return o.apply(this,arguments)+((P(ME)||{}).job==='farm
 function jwCry(){ act([],me=>{ if(me.job!=='war') fail('Only Warriors can do that.'); if(now()-(me.bcryL||0)<8*3600000) fail('Your Battle Cry is resting.'); me.bcryL=now(); me.bcry=now()+600000; return {}; },()=>{ snd('alarm'); toast('📯 BATTLE CRY! Your attacks are 25% stronger for 10 minutes!'); jobDialog(); }); }
 function jwDrill(){ act([],me=>{ if(me.job!=='war') fail('Only Warriors can do that.'); if(me.drill===dayNum()) fail('Come back tomorrow.'); const s=stats(ME), free=Math.floor(s.troopCap-armySp(me)); const n=Math.min(free,20*HLX()); if(n<=0) fail('Your barracks are full.'); me.drill=dayNum(); me.sol=(me.sol||0)+n; return {n}; },r=>{ snd('quest'); toast(`🎯 ${f(r.n)} free soldiers joined your army!`); jobDialog(); }); }
 function jmSend(a){ a=Math.floor(+a||0); act([],me=>{ if(me.job!=='mer') fail('Only Merchants can do that.'); if(me.trd) fail('Your trade route is already out.'); if(a<1000||a>20000*HLX()) fail(`Send between 1,000 and ${f(20000*HLX())} gold.`); settle(me); pay(me,{gold:a}); me.trd={a,t:now()}; return {}; },()=>{ snd('coin'); toast('🐫 Your caravan set off! Come back in 2 hours.'); jobDialog(); }); }
-function jmCollect(){ act([],me=>{ const tr=me.trd; if(me.job!=='mer') fail('Only Merchants can do that.'); if(!tr) fail('No trade route is out.'); if(now()<tr.t+2*3600000) fail('Not back yet.'); const g=Math.round(tr.a*1.3); me.gold+=g; delete me.trd; return {g}; },r=>{ snd('coin'); confetti(); toast(`🐫 Your trade route came back with ${f(r.g)} gold!`); jobDialog(); }); }
+function jmCollect(){ act([],me=>{ const tr=me.trd; if(me.job!=='mer') fail('Only Merchants can do that.'); if(!tr) fail('No trade route is out.'); if(now()<tr.t+2*3600000) fail('Not back yet.'); const g=Math.round(tr.a*1.3); me.gold+=g; me.trdN=(me.trdN||0)+1; delete me.trd; return {g}; },r=>{ snd('coin'); confetti(); toast(`🐫 Your trade route came back with ${f(r.g)} gold!`); jobDialog(); }); }
 function jmGuild(){ act([],me=>{ if(me.job!=='mer') fail('Only Merchants can do that.'); if(me.guild===dayNum()) fail('Come back tomorrow.'); const n=sc133(4000); settle(me); pay(me,{stone:n}); me.gold+=n; me.guild=dayNum(); return {n}; },r=>{ snd('coin'); toast(`🏦 Swapped ${f(r.n)} stone for ${f(r.n)} gold.`); jobDialog(); }); }
 function jeScout(){ act([],me=>{ if(me.job!=='exp') fail('Only Explorers can do that.'); if(now()-(me.scoutL||0)<4*3600000) fail('Your scouts are still out.'); me.scoutL=now(); const g=sc133(1500+Math.floor(Math.random()*2500)), s=sc133(800+Math.floor(Math.random()*1500)); me.gold+=g; me.stone+=s; let extra='';
     const r=Math.random(); if(r<.12){ me.stash=me.stash||{}; me.stash.wood=(me.stash.wood||0)+1; extra=' and a crate!'; } else if(r<.27&&(me.tmapP||0)<4){ me.tmapP=(me.tmapP||0)+1; extra=' and a treasure map piece!'; } else if(r<.5){ gemsAdd(me,3); extra=' and some gems!'; } return {g,s,extra}; },
@@ -9982,7 +9984,7 @@ async function weDialog(){ weSt=await cellRead(WE_CELL); const id=weId(), k=weKi
   v133Open(`${I[0]} World event`,body); }
 function weAct(fn,after){ act([WE_CELL],(me,pl)=>{ const id=weId(), b=weFresh(pl[WE_CELL],id); b.o='npc'; b.b='wevent'; const r=fn(me,b,id); trimMap(b.by,400); pl[WE_CELL]=b; return r||{}; },r=>{ if(after) after(r); weDialog(); }); }
 function weAttack(){ weAct((me,b,id)=>{ if(b.k!=='dragon') fail('There is no dragon right now.'); if(b.hp<=0) fail('The dragon is already defeated!'); if(now()-(me.weA||0)<15*60000) fail('Your army is resting.'); if(!attackers(me)&&!heroReady(me)) fail('You need an army.');
-    const spot=weSpot(id), near=spot!=null&&stats(ME).hall&&dist(stats(ME).hall,spot)<=10, A=Math.round(atkOf(me,false)*(.8+Math.random()*.4)*(near?1.5:1)), lost=loseUnits(me,.05,ATK); b.hp=Math.max(0,b.hp-A); b.by[ME]=(b.by[ME]||0)+A; me.weA=now(); return {A,lost,near,down:b.hp<=0}; },
+    const spot=weSpot(id), near=spot!=null&&stats(ME).hall&&dist(stats(ME).hall,spot)<=10, A=Math.round(atkOf(me,false)*(.8+Math.random()*.4)*(near?1.5:1)*(typeof bossMul==='function'?bossMul(me):1)), lost=loseUnits(me,.05,ATK); b.hp=Math.max(0,b.hp-A); b.by[ME]=(b.by[ME]||0)+A; me.weA=now(); return {A,lost,near,down:b.hp<=0}; },
     r=>{ snd(r.down?'quest':'click'); if(r.down) confetti(); toast(`🐉 You hit the dragon for ${f(r.A)}${r.near?' (close-up bonus!)':''}! ${r.lost} troops fell.${r.down?' THE DRAGON FELL!':''}`); }); }
 function weMedicine(){ weAct((me,b)=>{ if(b.k!=='plague') fail('There is no plague right now.'); if(b.n>=25) fail('The plague is already cured!'); if(now()-(me.weA||0)<30*60000) fail('Your healers are resting.'); settle(me); pay(me,{food:sc133(800)}); b.n++; b.by[ME]=(b.by[ME]||0)+1; me.weA=now(); return {n:b.n}; },r=>{ snd('quest'); toast(`💊 Medicine delivered! ${r.n}/25.`); }); }
 function weDig(){ weAct((me,b,id)=>{ if(b.k!=='rush') fail('There is no gold rush right now.'); if(b.by[ME]) fail('You already dug here!'); if(b.n>=25) fail('All the gold is gone!'); b.n++; b.by[ME]=b.n; me.weC=id; const first=b.n<=5; me.gold+=sc133(5000); me.stone+=sc133(3000); if(first) gemsAdd(me,10); return {n:b.n,first}; },r=>{ snd('coin'); confetti(); toast(`⛏️ You were digger #${r.n}! Gold and stone${r.first?' and gems':''} for you!`); }); }
@@ -9999,7 +10001,7 @@ function secList(m){ m=m||P(ME); if(!m) return []; const hall=stats(m.id||ME).ha
     out.push({key,c:cid(x,y),t:ks[Math.floor(h32(ME+'t'+key)*ks.length)],got:(m.secC||[]).includes(key)}); } return out; }
 function secAt(c){ return secList().find(s=>!s.got&&String(s.c)===String(c)); }
 function secPanel(c){ const s=secAt(c); if(!s) return ''; const T=SEC_T[s.t]; return `<div class="label">✨ You found a secret!</div><p class="desc"><b>${T[0]} ${T[1]}</b>: ${T[2]}</p><div class="row">${s.t==='giant'?`${btn('🤫 Sneak past',null,'v133:sec:'+s.key+':0','soft')}${btn('⚔️ Fight it',null,'v133:sec:'+s.key+':1','war')}`:btn('🔍 Explore',null,'v133:sec:'+s.key+':0','prime')}</div>`; }
-function secOpen(key,mode){ act([],me=>{ const s=secList(me).find(x=>x.key===key); if(!s) fail('That secret has vanished.'); me.secC=me.secC||[]; if(me.secC.includes(key)) fail('You already explored it.'); me.secC=[...me.secC,key].slice(-20); const bo=me.job==='exp'?1.25:1, G2=o=>{ const q={}; for(const k in o) q[k]=['gems','crate','sol'].includes(k)?o[k]:Math.round(o[k]*bo); return dGive(me,q); };
+function secOpen(key,mode){ act([],me=>{ const s=secList(me).find(x=>x.key===key); if(!s) fail('That secret has vanished.'); me.secC=me.secC||[]; if(me.secC.includes(key)) fail('You already explored it.'); me.secC=[...me.secC,key].slice(-20); me.secN=(me.secN||0)+1; const bo=me.job==='exp'?1.25:1, G2=o=>{ const q={}; for(const k in o) q[k]=['gems','crate','sol'].includes(k)?o[k]:Math.round(o[k]*bo); return dGive(me,q); };
     if(s.t==='ruins') return {t:'🏚️ You dug through the ruins!'+G2({gold:1500,stone:2000})}; if(s.t==='cave') return {t:'🕳️ Deep in the cave...'+(Math.random()<.35?G2({stone:1500,crate:'wood'}):G2({stone:2500}))};
     if(s.t==='fairy') return {t:'🧚 The fairies like you!'+G2({gems:4+Math.floor(Math.random()*4)})}; if(s.t==='chest') return {t:'🧰 A buried chest!'+G2({gold:3500})};
     if(+mode!==1) return {t:'🤫 You tiptoe past and grab a little gold.'+G2({gold:900})}; if(!attackers(me)&&!heroReady(me)) fail('You need an army to fight a giant!');
@@ -10027,7 +10029,7 @@ async function crHit(part){ const c=myClan(), u=crPickU, m=P(ME); if(!c||!u||!CR
     let R=cc.raid&&cc.raid.wk===wk?cc.raid:null; if(!R){ const mx=crHP(cc); R={wk,max:mx,hp:{wall:mx,tower:mx,gate:mx,keep:Math.round(mx*1.5)},by:{}}; } R={...R,hp:{...R.hp},by:{...(R.by||{})}}; if(R.dn) fail('The fortress already fell this week!');
     if(R.hp[part]<=0) fail('That part is already destroyed.'); if(part==='keep'&&['wall','tower','gate'].some(k=>R.hp[k]>0)) fail('Break the walls, towers and gate first!');
     const n=Math.floor(me[u]||0); if(n<=0) fail('You have none of those troops.'); settle(me); let um=1; try{ um=unitMult(me,u)||1; }catch(e){}
-    const dmg=Math.round(n*Math.max(4,UNITS[u].atk)*um*(CR_PARTS[part].weak.includes(u)?2:.6)*aim*(me.job==='war'?1.1:1)), lost=Math.ceil(n*(UNITS[u].tough?.15:.3));
+    const dmg=Math.round(n*Math.max(4,UNITS[u].atk)*um*(CR_PARTS[part].weak.includes(u)?2:.6)*aim*(me.job==='war'?1.1:1)*(typeof bossMul==='function'?bossMul(me):1)), lost=Math.ceil(n*(UNITS[u].tough?.15:.3));
     me[u]=n-lost; R.hp[part]=Math.max(0,R.hp[part]-dmg); R.by[ME]=(R.by[ME]||0)+dmg; trimMap(R.by,60); if(R.hp.keep<=0) R.dn=now(); me.crA.n++; cc.raid=R; t.setClan(c.id,cc); t.setPlayer(ME,me); return {dmg,lost,weak:CR_PARTS[part].weak.includes(u),dn:!!R.dn}; },
     r=>{ snd(r.dn?'quest':'click'); if(r.dn) confetti(); toast(`🏰 ${f(r.dmg)} damage${r.weak?' (weak spot! x2)':''}! ${f(r.lost)} troops fell.${r.dn?' THE FORTRESS HAS FALLEN!':''}`); setTimeout(crDialog,300); }); }
 function crClaim(){ const c=myClan(); if(!c) return; act([],me=>{ const R=crOf(G.clans[c.id]); if(!R||!R.dn) fail('The fortress is still standing.'); if(!(R.by||{})[ME]) fail('You did not help this week.'); if(me.crC===R.wk) fail('Already collected.'); me.crC=R.wk; me.stash=me.stash||{}; me.stash.royal=(me.stash.royal||0)+1; gemsAdd(me,25); me.gold+=sc133(4000); me.crW=(me.crW||0)+1; return {}; },()=>{ snd('quest'); confetti(); toast('🏰 Raid reward: a Royal Crate, gems and gold!'); crDialog(); }); }
@@ -10101,6 +10103,247 @@ NEW133.push(['💰','Camp bounties','v133:cb']);
 readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const h=stats(ME).hall; if(h&&cbyList().some(x=>x.seller!==ME&&cbyIsCamp(x.cell)&&dist(h,x.cell)<=MARCH_RANGE)) L.push({ic:'💰',t:'A camp near you has a bounty!',act:'v133:cb'}); }catch(e){} return L; })(readyList);
 (function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v133:cb')) return va(a,b); const r=a.split(':'), k=r[1];
   if(k==='cb') cbyDialog(); else if(k==='cbput'){ if(sel) cbyPost(sel,($('cbAmt')||{}).value); } else if(k==='cbtake') cbyTake(r[2]); return true; }; })();
+
+/* ===== v134: 8 jobs, and each job is the ONLY maker of one special good that everyone wants (a monopoly).
+   Makers craft goods and sell them at the 🏪 Job Market, so jobs depend on each other. ===== */
+Object.assign(JOBS,{
+  smith:{n:'Blacksmith',ic:'🔨',d:'Free piece of gear every day. Only Blacksmiths make ⚒️ Whetstones (+10% attack for 3 hours).'},
+  medic:{n:'Healer',ic:'💚',d:'Your troops die 10% less. Only Healers make 🧪 Healing Potions (25% fewer troop losses for 3 hours).'},
+  bldr:{n:'Builder',ic:'🏗️',d:'Your upgrades are 15% faster. Only Builders make 📐 Blueprints (upgrades 25% faster for 3 hours).'},
+  spy:{n:'Spy',ic:'🕵️',d:'You can always see other kingdoms\' armies. 🗡️ Sabotage a kingdom (-10% defense for 1 hour). Only Spies make 👁️ Spy Scrolls (see every army for 1 hour).'}});
+JOBS.war.d+=' Only Warriors make 🛡️ Bodyguard Contracts (+15% defense for 4 hours, and it blocks Spy sabotage).';
+JOBS.mer.d+=' Only Merchants make 🪙 Lucky Coins (+25% loot from barbarian camps for 2 hours).';
+JOBS.farm.d+=' Only Farmers make 🌱 seed packets (free planting for everyone).';
+JOBS.exp.d+=' Only Explorers make 🗺️ Map Pieces (4 pieces = a treasure dig).';
+var GOODS={guard:{job:'war',ic:'🛡️',n:'Bodyguard Contract',dur:4,d:'+15% defense for 4 hours. Spies cannot sabotage you while it is on.'},
+  luck:{job:'mer',ic:'🪙',n:'Lucky Coin',dur:2,d:'+25% loot from barbarian camps for 2 hours.'},
+  map:{job:'exp',ic:'🗺️',n:'Map Piece',dur:0,d:'Adds 1 treasure map piece. Collect 4 to dig for treasure!'},
+  sharp:{job:'smith',ic:'⚒️',n:'Whetstone',dur:3,d:'+10% attack for 3 hours.'},
+  potion:{job:'medic',ic:'🧪',n:'Healing Potion',dur:3,d:'25% fewer troop losses for 3 hours.'},
+  blue:{job:'bldr',ic:'📐',n:'Blueprint',dur:3,d:'Upgrades you start in the next 3 hours are 25% faster.'},
+  intel:{job:'spy',ic:'👁️',n:'Spy Scroll',dur:1,d:'See the exact army of every kingdom for 1 hour.'}};
+var JG_CD=4*3600000, JG_MAKE=3, JG_CAP=30, SAB_CD=12*3600000;
+function goodOfJob(j){ return Object.keys(GOODS).find(k=>GOODS[k].job===j)||null; }
+function jfxOn(p,k){ return !!(p&&p.jfx&&p.jfx[k]>Date.now()); }
+var sabIdx={}, sabT=0;
+function sabOn(p){ if(!p) return false; if(Date.now()-sabT>2000){ sabT=Date.now(); sabIdx={}; for(const q of Object.values(G.players||{})){ const s=q&&q.sab; if(s&&s.to&&s.until>Date.now()&&q.job==='spy') sabIdx[s.to]=1; } } return !!sabIdx[p.id]&&!jfxOn(p,'guard'); }
+/* effects */
+atkOf=(o=>function(p){ let v=o.apply(this,arguments); try{ if(jfxOn(p,'sharp')) v*=1.1; }catch(e){} return v; })(atkOf);
+defOf=(o=>function(p){ let v=o.apply(this,arguments); try{ if(jfxOn(p,'guard')) v*=1.15; if(sabOn(p)) v*=.9; }catch(e){} return v; })(defOf);
+loseUnits=(o=>function(p,L){ try{ if(p){ if(jfxOn(p,'potion')) L*=.75; if(p.job==='medic') L*=.9; } }catch(e){} const a=[...arguments]; a[1]=L; return o.apply(this,a); })(loseUnits);
+function jbBuildMul(){ const m=P(ME); let k=1; try{ if(m&&m.job==='bldr') k*=.85; if(jfxOn(m,'blue')) k*=.75; }catch(e){} return k; }
+function spySees(){ const m=P(ME); return !!m&&(m.job==='spy'||jfxOn(m,'intel')); }
+/* making goods */
+function jgMake(){ act([],me=>{ const j=jobOf(me), g=goodOfJob(j); if(!j) fail('Pick a job first.'); if(now()-(me.jgL||0)<JG_CD) fail('Your workshop is still busy.'); me.jgL=now(); if(me.jobP&&me.jobP.j===j) me.jobP={...me.jobP,m:(me.jobP.m||0)+1};
+    if(j==='farm'){ const ks=Object.keys(GDN_SEEDS).filter(k=>!GDN_SEEDS[k].farm); me.seeds=me.seeds||{}; const got={}; for(let i=0;i<JG_MAKE;i++){ const k=ks[Math.floor(Math.random()*ks.length)]; me.seeds[k]=(me.seeds[k]||0)+1; got[k]=(got[k]||0)+1; } return {t:'🌱 You made seed packets: '+Object.entries(got).map(([k,n])=>GDN_SEEDS[k].ic+'×'+n).join(' ')}; }
+    me.goods=me.goods||{}; const have=me.goods[g]||0; if(have>=JG_CAP) fail(`Your storeroom is full (${JG_CAP}). Sell some at the Job Market!`); const n=Math.min(JG_MAKE,JG_CAP-have); me.goods[g]=have+n; return {t:`${GOODS[g].ic} You made ${n} ${GOODS[g].n}s! Use them or sell them at the 🏪 Job Market.`}; },
+    r=>{ snd('build'); toast(r.t); jobDialog(); }); }
+function jgUse(k){ const G0=GOODS[k]; if(!G0) return; act([],me=>{ me.goods=me.goods||{}; if(!(me.goods[k]>0)) fail(`You have no ${G0.n}s.`); if(k==='map'){ if((me.tmapP||0)>=4) fail('You already have 4 map pieces. Go dig for treasure!'); me.tmapP=(me.tmapP||0)+1; }
+    else { me.jfx=Object.assign({},me.jfx); for(const q in me.jfx) if(me.jfx[q]<now()) delete me.jfx[q]; me.jfx[k]=Math.max(now(),me.jfx[k]||0)+G0.dur*3600000; } me.goods[k]--; if(!me.goods[k]) delete me.goods[k]; return {}; },
+    ()=>{ snd('quest'); toast(`${G0.ic} ${G0.n} used! ${G0.d}`); if($('fkOv')) jmDialog(); }); }
+function smithForge(){ act([],me=>{ if(me.job!=='smith') fail('Only Blacksmiths can do that.'); if(me.sfg===dayNum()) fail('Come back tomorrow.'); me.inv=me.inv||[]; if(me.inv.length>=INV_MAX) fail('Your bag is full.'); const ks=Object.keys(ITEMS).filter(k=>ITEMS[k].r<=1), k=ks[Math.floor(Math.random()*ks.length)]; me.inv.push({id:Math.random().toString(36).slice(2,9),k}); me.sfg=dayNum(); me.sfgN=(me.sfgN||0)+1; return {k}; },r=>{ snd('build'); toast(`🔨 You forged a ${ITEMS[r.k].name}! Find it in Gear.`); jobDialog(); }); }
+function spySab(uid){ const v=P(uid); if(!v||uid===ME) return; if(blkAny(uid)) return toast(blkMsg(uid),true); if(jfxOn(v,'guard')) return toast(`🛡️ ${cleanText(v.name)} has a Bodyguard. Sabotage would fail!`,true);
+  act([],me=>{ if(me.job!=='spy') fail('Only Spies can sabotage.'); if(now()-(me.sabL||0)<SAB_CD) fail('Lie low for a while. Sabotage is ready every 12 hours.'); me.sabL=now(); me.sabN=(me.sabN||0)+1; me.sab={to:uid,until:now()+3600000}; return {}; },()=>{ snd('alarm'); toast(`🗡️ You sabotaged ${cleanText(v.name)}! Their defense is 10% lower for 1 hour.`); try{ report(uid,'🗡️ A spy sabotaged your kingdom! Your defense is 10% lower for 1 hour. A 🛡️ Bodyguard Contract from a Warrior blocks this.','bad'); }catch(e){} }); }
+/* the Job Market */
+var JM_MAXL=6;
+function jmLists(){ return Object.values(G.market||{}).filter(L=>L&&L.kind==='jm'&&GOODS[L.k]&&(L.seller===ME||!blkAny(L.seller))).sort((a,b)=>(a.price/a.n)-(b.price/b.n)); }
+function jmDialog(){ const m=P(ME)||{}, j=jobOf(m), g=goodOfJob(j), L=jmLists(), mine=L.filter(x=>x.seller===ME), own=m.goods||{}, act0=Object.entries(m.jfx||{}).filter(([k,t])=>t>now()&&GOODS[k]);
+  const inv=Object.entries(own).filter(([k,n])=>n>0&&GOODS[k]);
+  v133Open('🏪 Job Market',`<p class="desc">Every job is the <b>only</b> maker of one special good. Buy what you need from other jobs, and sell what your job makes!</p>
+    ${act0.length?`<p class="desc">✨ Active: ${act0.map(([k,t])=>`${GOODS[k].ic} ${fmtT((t-now())/1000)}`).join(' · ')}</p>`:''}
+    <div class="label">🛒 For sale</div>${L.filter(x=>x.seller!==ME).length?`<div class="board">${L.filter(x=>x.seller!==ME).map(x=>`<div><span>${GOODS[x.k].ic} ${f(x.n)} ${esc(GOODS[x.k].n)}${x.n>1?'s':''}</span><span>by ${esc(cleanText(x.sname||'?'))}</span><span>${btn('Buy '+f(x.price)+' gold',null,'v134:jmb:'+x.id,'prime')}</span></div>`).join('')}</div>`:'<p class="desc">Nothing for sale right now.</p>'}
+    <div class="label">🎒 Your goods</div>${inv.length?`<div class="setList">${inv.map(([k,n])=>`<div class="setItem"><div><b>${GOODS[k].ic} ${esc(GOODS[k].n)} ×${n}</b><small>${esc(GOODS[k].d)}</small></div>${btn('Use',null,'v134:use:'+k,'soft')}</div>`).join('')}</div>`:'<p class="desc">You have no goods. Buy some above!</p>'}
+    ${g&&(own[g]||0)>0?`<div class="label">💰 Sell your ${GOODS[g].ic} ${esc(GOODS[g].n)}s</div><div class="row"><input id="jmN" type="number" min="1" max="${Math.min(30,own[g])}" placeholder="How many (you have ${own[g]})"><input id="jmP" type="number" min="1" placeholder="Price in gold"><button class="prime" data-act="v134:jms">List</button></div>`:''}
+    ${mine.length?`<div class="board">${mine.map(x=>`<div><span>${GOODS[x.k].ic} ${f(x.n)} for ${f(x.price)} gold</span><span>${btn('Take back',null,'v134:jmc:'+x.id,'soft')}</span></div>`).join('')}</div>`:''}
+    <div class="label">📚 Who makes what</div><div class="board">${Object.entries(GOODS).map(([k,G0])=>`<div><span>${G0.ic} ${esc(G0.n)}</span><span>${JOBS[G0.job].ic} ${JOBS[G0.job].n}s only</span></div>`).join('')}<div><span>🌱 Seed packets</span><span>🌾 Farmers only (🧺 Farmers Market)</span></div></div>
+    <div class="row">${btn('🧺 Farmers Market',null,'v133:fm','soft')}</div>`); }
+function jmSell(n,price){ const m=P(ME)||{}, g=goodOfJob(jobOf(m)); n=Math.floor(+n||0); price=Math.floor(+price||0); if(!g) return toast('Only makers can sell their goods.',true); if(n<1||n>30) return toast('Sell 1 to 30 at a time.',true); if(price<1||price>1e7) return toast('Pick a price.',true);
+  if(Object.values(G.market||{}).filter(L=>L&&L.kind==='jm'&&L.seller===ME).length>=JM_MAXL) return toast(`You can have ${JM_MAXL} listings at once.`,true);
+  const id='jm'+Math.random().toString(36).slice(2,10); mkTx(async(t,me)=>{ const gg=goodOfJob(jobOf(me)); if(gg!==g) fail('Only the job that makes it can sell it.'); me.goods=me.goods||{}; if((me.goods[g]||0)<n) fail('You do not have that many.'); me.goods[g]-=n; t.setMk(id,{seller:ME,sname:me.name,kind:'jm',k:g,n,price,cur:'gold',t:now()}); t.setPlayer(ME,me); },()=>{ snd('coin'); toast('🏪 Listed at the Job Market!'); setTimeout(jmDialog,400); }); }
+function jmBuy(id){ const L0=(G.market||{})[id]; if(L0&&blkAny(L0.seller)) return toast(blkMsg(L0.seller),true);
+  mkTx(async(t,me)=>{ const L=await t.getMk(id); if(!L||L.kind!=='jm'||!GOODS[L.k]) fail('Someone else bought it first.'); if(L.seller===ME) fail('That is your own listing.'); const sel2=await t.getPlayer(L.seller); settle(me); pay(me,{gold:L.price}); me.goods=me.goods||{}; me.goods[L.k]=(me.goods[L.k]||0)+L.n;
+    if(sel2){ settle(sel2); sel2.gold=(sel2.gold||0)+L.price; t.setPlayer(L.seller,sel2); } t.setMk(id,null); t.setPlayer(ME,me); return {k:L.k,n:L.n,s:L.seller}; },
+    r=>{ snd('coin'); toast(`${GOODS[r.k].ic} You bought ${r.n} ${GOODS[r.k].n}${r.n>1?'s':''}! Tap Use when you need it.`); try{ report(r.s,`🏪 ${P(ME).name} bought your ${GOODS[r.k].n}s!`,'good'); }catch(e){} setTimeout(jmDialog,400); }); }
+function jmCancel(id){ mkTx(async(t,me)=>{ const L=await t.getMk(id); if(!L||L.kind!=='jm'||L.seller!==ME) fail('That listing is gone.'); me.goods=me.goods||{}; me.goods[L.k]=(me.goods[L.k]||0)+L.n; t.setMk(id,null); t.setPlayer(ME,me); },()=>{ toast('Taken back.'); setTimeout(jmDialog,400); }); }
+buyListing=(o=>function(id){ const L=(G.market||{})[id]; if(L&&L.kind==='jm') return jmBuy(id); return o.apply(this,arguments); })(buyListing);
+cancelListing=(o=>function(id){ const L=(G.market||{})[id]; if(L&&L.kind==='jm') return jmCancel(id); return o.apply(this,arguments); })(cancelListing);
+mkView=(o=>function(){ const l=o.apply(this,arguments); return Array.isArray(l)?l.filter(L=>!L||L.kind!=='jm'):l; })(mkView);
+/* job page: workshop + job powers */
+jobDialog=(o=>function(){ o.apply(this,arguments); try{ const m=P(ME)||{}, j=jobOf(m), d=document.querySelector('#fkOv .dialog'); if(!j||!d||d.querySelector('.jgBox')) return; const g=goodOfJob(j), cd=Math.max(0,JG_CD-(now()-(m.jgL||0)));
+  const w=document.createElement('div'); w.className='jgBox'; let h=`<div class="label">🏭 Your workshop</div><p class="desc">${j==='farm'?'You are the only maker of 🌱 seed packets.':`You are the only maker of ${GOODS[g].ic} <b>${GOODS[g].n}s</b>: ${esc(GOODS[g].d)}`} You have: ${j==='farm'?seedTxt(m):((m.goods||{})[g]||0)}</p>
+    <div class="row"><button class="prime" data-act="v134:make" ${cd?'disabled':''}>🏭 Make ${JG_MAKE} ${j==='farm'?'seed packets':GOODS[g].n+'s'}${cd?' ('+fmtT(cd/1000)+')':''}</button>${btn('🏪 Job Market',null,'v134:jm','soft')}</div>`;
+  if(j==='smith') h+=`<div class="row"><button class="soft" data-act="v134:forge" ${m.sfg===dayNum()?'disabled':''}>🔨 Forge free gear${m.sfg===dayNum()?' (tomorrow)':''}</button></div>`;
+  if(j==='spy'){ const sc=Math.max(0,SAB_CD-(now()-(m.sabL||0))); h+=`<p class="desc">🗡️ Sabotage: open someone's profile and tap Sabotage. ${sc?'Ready in '+fmtT(sc/1000)+'.':'Ready now!'}</p>`; }
+  w.innerHTML=h; const p=d.querySelector('p.desc'); if(p) p.after(w); else d.appendChild(w); }catch(e){} })(jobDialog);
+/* profile: sabotage button for spies, and show active effects */
+profileDialog=(o=>function(uid){ const r=o.apply(this,arguments); try{ const m=P(ME)||{}, d=document.querySelector('#profOv .v132prof .row'); if(d&&uid!==ME&&m.job==='spy'&&!d.querySelector('.sabBtn')){ const b=document.createElement('button'); b.className='soft mini sabBtn'; b.dataset.act='v134:sab:'+uid; b.textContent='🗡️ Sabotage'; d.appendChild(b); } }catch(e){} return r; })(profileDialog);
+NEW133.push(['🏪','Job Market','v134:jm']);
+readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const m=P(ME); if(m&&jobOf(m)&&now()-(m.jgL||0)>=JG_CD) L.push({ic:'🏭',t:'Your workshop can make more goods',act:'v133:job'}); if(m&&m.job==='smith'&&m.sfg!==dayNum()) L.push({ic:'🔨',t:'Forge your free gear',act:'v133:job'}); }catch(e){} return L; })(readyList);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v134:')) return va(a,b); const r=a.split(':'), k=r[1];
+  if(k==='jm') jmDialog(); else if(k==='jmb') jmBuy(r[2]); else if(k==='jmc') jmCancel(r[2]); else if(k==='jms') jmSell(($('jmN')||{}).value,($('jmP')||{}).value);
+  else if(k==='use') jgUse(r[2]); else if(k==='make') jgMake(); else if(k==='forge') smithForge(); else if(k==='sab') spySab(r[2]); return true; }; })();
+
+/* ---------- 12 more jobs (20 in all), each the only maker of its own good ---------- */
+Object.assign(JOBS,{
+  fish:{n:'Fisher',ic:'🎣',d:'Your farms make 10% more food. Only Fishers make 🐟 Fish Feasts (farms make 20% more food for 3 hours).'},
+  miner:{n:'Miner',ic:'⛏️',d:'Your quarries and stone mines make 10% more stone. Only Miners make ⛏️ Pickaxes (20% more stone for 3 hours).'},
+  bank:{n:'Banker',ic:'🏦',d:'Your gold mines make 10% more gold. Only Bankers make 💵 Gold Stamps (20% more gold for 3 hours).'},
+  stable:{n:'Stablemaster',ic:'🐴',d:'Your armies march 15% faster. Only Stablemasters make 🐎 Horseshoes (armies march 25% faster for 2 hours).'},
+  wiz:{n:'Wizard',ic:'🧙',d:'+10% attack against barbarian camps. Only Wizards make 🔥 Fire Scrolls (+15% attack against camps for 3 hours).'},
+  baker:{n:'Baker',ic:'🍞',d:'Your troops cost 15% less food. Only Bakers make 🥧 Rations (troops cost 30% less food for 3 hours).'},
+  tamer:{n:'Pet Trainer',ic:'🐾',d:'Your guardian pet is 10% stronger. Only Pet Trainers make 🦴 Pet Treats (guardian pet 25% stronger for 3 hours).'},
+  artist:{n:'Artist',ic:'🎨',d:'All your buildings make 5% more. Only Artists make 🎭 Festival Posters (all buildings make 10% more for 2 hours).'},
+  hunter:{n:'Hunter',ic:'🏹',d:'+10% damage to the dragon and clan fortresses. Only Hunters make 🍖 Monster Bait (+25% damage to them for 3 hours).'},
+  priest:{n:'Priest',ic:'⛪',d:'+5% defense. Only Priests make 🕯️ Blessings (+10% defense and 10% fewer troop losses for 2 hours).'},
+  alch:{n:'Alchemist',ic:'⚗️',d:'Your garden grows 15% faster. Only Alchemists make 🧪 Growth Elixirs (garden grows twice as fast for 3 hours).'},
+  bard:{n:'Bard',ic:'🎵',d:'+5% attack. Only Bards make 🎶 Songs of Courage (you AND your whole clan get +5% attack for 2 hours).'}});
+Object.assign(GOODS,{
+  feast:{job:'fish',ic:'🐟',n:'Fish Feast',dur:3,d:'Farms make 20% more food for 3 hours.'},
+  pick:{job:'miner',ic:'⛏️',n:'Pickaxe',dur:3,d:'Quarries and stone mines make 20% more for 3 hours.'},
+  stamp:{job:'bank',ic:'💵',n:'Gold Stamp',dur:3,d:'Gold mines make 20% more for 3 hours.'},
+  shoe:{job:'stable',ic:'🐎',n:'Horseshoe',dur:2,d:'Your armies march 25% faster for 2 hours.'},
+  fire:{job:'wiz',ic:'🔥',n:'Fire Scroll',dur:3,d:'+15% attack against barbarian camps for 3 hours.'},
+  ration:{job:'baker',ic:'🥧',n:'Ration Pack',dur:3,d:'Training troops costs 30% less food for 3 hours.'},
+  treat:{job:'tamer',ic:'🦴',n:'Pet Treat',dur:3,d:'Your guardian pet is 25% stronger for 3 hours.'},
+  poster:{job:'artist',ic:'🎭',n:'Festival Poster',dur:2,d:'All your buildings make 10% more for 2 hours.'},
+  bait:{job:'hunter',ic:'🍖',n:'Monster Bait',dur:3,d:'+25% damage to the world dragon and clan fortresses for 3 hours.'},
+  bless:{job:'priest',ic:'🕯️',n:'Blessing',dur:2,d:'+10% defense and 10% fewer troop losses for 2 hours.'},
+  elixir:{job:'alch',ic:'🧪',n:'Growth Elixir',dur:3,d:'Your garden grows twice as fast for 3 hours.'},
+  song:{job:'bard',ic:'🎶',n:'Song of Courage',dur:2,d:'You and everyone in your clan get +5% attack for 2 hours.'}});
+GOODS.potion.n='Healing Potion'; GOODS.elixir.ic='🍶';
+function jobProd(o,res){ const p=P(o); if(!p) return 1; let k=1; const j=p.job;
+  if(res==='food'){ if(j==='fish') k*=1.1; if(jfxOn(p,'feast')) k*=1.2; } if(res==='stone'){ if(j==='miner') k*=1.1; if(jfxOn(p,'pick')) k*=1.2; } if(res==='gold'){ if(j==='bank') k*=1.1; if(jfxOn(p,'stamp')) k*=1.2; }
+  if(j==='artist') k*=1.05; if(jfxOn(p,'poster')) k*=1.1; return k; }
+function bakerMul(){ const m=P(ME); let k=1; if(m){ if(m.job==='baker') k*=.85; if(jfxOn(m,'ration')) k*=.7; } return k; }
+function gdnMul(){ const m=P(ME); let k=1; if(m){ if(m.job==='alch') k*=.85; if(jfxOn(m,'elixir')) k*=.5; } return k; }
+function bossMul(p){ let k=1; if(p){ if(p.job==='hunter') k*=1.1; if(jfxOn(p,'bait')) k*=1.25; } return k; }
+var songIdx={}, songT=0;
+function songOn(p){ if(!p) return false; if(jfxOn(p,'song')) return true; if(!p.clan) return false; if(Date.now()-songT>2000){ songT=Date.now(); songIdx={}; for(const q of Object.values(G.players||{})) if(q&&q.clan&&jfxOn(q,'song')) songIdx[q.clan]=1; } return !!songIdx[p.clan]; }
+atkOf=(o=>function(p,vsCamp){ let v=o.apply(this,arguments); try{ if(p){ if(vsCamp){ if(p.job==='wiz') v*=1.1; if(jfxOn(p,'fire')) v*=1.15; } if(p.job==='bard') v*=1.05; if(songOn(p)) v*=1.05; } }catch(e){} return v; })(atkOf);
+defOf=(o=>function(p){ let v=o.apply(this,arguments); try{ if(p){ if(p.job==='priest') v*=1.05; if(jfxOn(p,'bless')) v*=1.1; } }catch(e){} return v; })(defOf);
+loseUnits=(o=>function(p,L){ try{ if(p&&jfxOn(p,'bless')) L*=.9; }catch(e){} const a=[...arguments]; a[1]=L; return o.apply(this,a); })(loseUnits);
+petPower=(o=>function(p){ let v=o.apply(this,arguments); try{ if(p){ if(p.job==='tamer') v*=1.1; if(jfxOn(p,'treat')) v*=1.25; } }catch(e){} return v; })(petPower);
+mountSpd=(o=>function(){ let v=o.apply(this,arguments); try{ const m=P(ME); if(m){ if(m.job==='stable') v*=.85; if(jfxOn(m,'shoe')) v*=.75; } }catch(e){} return v; })(mountSpd);
+
+/* ---------- taps that go through: a different tap now waits its turn instead of being thrown away ---------- */
+var TXQ_KEYS=new Set(), TXQ_LAST=new Map(), txSpinT=0;
+function txSpin(on){ let el=$('txSpin'); if(on){ if(!el){ el=document.createElement('div'); el.id='txSpin'; el.textContent='⏳ Saving…'; document.body.appendChild(el); } el.classList.add('on'); } else if(el) el.classList.remove('on'); }
+function txQueue2(o){ return async function(){ const user=Date.now()-lastInput<1500; let key=''; try{ key=(o.name||'f')+'|'+[...arguments].map(a=>typeof a==='function'?String(a).slice(0,200):JSON.stringify(a)).join('|'); }catch(e){}
+  if(user&&key){ const lt=TXQ_LAST.get(key)||0; if(Date.now()-lt<400) return; TXQ_LAST.set(key,Date.now()); if(TXQ_LAST.size>50) TXQ_LAST.clear(); TXQ_KEYS.add(key); } let sp=0; if(user) sp=setTimeout(()=>txSpin(true),250);
+  try{ if(busy){ const t0=performance.now(); while(busy&&performance.now()-t0<(user?12000:4000)) await new Promise(r=>setTimeout(r,25)); if(busy){ if(user) toast('The game is busy. Try again in a moment.',true); return; } }
+    return await o.apply(this,arguments); } finally{ if(key) TXQ_KEYS.delete(key); clearTimeout(sp); if(!TXQ_KEYS.size) txSpin(false); } }; }
+
+/* ===== v135: job levels (each level unlocks a new monopoly good), resell any good, a Job Goods tab in the Shop sorted by job, and Orders as a Shop tab ===== */
+var JLV_MAX=4;
+/* level 2-4 goods for every job. fx: stats that last `dur` hours. i: instant items. */
+var JLV_GOODS={
+ war:[['wbanner','🚩','War Banner',2,{atk:.15}],['fortkit','🏰','Fortify Kit',3,{def:.25,guard:1}],['chorn','📯','Champion\'s Horn',3,{atk:.2,loss:.15}]],
+ mer:[['supply','📦','Supply Crate',0,null,{gold:5000,stone:3000}],['charter','🧾','Trade Charter',3,{gold:.25,stone:.25}],['ledger','📒','Golden Ledger',3,{prod:.2,loot:.2}]],
+ farm:[['basket','🧺','Harvest Basket',0,null,{food:6000}],['fert','🌻','Fertilizer',3,{food:.35}],['honey','🍯','Golden Honey',4,{food:.3,fcost:.2}]],
+ exp:[['compass','🧭','Compass',3,{march:.2}],['glass','🔭','Spyglass',2,{intel:1}],['akey','🗝️','Ancient Key',0,null,{crate:'iron',map:1}]],
+ smith:[['plating','🛡️','Iron Plating',3,{def:.15}],['hammer','🔨','Siege Hammer',3,{camp:.25}],['mblade','⚔️','Masterwork Blade',3,{atk:.2}]],
+ medic:[['herbs','🌿','Herb Bundle',4,{loss:.15}],['medkit','💉','Battle Medic Kit',2,{loss:.3}],['phoenix','🪶','Phoenix Feather',3,{loss:.35,def:.1}]],
+ bldr:[['bricks','🧱','Brick Pack',0,null,{stone:6000}],['crane','🏗️','Crane Rental',3,{build:.35}],['mplans','🏛️','Master Plans',4,{build:.3,def:.1}]],
+ spy:[['disguise','🎭','Disguise',4,{guard:1}],['splans','📜','Stolen Plans',2,{camp:.2,intel:1}],['nowl','🦉','Night Owl',3,{atk:.15,intel:1}]],
+ fish:[['crab','🦀','Crab Pot',0,null,{food:7000}],['gfish','🐠','Golden Fish',3,{gold:.2,food:.2}],['whale','🐋','Whale Feast',3,{food:.4,fcost:.15}]],
+ miner:[['cart','🪨','Stone Cart',0,null,{stone:7000}],['lantern','💡','Miner\'s Lantern',3,{stone:.35}],['crystal','💠','Crystal Vein',3,{stone:.3,gold:.2}]],
+ bank:[['pouch','💰','Gold Pouch',0,null,{gold:6000}],['bond','📈','Interest Bond',3,{gold:.35}],['vkey','🔑','Vault Key',3,{gold:.3,loot:.25}]],
+ stable:[['carrot','🥕','Carrot Bag',2,{march:.3}],['whorse','🏇','War Horse',3,{march:.25,atk:.1}],['ushoe','🦄','Unicorn Shoes',3,{march:.4}]],
+ wiz:[['bolt','⚡','Lightning Scroll',3,{camp:.25}],['charm','🔮','Shield Charm',3,{def:.2}],['star','🌟','Star Spell',3,{atk:.15,camp:.15}]],
+ baker:[['cookie','🍪','Cookie Box',2,{fcost:.4}],['cake','🎂','Feast Cake',3,{food:.25,fcost:.2}],['pastry','🥐','Royal Pastry',0,null,{food:8000,sol:30}]],
+ tamer:[['ball','🎾','Play Ball',3,{pet:.35}],['whistle','🦮','Training Whistle',3,{pet:.3,def:.1}],['dsnack','🐉','Dragon Snack',3,{pet:.5}]],
+ artist:[['paint','🖌️','Paint Kit',3,{prod:.15}],['concert','🎻','Concert Ticket',2,{prod:.2}],['master','🏺','Masterpiece',4,{prod:.15,gold:.15,stone:.15}]],
+ hunter:[['trap','🪤','Bear Trap',2,{boss:.35}],['arrows','🏹','Silver Arrows',3,{boss:.3,camp:.15}],['antlers','🦌','Trophy Antlers',3,{boss:.4,atk:.1}]],
+ priest:[['beads','📿','Prayer Beads',3,{def:.15}],['hwater','💧','Holy Water',3,{loss:.2,def:.1,guard:1}],['grace','😇','Angel\'s Grace',3,{def:.25,loss:.15}]],
+ alch:[['powder','🧫','Grow Powder',3,{garden:.4}],['gpotion','🫧','Gold Potion',0,null,{gold:5500}],['stone2','⚗️','Philosopher\'s Stone',4,{gold:.2,stone:.2,food:.2}]],
+ bard:[['drums','🥁','War Drums',2,{clan:.08}],['fanfare','🎺','Victory Fanfare',3,{clan:.06,atk:.1}],['ballad','🎤','Legendary Ballad',3,{clan:.12}]]};
+var FX_TXT={atk:'attack',def:'defense',camp:'attack vs camps',loss:'fewer troop losses',build:'faster upgrades',food:'food',gold:'gold',stone:'stone',prod:'from all buildings',march:'faster marches',fcost:'less food for troops',pet:'guardian pet power',boss:'damage to the dragon and fortresses',garden:'faster garden',loot:'camp loot',clan:'attack for your whole clan'};
+function fxDesc(fx,dur,inst){ if(inst){ const L=[]; for(const k of ['gold','stone','food']) if(inst[k]) L.push('+'+f(sc133(inst[k]))+' '+k); if(inst.sol) L.push('+'+inst.sol+'×TH soldiers'); if(inst.crate) L.push('an '+(CRATES[inst.crate]?CRATES[inst.crate].name:'crate')); if(inst.map) L.push('a treasure map piece'); return 'Use it to get '+L.join(', ')+' right away.'; }
+  const L=[]; for(const [k,v] of Object.entries(fx||{})){ if(k==='guard') L.push('blocks Spy sabotage'); else if(k==='intel') L.push('see every army'); else L.push('+'+Math.round(v*100)+'% '+FX_TXT[k]); } return L.join(', ')+` for ${dur} hours.`; }
+for(const [j,L] of Object.entries(JLV_GOODS)) L.forEach(([k,ic,n,dur,fx,inst],i)=>{ GOODS[k]={job:j,lv:i+2,ic,n,dur,fx:fx||null,i:inst||null,d:fxDesc(fx,dur,inst)}; });
+for(const k in GOODS) if(!GOODS[k].lv) GOODS[k].lv=1;
+/* ---- generic effects ---- */
+function fxSum(p,st){ let s=0; const J=p&&p.jfx; if(!J) return 0; const t=Date.now(); for(const k in J){ if(J[k]>t){ const G0=GOODS[k]; if(G0&&G0.fx&&G0.fx[st]) s+=G0.fx[st]; } } return s; }
+var clanFxI={}, clanFxT=0;
+function clanFx(p){ if(!p||!p.clan) return fxSum(p,'clan'); if(Date.now()-clanFxT>2000){ clanFxT=Date.now(); clanFxI={}; for(const q of Object.values(G.players||{})){ if(q&&q.clan){ const v=fxSum(q,'clan'); if(v) clanFxI[q.clan]=Math.max(clanFxI[q.clan]||0,v); } } } return clanFxI[p.clan]||0; }
+atkOf=(o=>function(p,vsCamp){ let v=o.apply(this,arguments); try{ if(p){ v*=1+fxSum(p,'atk')+clanFx(p); if(vsCamp) v*=1+fxSum(p,'camp'); } }catch(e){} return v; })(atkOf);
+defOf=(o=>function(p){ let v=o.apply(this,arguments); try{ if(p) v*=1+fxSum(p,'def'); }catch(e){} return v; })(defOf);
+loseUnits=(o=>function(p,L){ try{ if(p){ const r=Math.min(.6,fxSum(p,'loss')); if(r) L*=1-r; } }catch(e){} const a=[...arguments]; a[1]=L; return o.apply(this,a); })(loseUnits);
+petPower=(o=>function(p){ let v=o.apply(this,arguments); try{ if(p) v*=1+fxSum(p,'pet'); }catch(e){} return v; })(petPower);
+mountSpd=(o=>function(){ let v=o.apply(this,arguments); try{ v*=1-Math.min(.6,fxSum(P(ME),'march')); }catch(e){} return v; })(mountSpd);
+jobProd=(o=>function(ow,res){ let v=o.apply(this,arguments); try{ const p=P(ow); if(p) v*=(1+fxSum(p,res))*(1+fxSum(p,'prod')); }catch(e){} return v; })(jobProd);
+bakerMul=(o=>function(){ return o.apply(this,arguments)*(1-Math.min(.6,fxSum(P(ME),'fcost'))); })(bakerMul);
+gdnMul=(o=>function(){ return o.apply(this,arguments)*(1-Math.min(.7,fxSum(P(ME),'garden'))); })(gdnMul);
+bossMul=(o=>function(p){ return o.apply(this,arguments)*(1+fxSum(p,'boss')); })(bossMul);
+jbBuildMul=(o=>function(){ return o.apply(this,arguments)*(1-Math.min(.6,fxSum(P(ME),'build'))); })(jbBuildMul);
+spySees=(o=>function(){ return o.apply(this,arguments)||fxSum(P(ME),'intel')>0; })(spySees);
+sabOn=(o=>function(p){ if(p&&fxSum(p,'guard')>0) return false; return o.apply(this,arguments); })(sabOn);
+spySab=(o=>function(uid){ const v=P(uid); if(v&&fxSum(v,'guard')>0) return toast(`🛡️ ${cleanText(v.name)} is protected. Sabotage would fail!`,true); return o.apply(this,arguments); })(spySab);
+/* using a level 2-4 good */
+jgUse=(o=>function(k){ const G0=GOODS[k]; if(!G0||(!G0.fx&&!G0.i)) return o.apply(this,arguments);
+  act([],me=>{ me.goods=me.goods||{}; if(!(me.goods[k]>0)) fail(`You have no ${G0.n}s.`);
+    if(G0.i){ const I=G0.i; if(I.gold) me.gold+=sc133(I.gold); if(I.stone) me.stone+=sc133(I.stone); if(I.food) me.food=(me.food||0)+sc133(I.food); if(I.sol) me.sol=(me.sol||0)+I.sol*HLX(); if(I.crate){ me.stash=me.stash||{}; me.stash[I.crate]=(me.stash[I.crate]||0)+1; } if(I.map&&(me.tmapP||0)<4) me.tmapP=(me.tmapP||0)+1; }
+    else { me.jfx=Object.assign({},me.jfx); for(const q in me.jfx) if(me.jfx[q]<now()) delete me.jfx[q]; me.jfx[k]=Math.max(now(),me.jfx[k]||0)+G0.dur*3600000; }
+    me.goods[k]--; if(!me.goods[k]) delete me.goods[k]; me.jgU=(me.jgU||0)+1; return {}; },()=>{ snd('quest'); toast(`${G0.ic} ${G0.n}: ${G0.d}`); jmRefresh(); }); })(jgUse);
+function jmRefresh(){ if($('shopOv')) shopDialog('jobs'); else if($('fkOv')) jmDialog(); }
+
+/* ---- job levels ---- */
+var JLV_REQ={war:['battles won',m=>Object.assign(defaultStats(),m.stats).won,[5,15,35]],mer:['trade routes finished',m=>m.trdN||0,[2,5,10]],farm:['garden harvests',m=>m.gdnN||0,[5,15,35]],exp:['secrets explored',m=>m.secN||0,[3,8,18]],
+  smith:['days of free gear forged',m=>m.sfgN||0,[2,4,8]],medic:['battles fought',m=>{ const s=Object.assign(defaultStats(),m.stats); return s.won+s.lost; },[5,15,35]],bldr:['buildings upgraded',m=>Object.assign(defaultStats(),m.stats).built,[5,15,35]],spy:['sabotages',m=>m.sabN||0,[1,3,7]],
+  fish:['fish caught',m=>Object.assign(defaultStats(),m.stats).fish,[5,15,35]],miner:['times collecting buildings',m=>Object.assign(defaultStats(),m.stats).collected,[10,30,70]],bank:['times collecting buildings',m=>Object.assign(defaultStats(),m.stats).collected,[10,30,70]],
+  stable:['barbarian camps raided',m=>Object.assign(defaultStats(),m.stats).raids,[5,15,35]],wiz:['barbarian camps raided',m=>Object.assign(defaultStats(),m.stats).raids,[5,15,35]],baker:['troops trained',m=>{ const s=Object.assign(defaultStats(),m.stats); return ALLU.reduce((a,u)=>a+(s[u]||0),0); },[100,400,1200]],
+  tamer:['total pet levels (all your pets)',m=>(m.pets||[]).reduce((a,p)=>a+(p.lvl||1),0),[8,20,40],1],artist:['daily rewards claimed',m=>Object.assign(defaultStats(),m.stats).dailies,[2,5,9]],hunter:['bosses beaten',m=>Object.assign(defaultStats(),m.stats).bosses+(m.bossKills||0),[2,5,10]],
+  priest:['daily quests done',m=>Object.assign(defaultStats(),m.stats).dq,[3,8,18]],alch:['garden harvests',m=>m.gdnN||0,[5,15,35]],bard:['troops donated to clanmates',m=>Object.assign(defaultStats(),m.stats).donated,[10,40,120]]};
+var JLV_MAKE=[2,5,10];
+function jobBase(m,j){ const R=JLV_REQ[j]; return R&&!R[3]?R[1](m):0; }
+function jobLvOf(m){ const j=jobOf(m); return j?Math.max(1,((m.jobLv||{})[j])||1):0; }
+function jobProg(m){ const j=jobOf(m), R=JLV_REQ[j], P2=m.jobP&&m.jobP.j===j?m.jobP:null; if(!R) return null; const lv=jobLvOf(m); if(lv>=JLV_MAX) return {lv,max:1};
+  const need=R[2][lv-1], mk=JLV_MAKE[lv-1], have=P2?Math.max(0,R[1](m)-(P2.b||0)):0, made=P2?(P2.m||0):0; return {lv,need,mk,have,made,lab:R[0],ok:have>=need&&made>=mk}; }
+function jobLvUp(){ act([],me=>{ const j=jobOf(me); if(!j) fail('Pick a job first.'); const pr=jobProg(me); if(!pr||pr.max) fail('Your job is already max level!'); if(!pr.ok) fail('Finish the tasks first.'); me.jobLv=Object.assign({},me.jobLv,{[j]:pr.lv+1}); me.jobP={j,b:jobBase(me,j),m:0}; return {lv:pr.lv+1,j}; },
+  r=>{ snd('quest'); confetti(); const g=Object.values(GOODS).find(x=>x.job===r.j&&x.lv===r.lv); toast(`⭐ ${JOBS[r.j].n} level ${r.lv}! You can now make ${g?g.ic+' '+g.n+'s':'something new'}!`); jobDialog(); }); }
+setInterval(()=>{ try{ const m=P(ME); if(!m||m.dead||busy) return; const j=jobOf(m); if(j&&!(m.jobP&&m.jobP.j===j)) act([],me=>{ const jj=jobOf(me); if(jj&&!(me.jobP&&me.jobP.j===jj)) me.jobP={j:jj,b:jobBase(me,jj),m:0}; return {}; }); }catch(e){} },8000);
+/* making a chosen good: bigger batches at higher levels */
+function jgMake2(k){ const G0=GOODS[k]; if(!G0) return; act([],me=>{ const j=jobOf(me); if(!j||G0.job!==j) fail('Only that job can make it.'); if(G0.lv>jobLvOf(me)) fail(`Reach ${JOBS[j].n} level ${G0.lv} first.`); if(now()-(me.jgL||0)<JG_CD) fail('Your workshop is still busy.'); me.jgL=now();
+    if(me.jobP&&me.jobP.j===j) me.jobP={...me.jobP,m:(me.jobP.m||0)+1}; me.goods=me.goods||{}; const have=me.goods[k]||0; if(have>=JG_CAP) fail(`Your storeroom is full (${JG_CAP}).`); const n=Math.min(JG_MAKE+jobLvOf(me)-1,JG_CAP-have); me.goods[k]=have+n; return {n}; },
+    r=>{ snd('build'); toast(`${G0.ic} You made ${r.n} ${G0.n}s! Use them or sell them in 🛍️ Shop → 🏪 Job goods.`); jobDialog(); }); }
+jobDialog=(o=>function(){ o.apply(this,arguments); try{ const m=P(ME)||{}, j=jobOf(m), box=document.querySelector('#fkOv .jgBox'); if(!j||!box) return; const lv=jobLvOf(m), pr=jobProg(m), cd=Math.max(0,JG_CD-(now()-(m.jgL||0)));
+  const mine=Object.entries(GOODS).filter(([k,G0])=>G0.job===j).sort((a,b)=>a[1].lv-b[1].lv);
+  let h=`<div class="label">⭐ ${JOBS[j].n} level ${lv}/${JLV_MAX}</div>`;
+  if(pr&&!pr.max) h+=`<p class="desc">To reach level ${lv+1}:</p><div class="jlvTask"><span>🏭 Make goods ${Math.min(pr.made,pr.mk)}/${pr.mk} times</span><div class="lvBar"><i style="width:${Math.min(100,pr.made/pr.mk*100)}%"></i></div></div><div class="jlvTask"><span>🎯 ${esc(pr.lab)}: ${f(Math.min(pr.have,pr.need))}/${f(pr.need)}</span><div class="lvBar"><i style="width:${Math.min(100,pr.have/pr.need*100)}%"></i></div></div>${pr.ok?'<div class="row"><button class="gemb" data-act="v135:lvup">⭐ Level up!</button></div>':''}`;
+  else h+='<p class="desc">🏆 Max level! You can make every good of your job.</p>';
+  h+=`<div class="label">🏭 Your workshop${cd?' (ready in '+fmtT(cd/1000)+')':''}</div><div class="setList">${j==='farm'?`<div class="setItem"><div><b>🌱 Seed packets</b><small>Free planting for anyone. You have: ${seedTxt(m)}</small></div><button class="prime" data-act="v134:make" ${cd?'disabled':''}>Make</button></div>`:''}${mine.map(([k,G0])=>{ const ok=G0.lv<=lv; return `<div class="setItem${ok?'':' lock'}"><div><b>${G0.ic} ${esc(G0.n)} <small>(Lv ${G0.lv})</small></b><small>${esc(G0.d)} You have: ${(m.goods||{})[k]||0}</small></div>${ok?`<button class="prime" data-act="v135:make:${k}" ${cd?'disabled':''}>Make ${JG_MAKE+lv-1}</button>`:'<button class="soft" disabled>🔒 Lv '+G0.lv+'</button>'}</div>`; }).join('')}</div>
+    <div class="row">${btn('🏪 Job goods shop',null,'v134:jm','soft')}</div>`;
+  if(j==='smith') h+=`<div class="row"><button class="soft" data-act="v134:forge" ${m.sfg===dayNum()?'disabled':''}>🔨 Forge free gear${m.sfg===dayNum()?' (tomorrow)':''}</button></div>`;
+  if(j==='spy'){ const sc=Math.max(0,SAB_CD-(now()-(m.sabL||0))); h+=`<p class="desc">🗡️ Sabotage: open someone's profile and tap Sabotage. ${sc?'Ready in '+fmtT(sc/1000)+'.':'Ready now!'}</p>`; }
+  box.innerHTML=h; }catch(e){} })(jobDialog);
+
+/* ---- Shop: 🏪 Job goods tab (sorted by job) and 📦 Orders tab ---- */
+var jgFilt='all', shopBodyTabs=['jobs','orders'];
+function jgShopHtml(){ const m=P(ME)||{}, own=m.goods||{}, L=jmLists(), fit=k=>jgFilt==='all'||(GOODS[k]&&GOODS[k].job===jgFilt), act0=Object.entries(m.jfx||{}).filter(([k,t])=>t>now()&&GOODS[k]);
+  const chips=`<div class="jgChips">${[['all','🌍 All']].concat(Object.entries(JOBS).map(([k,J])=>[k,J.ic+' '+J.n])).map(([k,t])=>`<button class="${jgFilt===k?'prime':'soft'} mini" data-act="v135:filt:${k}">${t}</button>`).join('')}</div>`;
+  const inv=Object.entries(own).filter(([k,n])=>n>0&&GOODS[k]&&fit(k)).sort((a,b)=>GOODS[a[0]].job.localeCompare(GOODS[b[0]].job)||GOODS[a[0]].lv-GOODS[b[0]].lv);
+  const sale=L.filter(x=>x.seller!==ME&&fit(x.k)), mine=L.filter(x=>x.seller===ME&&fit(x.k));
+  const cat=Object.entries(GOODS).filter(([k])=>fit(k)).sort((a,b)=>a[1].job.localeCompare(b[1].job)||a[1].lv-b[1].lv);
+  return `<p class="desc">Every job is the <b>only</b> maker of its goods. Buy them here, use them, or sell the ones you own. Tap a job to sort!</p>${chips}
+    ${act0.length?`<p class="desc">✨ Active now: ${act0.map(([k,t])=>`${GOODS[k].ic} ${fmtT((t-now())/1000)}`).join(' · ')}</p>`:''}
+    <div class="label">🎒 Your goods</div>${inv.length?`<div class="setList">${inv.map(([k,n])=>`<div class="setItem"><div><b>${GOODS[k].ic} ${esc(GOODS[k].n)} ×${n}</b><small>${JOBS[GOODS[k].job].ic} ${esc(GOODS[k].d)}</small></div><div class="row" style="flex-wrap:nowrap">${btn('Use',null,'v134:use:'+k,'prime')}${btn('Sell',null,'v135:sellpick:'+k,'soft')}</div></div>`).join('')}</div>`:'<p class="desc">No goods here yet.</p>'}
+    ${jmSellK&&own[jmSellK]>0?`<div class="label">💰 Sell ${GOODS[jmSellK].ic} ${esc(GOODS[jmSellK].n)}s</div><div class="row"><input id="jmN" type="number" min="1" max="${Math.min(30,own[jmSellK])}" placeholder="How many (you have ${own[jmSellK]})"><input id="jmP" type="number" min="1" placeholder="Price in gold"><button class="prime" data-act="v135:sell">List</button></div>`:''}
+    <div class="label">🛒 For sale</div>${sale.length?`<div class="board">${sale.map(x=>`<div><span>${GOODS[x.k].ic} ${f(x.n)} ${esc(GOODS[x.k].n)}</span><span>by ${esc(cleanText(x.sname||'?'))}</span><span>${btn('Buy '+f(x.price)+' gold',null,'v134:jmb:'+x.id,'prime')}</span></div>`).join('')}</div>`:'<p class="desc">Nothing for sale here right now.</p>'}
+    ${mine.length?`<div class="label">🏷️ Your listings</div><div class="board">${mine.map(x=>`<div><span>${GOODS[x.k].ic} ${f(x.n)} for ${f(x.price)} gold</span><span>${btn('Take back',null,'v134:jmc:'+x.id,'soft')}</span></div>`).join('')}</div>`:''}
+    <div class="label">📚 Every good${jgFilt==='all'?'':' of the '+JOBS[jgFilt].n}</div><div class="setList">${cat.map(([k,G0])=>`<div class="setItem"><div><b>${G0.ic} ${esc(G0.n)}</b><small>${JOBS[G0.job].ic} ${JOBS[G0.job].n} level ${G0.lv} · ${esc(G0.d)}</small></div></div>`).join('')}</div>
+    <div class="row">${btn('🧺 Farmers Market (seeds)',null,'v133:fm','soft')}</div>`; }
+var jmSellK=null;
+function jmSell2(k,n,price){ n=Math.floor(+n||0); price=Math.floor(+price||0); if(!GOODS[k]) return; if(n<1||n>30) return toast('Sell 1 to 30 at a time.',true); if(price<1||price>1e7) return toast('Pick a price.',true);
+  if(Object.values(G.market||{}).filter(L=>L&&L.kind==='jm'&&L.seller===ME).length>=JM_MAXL) return toast(`You can have ${JM_MAXL} listings at once.`,true);
+  const id='jm'+Math.random().toString(36).slice(2,10); mkTx(async(t,me)=>{ me.goods=me.goods||{}; if((me.goods[k]||0)<n) fail('You do not have that many.'); me.goods[k]-=n; if(!me.goods[k]) delete me.goods[k]; t.setMk(id,{seller:ME,sname:me.name,kind:'jm',k,n,price,cur:'gold',t:now()}); t.setPlayer(ME,me); },()=>{ snd('coin'); toast('🏪 Listed for sale!'); jmSellK=null; setTimeout(jmRefresh,400); }); }
+shopDialog=(o=>function(tab){ const r=o.apply(this,arguments); try{ const d=document.querySelector('#shopOv .dialog'); if(!d) return r; const tabs=d.querySelector('.tabs');
+  if(tabs&&!tabs.querySelector('[data-act="tab:jobs"]')){ tabs.insertAdjacentHTML('beforeend',`<button class="${shopTab==='jobs'?'prime':'soft'}" data-act="tab:jobs">🏪 Job goods</button><button class="${shopTab==='orders'?'prime':'soft'}" data-act="tab:orders">📦 Orders</button>`); }
+  if(shopBodyTabs.includes(shopTab)){ [...d.children].forEach(c=>{ if(c.tagName!=='H2'&&!c.classList.contains('tabs')&&c.dataset.act!=='shop:close') c.remove(); }); const w=document.createElement('div'); w.className='shopBody'; w.innerHTML=shopTab==='jobs'?jgShopHtml():ordHtml(); const cl=d.querySelector('[data-act="shop:close"]'); d.insertBefore(w,cl); refreshButtons(); } }catch(e){} return r; })(shopDialog);
+jmDialog=(o=>function(){ if(typeof featOK==='function'&&!featOK('shop')) return o.apply(this,arguments); shopDialog('jobs'); })(jmDialog);
+ordDialog=(o=>function(){ if($('shopOv')) return shopDialog('orders'); if(typeof featOK==='function'&&!featOK('shop')) return o.apply(this,arguments); shopDialog('orders'); })(ordDialog);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v135:')) return va(a,b); const r=a.split(':'), k=r[1];
+  if(k==='lvup') jobLvUp(); else if(k==='make') jgMake2(r[2]); else if(k==='filt'){ jgFilt=r[2]; shopDialog('jobs'); } else if(k==='sellpick'){ jmSellK=r[2]; shopDialog('jobs'); setTimeout(()=>{ const i=$('jmN'); if(i) i.focus(); },50); } else if(k==='sell') jmSell2(jmSellK,($('jmN')||{}).value,($('jmP')||{}).value);
+  return true; }; })();
 
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
@@ -10294,6 +10537,8 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  135:['⭐ Job levels! Finish job tasks to level up (up to level 4). Each new level unlocks a brand new good that only your job can make (60 new goods!)','💰 You can now resell any goods you own','🛍️ The Shop has two new tabs: 🏪 Job goods (sorted by job) and 📦 Orders'],
+  134:['🧑‍🌾 20 jobs now! New: Blacksmith, Healer, Builder, Spy, Fisher, Miner, Banker, Stablemaster, Wizard, Baker, Pet Trainer, Artist, Hunter, Priest, Alchemist and Bard','🏭 Each job is the ONLY maker of one special good, so jobs need each other. Bards boost their whole clan, Spies sabotage, and Warrior bodyguards block it','🏪 New Job Market to buy and sell goods','⚡ Taps no longer get lost: if you tap something while the game is saving, it waits its turn and then goes through'],
   133:['📜 Kingdom decisions: messengers bring choices, and some choices come back days later!','🧑‍🌾 Jobs at Town Hall 5: Warrior, Merchant, Farmer or Explorer, each with its own powers. Farmers can sell seeds at the new 🧺 Farmers Market','🌍 World events for everyone: dragons, plagues and gold rushes','✨ Hidden secrets near your kingdom, 🏰 clan fortress raids, ⚡ bonus taps and 🎯 aiming','⏩ Early upgrades are much faster. Find it all in 🎮 Play → 🔥 Newest','💰 Camp bounties: put gold on a barbarian camp, and whoever beats it gets the gold!','🗳️ Polls work now: new polls show up for everyone, votes update live, and there is a new question every week'],
   132:['⚔️ Clan Wars have their own screen now, and winners also get a Royal Crate','⭐ Player levels with rewards (the weekly Tournament is now in the Play menu too)','🌦️ Weather now matters (rain and snow slow armies) with a forecast','👍 React to messages, ⚠️ report a mean message, 🔇 mute someone for a day','🎨 Building skins, 👗 hero outfits, 🏠 bigger pet house with decorations, and museums show more','🧠 Daily trivia, 📌 map notes, 📺 watch your clanmates\' battles. Find it all in 🎮 Play → 🆕 New'],
   131:['🚫 Blocking now works everywhere: blocked players cannot message you, gift, trade, send caravans, stamps or pet visits, and you can block right from a private chat','🚫 New Blocked players list in Settings to see and unblock people'],
@@ -10464,7 +10709,7 @@ function levelFlair(p,cx,cy,col){ const L=p.lvl||0, u=TW; if(!L||cam.z<.45) retu
 
 /* ===== food and farms ===== */
 const FOOD_PER_SP=3, START_FOOD=300;
-const foodCost=(u,n)=>Math.ceil(UNITS[u].sp*FOOD_PER_SP*n*(typeof wxFood==='function'?wxFood():1));
+const foodCost=(u,n)=>Math.ceil(UNITS[u].sp*FOOD_PER_SP*n*(typeof wxFood==='function'?wxFood():1)*(typeof bakerMul==='function'?bakerMul():1));
 
 /* ===== pet powers in battle ===== */
 const PET_REST=20*60000;
