@@ -532,7 +532,7 @@ body.nightUI input,body.nightUI select{background:#1e1828;color:#ece6f5;border-c
 .dlmX{font-size:1.02rem}.crGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.crPart{background:#fff6dc;border:2px solid #c9a24a;border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:4px}.crPart.down{opacity:.6}.crPart small{font-size:.72rem}
 @media (max-width:420px){.crGrid{grid-template-columns:1fr}}
 #txSpin{position:fixed;top:8px;left:50%;transform:translateX(-50%) translateY(-60px);z-index:90;background:#2b1a0c;color:#fff6dc;border-radius:12px;padding:4px 12px;font-weight:800;font-size:.85rem;transition:transform .15s;pointer-events:none}#txSpin.on{transform:translateX(-50%) translateY(0)}
-button:active{transform:scale(.96)}.jgChips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}.jgChips button{padding:3px 8px;font-size:.78rem}.jlvTask{margin:4px 0}.jlvTask span{display:block;font-size:.85rem;font-weight:700}.setItem.lock{opacity:.6}.shopBody{margin-top:6px}.jgSearch{width:100%;margin:4px 0 6px}.jgRow{background:#fff6dc;border:2px solid #e2c48a;border-radius:10px;padding:6px 8px;margin:5px 0}.jgTop{display:flex;align-items:center;gap:6px}.jgName{flex:1;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis}.jgBy{font-size:.75rem;color:var(--muted);white-space:nowrap}.jgQ{border:0!important;box-shadow:none!important;background:transparent!important;min-height:0!important;transform:none!important;color:#8a5a2b;font-size:.78rem;font-weight:800;padding:2px 0;cursor:pointer;text-decoration:underline}.jgWhat{font-size:.82rem;background:#fff;border-radius:8px;padding:5px 7px;margin-top:3px}.fairBan{background:linear-gradient(90deg,#ffd13b,#ff8ad8);border-radius:10px;padding:6px 8px;font-weight:800;color:#3b2412}.jmLinks{flex-wrap:wrap}</style>
+button:active{transform:scale(.96)}.jgChips{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}.jgChips button{padding:3px 8px;font-size:.78rem}.jlvTask{margin:4px 0}.jlvTask span{display:block;font-size:.85rem;font-weight:700}.setItem.lock{opacity:.6}.shopBody{margin-top:6px}.jgSearch{width:100%;margin:4px 0 6px}.jgRow{background:#fff6dc;border:2px solid #e2c48a;border-radius:10px;padding:6px 8px;margin:5px 0}.jgTop{display:flex;align-items:center;gap:6px}.jgName{flex:1;font-weight:800;min-width:0;overflow:hidden;text-overflow:ellipsis}.jgBy{font-size:.75rem;color:var(--muted);white-space:nowrap}.jgQ{border:0!important;box-shadow:none!important;background:transparent!important;min-height:0!important;transform:none!important;color:#8a5a2b;font-size:.78rem;font-weight:800;padding:2px 0;cursor:pointer;text-decoration:underline}.jgWhat{font-size:.82rem;background:#fff;border-radius:8px;padding:5px 7px;margin-top:3px}.fairBan{background:linear-gradient(90deg,#ffd13b,#ff8ad8);border-radius:10px;padding:6px 8px;font-weight:800;color:#3b2412}.jmLinks{flex-wrap:wrap}.privSec ul{margin:4px 0 4px 18px;padding:0}.privSec li{margin:3px 0}.privLink{text-align:center;margin-top:8px}.privLink a{color:#8a5a2b;font-weight:800}#privOv .dialog{max-height:88vh;overflow:auto}</style>
 </head>
 <body>
 <div class="wrap">
@@ -648,7 +648,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 137;
+const GAME_VERSION = 140;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -10491,6 +10491,42 @@ readyList=(f0=>function(){ const L=f0.apply(this,arguments); try{ const m=P(ME);
   else if(k==='jqs') jqStart(); else if(k==='jqc') jqClaim(); else if(k==='rr'){ if(r[2]!=null) rrGive(r[2]); else rrDialog(); } else if(k==='guild') guildDialog(); else if(k==='gchat') guildChat(); else if(k==='ts') tsDialog(); else if(k==='tsclaim') tsClaim();
   return true; }; })();
 
+/* ===== v138: a visible privacy policy (login screen, new kingdom screen, Settings, More menu, and the #privacy link) ===== */
+var PRIV_DATE='November 21, 2026 (updated for ads)';
+var PRIV_SECTIONS=[
+ ['👑 Who runs Crownforge','Crownforge is a free fan-made game run by its owner, not by a company. If you have a question about privacy or want your data removed, use the 🐞 Bug button in the game and the owner will read it.'],
+ ['📝 What we collect',`<ul><li><b>Your username and password.</b> We do not ask for your real name, email, phone number or address. Your password is checked by Google Firebase, and the owner can never see it.</li>
+   <li><b>Your game:</b> your kingdom, land, buildings, troops, pets, items, clan, friends, trophies and other progress.</li>
+   <li><b>Things you type:</b> your kingdom name, clan chat, private messages, notes on gifts and orders, map notes, poll votes, and bug reports.</li>
+   <li><b>Bug reports</b> also include the game version, your screen size, whether you are on a phone or computer, and your browser name, so problems can be fixed.</li>
+   <li><b>Player reports:</b> if someone reports you, a few of your recent chat messages are sent with the report.</li>
+   <li><b>Feature counts:</b> the game counts which features get used (like "Dungeon: 3 times") so the owner knows what players like. These counts are saved with your game.</li>
+   <li><b>On your device:</b> your settings (like sound, language and graphics) are saved in your browser so they stay the same next time.</li></ul>`],
+ ['👀 Who can see it',`<ul><li><b>Other players</b> can see your kingdom name, your kingdom on the map, your profile, your clan chat messages and things you list for sale.</li>
+   <li><b>Private messages and group chats</b> only show up for the people in that chat. But they are not secret like a diary: they are stored in the game's data, and the owner can see them if there is a problem. Never share private information in messages.</li>
+   <li><b>The owner</b> can see game data, reports and bug reports to keep the game fair and safe.</li></ul>`],
+ ['🔧 Other services the game uses',`<ul><li><b>Google Firebase</b> stores accounts and game data.</li><li><b>Google Fonts</b> and Google's code servers send the game its lettering and code. Like any website, they can see your internet address (IP address).</li>
+   <li><b>Google Translate</b> is only loaded if you turn on translation in Settings.</li><li><b>Google AdSense</b> may show ads in the game (see Ads below).</li><li>Game pictures are loaded from the game's own GitHub page.</li></ul>`],
+ ['📢 Ads',`<ul><li>Crownforge may show ads from <b>Google AdSense</b> to help pay for the game. Ads are made by other companies, not by the game.</li>
+   <li>Google and its partners may use <b>cookies</b> (small files in your browser) to show ads, including ads based on your visits to this and other websites.</li>
+   <li>You can turn off personalized ads at <a href="https://adssettings.google.com" target="_blank" rel="noopener">Google Ads Settings</a>. Learn more about <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener">how Google uses information from sites that use its services</a>.</li>
+   <li>Because kids play Crownforge, the game asks Google to show <b>non-personalized ads</b> to players under 13.</li></ul>`],
+ ['🚫 What we never do','<ul><li>We never sell your information or give it to anyone to sell things to you.</li><li>The game itself does not use tracking cookies. Only ad partners like Google may, as explained above.</li></ul>'],
+ ['🧒 Kids',`Crownforge is for players of all ages. If you are under 13, ask a parent or guardian before you make an account. <b>Never share</b> your real name, school, address, phone number, passwords or photos of yourself in chat or messages, even with friends from the game.`],
+ ['🛡️ Staying safe','You can 🚫 block or 🔇 mute anyone, ⚠️ report a player or a mean message, and see who you blocked in ⚙️ Settings. Reports go to the owner.'],
+ ['🗑️ Keeping and deleting your data','Your game is kept as long as the game is running, so you can come back to it. To have your account and kingdom deleted, send a 🐞 bug report that says "please delete my account" from that account, and the owner will remove it.'],
+ ['🔄 Changes','If this policy changes, this page and the date at the top will be updated.']];
+function privHtml(){ return `<p class="desc">Last updated: <b>${PRIV_DATE}</b>. This explains, in plain words, what Crownforge saves and why.</p>${PRIV_SECTIONS.map(([t,b])=>`<div class="privSec"><div class="label">${t}</div><div class="desc">${b}</div></div>`).join('')}`; }
+function privDialog(){ const back=$('ov').innerHTML; const d=document.createElement('div'); d.className='overlay'; d.id='privOv'; d.style.zIndex=95; d.innerHTML=`<div class="dialog wide"><h2>🔒 Privacy policy</h2>${privHtml()}<div class="row"><button class="prime" data-act="v138:close">Got it</button></div></div>`; document.body.appendChild(d); }
+function privLink(){ return '<p class="desc privLink"><a href="#privacy" data-act="v138:open">🔒 Privacy policy</a></p>'; }
+/* show the link on the login form and the new-kingdom form */
+setInterval(()=>{ try{ for(const id of ['lf','jf']){ const f=$(id); if(f&&!f.querySelector('.privLink')) f.insertAdjacentHTML('beforeend',privLink()); } }catch(e){} },400);
+settingsDialog=(o=>function(){ o.apply(this,arguments); try{ const d=document.querySelector('#setOv .blkSet .setList'); if(d&&!d.querySelector('.privSet')){ const w=document.createElement('div'); w.className='setItem privSet'; w.innerHTML='<div><b>🔒 Privacy policy</b><small>What the game saves and who can see it.</small></div><button class="soft" data-act="v138:open">Open</button>'; d.appendChild(w); } }catch(e){} })(settingsDialog);
+setTimeout(()=>{ try{ v84add('bPriv','soft','v138:open','🔒 Privacy policy','gMore'); }catch(e){} },0);
+document.addEventListener('click',e=>{ const a=e.target.closest&&e.target.closest('[data-act^="v138:"]'); if(!a) return; e.preventDefault(); e.stopPropagation(); if(a.dataset.act==='v138:open') privDialog(); else { const o=$('privOv'); if(o) o.remove(); if(location.hash==='#privacy') history.replaceState(null,'',location.pathname+location.search); } },true);
+function privHash(){ if(location.hash==='#privacy'&&!$('privOv')) privDialog(); }
+window.addEventListener('hashchange',privHash); setTimeout(privHash,800);
+
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
 var SITES={vein:{name:'Gold Vein',ic:'⛏️',desc:'+25% gold from your Town Hall and Gold Mines.'},well:{name:'Magic Well',ic:'🔮',desc:'+25% food from your Town Hall and Farms.'},ruins:{name:'Ancient Ruins',ic:'🏛️',desc:'Search them once a day for 10 gems.'},grove:{name:'Crystal Grove',ic:'💎',desc:'+10% attack for your whole army.'}};
@@ -10683,6 +10719,9 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  140:['👑 The game owner is now built in, so the owner panel always works for the owner'],
+  139:['🔒 Privacy policy updated: it now explains ads from Google AdSense'],
+  138:['🔒 New privacy policy: it explains in plain words what the game saves and who can see it. Find it on the login screen, in ⚙️ Settings and in ☰ More'],
   137:['📋 Job orders: ask for job goods, anyone who has them can deliver','🏪 Market stalls: build one and visitors buy your goods from it','🎓 Apprentices and mentors, ⭐ job titles (Skilled, Expert, Master), 🏆 weekly top sellers, 🏷️ price tags','🎪 Kingdom Fair on the first weekend of every month: goods twice as strong','🏛️ Job guilds with their own chat, 📜 job quests, ✨ combo goods','👑 Royal Requests, and job goods matter more: they last 50% longer and give XP'],
   136:['🌍 World events now really change: dragons, plagues and gold rushes take turns (it was stuck on gold rush)','🏪 Job Market has its own button on the home screen, shows only what is for sale, has a search box, and a ❓ What is this? button on every item'],
   135:['⭐ Job levels! Finish job tasks to level up (up to level 4). Each new level unlocks a brand new good that only your job can make (60 new goods!)','💰 You can now resell any goods you own','🛍️ The Shop has two new tabs: 🏪 Job goods (sorted by job) and 📦 Orders'],
@@ -11013,9 +11052,9 @@ function joust(rid){ const r=NPC_KNIGHTS.find(x=>x.id===rid)||(P(rid)?{id:rid,na
     requestAnimationFrame(loop); }; loop(); }
 
 /* ===== owner (admin) panel ===== */
-var ADMIN=null, ANNOUNCE=null, adminTab='reports';
-const isAdmin=()=>!!ME&&ADMIN===ME;
-function watchConfig(){ if(!DB||!DB.watchConfig) return; DB.watchConfig('admin',d=>{ ADMIN=d&&d.uid||null; try{ if($('setOv')) settingsDialog(); }catch(e){} }); DB.watchConfig('announce',d=>{ ANNOUNCE=d||null; showAnnounce(); }); }
+var OWNER_UIDS=['pFOs22usWyObYEI3tmMKFLfQFHF2'], ADMIN=OWNER_UIDS[0], ANNOUNCE=null, adminTab='reports';
+const isAdmin=()=>!!ME&&(ADMIN===ME||OWNER_UIDS.includes(ME));
+function watchConfig(){ if(!DB||!DB.watchConfig) return; DB.watchConfig('admin',d=>{ ADMIN=d&&d.uid||OWNER_UIDS[0]; try{ if($('setOv')) settingsDialog(); }catch(e){} }); DB.watchConfig('announce',d=>{ ANNOUNCE=d||null; showAnnounce(); }); }
 function showAnnounce(){ let el=$('annBar'); const a=ANNOUNCE; let seen=''; try{ seen=localStorage.getItem('cf-ann')||''; }catch(e){}
   if(!a||!a.text||seen===String(a.t)||now()-a.t>3*864e5){ if(el) el.remove(); return; }
   if(!el){ el=document.createElement('div'); el.id='annBar'; document.body.appendChild(el); }
