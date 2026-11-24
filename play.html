@@ -586,6 +586,15 @@ button:active{transform:scale(.96)}.jgChips{display:flex;flex-wrap:wrap;gap:4px;
 .op2 .op2Row{flex-direction:row!important;justify-content:flex-start!important;align-items:center!important;text-align:left!important;min-height:0!important;height:auto!important;box-shadow:none!important;text-shadow:none!important;margin:0!important}
 .op2 .op2Row b,.op2 .op2Row small,.op2 .op2Row span{text-shadow:none}
 .op2 .row select{flex:1 1 140px;min-width:0}.op2 .row input[type=number]{flex:0 1 100px;min-width:70px}
+.duAsk2,#bgAsk{position:fixed;left:50%;top:110px;transform:translateX(-50%);z-index:90;background:#fff6dc;border:3px solid #2b1a0c;border-radius:14px;padding:8px 12px;display:flex;gap:6px;align-items:center;box-shadow:0 4px 0 #2b1a0c;max-width:94vw;flex-wrap:wrap;color:#2b1a0c}
+.bgT{display:grid;grid-template-columns:repeat(3,72px);gap:6px;justify-content:center;margin:8px auto}.bgC{width:72px;height:72px;font-size:38px;border-radius:12px;background:#fff6dc;border:3px solid #2b1a0c;padding:0}
+.bgF{display:grid;grid-template-columns:repeat(7,40px);gap:4px;justify-content:center;background:#2f6bd1;padding:8px;border-radius:12px;margin:8px auto;width:max-content}.bgD{width:40px;height:40px;border-radius:50%;background:#dfe9ff;border:0;font-size:28px;padding:0;line-height:40px}
+.bgK{display:grid;grid-template-columns:repeat(8,minmax(0,40px));gap:0;justify-content:center;margin:8px auto;border:3px solid #2b1a0c;width:max-content;max-width:100%}.bgS{aspect-ratio:1;width:40px;max-width:11vw;border:0;border-radius:0;background:#f3e2bf;font-size:20px;padding:0;line-height:1}.bgS.d{background:#8a5a2b}.bgS.hl{box-shadow:inset 0 0 0 4px #7ee04f}.bgS.sel{box-shadow:inset 0 0 0 4px #ffd13b}
+.psPick{display:flex;flex-wrap:wrap;gap:6px}.psPick button{display:flex;flex-direction:column;align-items:center;padding:4px}
+.psGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin:6px 0}.psCard{background:#fff6dc;border:2px solid #e2c48a;border-radius:12px;padding:6px;display:flex;flex-direction:column;align-items:center;gap:3px;color:#2b1a0c;text-align:center}.psCard.on{border-color:#5fbf3a;background:#eaffdc}.psCard small{font-size:11px}
+.clLv{text-align:center;background:#fff6dc;border:2px solid #c9a24a;border-radius:12px;padding:8px;margin:6px 0;color:#2b1a0c}.clLv b{font-size:22px;display:block}
+.seaFleet{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}.seaFleet>div{background:#e3f1ff;border:2px solid #4fb6ff;border-radius:12px;padding:6px;text-align:center;color:#12324a}.seaFleet span{font-size:24px;display:block}.seaFleet b{display:block;font-size:18px}.seaFleet small{font-size:11px}
+.seaBat{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#8fd0ff,#2f6bd1);border-radius:14px;padding:14px 10px;margin:8px 0;color:#fff}.seaBat .side{flex:1;text-align:center}.seaBat .side span{font-size:32px;display:block}.seaBat .vs{font-size:26px}.seaBat .lvBar i{transition:width .5s}
 </style>
 </head>
 <body>
@@ -706,7 +715,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 150;
+const GAME_VERSION = 151;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -11106,7 +11115,7 @@ function wrDialog(){ const R=wrNow(), N=WRULES[wrIdx(weekId()+1)], d=new Date(),
 var wrSeen=null; setInterval(()=>{ try{ if(!P(ME)) return; const w=weekId(); if(wrSeen===w) return; let s=null; try{ s=localStorage.getItem('cf-wr'); }catch(e){} wrSeen=w; if(String(s)!==String(w)){ try{ localStorage.setItem('cf-wr',w); }catch(e){} const R=wrNow(); setTimeout(()=>toast(`📅 New world rule this week: ${R[0]} ${R[1]}! ${R[2]}`),4000); } }catch(e){} },5000);
 
 /* =============== 4. ROYAL COUNCIL =============== */
-var CN_H=3;
+var CN_H=12;
 var COUNCIL=[
  ['🧙','A wandering wizard asks to sleep in your castle tonight.',[['Let him stay',[[.5,{gems:6,t:'He leaves you a gift of gems! 💎'}],[.5,{food:-.2,t:'He turned some of your food into frogs! 🐸'}]]],['Send him away',[[1,{dec:[{def:.1},3],t:'Your guards are extra careful. +10% defense for 3 hours.'}]]]]],
  ['🌧️','A storm ruined the farmers\' fields. They ask for help.',[['Give them gold',[[1,{gold:-.1,dec:[{food:.25,prod:.05},4],t:'The farmers are thankful! +25% food for 4 hours.'}]]],['Tell them to manage',[[1,{dec:[{food:-.1},3],t:'The farmers are grumpy. -10% food for 3 hours.'},]]]]],
@@ -11382,6 +11391,176 @@ try{ for(let i=NEW133.length-1;i>=0;i--) if(PM_REMOVE.has(NEW133[i][2])) NEW133.
 /* old buttons that still point at the retired features open the Royal Council instead */
 (function(){ const va=v82Act; v82Act=function(a,b){ if(a==='v125:ev'||a==='v133:dlm'||a.startsWith('v133:dl:')){ cnDialog(); return true; } return va(a,b); }; })();
 
+/* ===== v151: sea battles (inside the Sea Expeditions harbor), weekly pet show, live board games, invite rewards.
+   Also: world events removed, Royal Council twice a day, hero talent rows are bought with gold (7,500, then doubling). ===== */
+function o151(t,b,back){ fkOpen(t,b,back===undefined?'v127:play':back); }
+function n151(u){ return esc(cleanText((P(u)||{}).name||'?')); }
+function th151(u){ try{ return stats(u).hallLvl||1; }catch(e){ return 1; } }
+
+/* =============== world events are gone =============== */
+weSpot=function(){ return null; };
+weDialog=function(){ toast('World events have ended. Try the Scavenger hunt or Sea battles!'); };
+try{ PM_REMOVE.add('v133:we'); for(let i=NEW133.length-1;i>=0;i--) if(NEW133[i][2]==='v133:we') NEW133.splice(i,1); }catch(e){}
+
+/* =============== hero talents: unlock rows with gold (7,500, then double) =============== */
+var TAL_BASE=7500;
+function talOpen(p){ return Math.min(TALENTS.length,Math.max((p&&p.htalU)||0,((p&&p.htal)||[]).filter(Boolean).length)); }
+function talCost(n){ return TAL_BASE*Math.pow(2,n); }
+talPts=function(p){ return talOpen(p)*2; };
+talSum=function(p,st){ const T=p&&p.htal; if(!Array.isArray(T)) return 0; const n=talOpen(p); let s=0; for(let i=0;i<Math.min(n,T.length);i++){ const c=TALENTS[i][T[i]==='b'?1:0]; if(c&&c[1][st]) s+=c[1][st]; } return s; };
+talDialog=function(){ const m=P(ME)||{}, T=m.htal||[], open=talOpen(m), next=open<TALENTS.length?talCost(open):0;
+  o146('🌟 Hero talents',`<p class="desc">Buy a new talent row with gold. The first row costs <b>${f(TAL_BASE)} gold</b>, and every next row costs <b>double</b>. In each row you pick <b>one</b> of two talents, never both!</p><p class="desc">Rows open: <b>${open}</b>/${TALENTS.length}</p>
+    ${next?`<div class="row">${btn(`🔓 Unlock row ${open+1}`,{gold:next},'v151:talbuy','gemb')}</div>`:'<p class="desc opLive">🎉 All rows unlocked!</p>'}
+    ${TALENTS.map((row,i)=>`<div class="talRow${i<open?'':' lock'}"><span>Row ${i+1}${i<open?'':' 🔒 '+f(talCost(i))}</span>${row.map((c,j)=>{ const p='ab'[j], on=T[i]===p; return `<button class="${on?'prime':'soft'} talBtn" data-act="v146:tal:${i}:${p}" ${i<open&&!T[i]?'':'disabled'}><b>${c[0]}</b><small>${fxTxt(c[1])}</small>${on?'<small>✅</small>':''}</button>`; }).join('')}</div>`).join('')}
+    ${T.filter(Boolean).length?`<div class="row">${btn('♻️ Re-pick talents (rows stay unlocked)',{gems:TAL_RESET},'v146:talreset','soft')}</div>`:''}`); };
+talPick=function(i,p){ act([],me=>{ i=+i; const open=talOpen(me); if(!(i>=0&&i<open)) fail('Unlock that row first.'); me.htal=Array.isArray(me.htal)?[...me.htal]:[]; if(me.htal[i]) fail('You already picked in this row.'); for(let q=0;q<i;q++) if(!me.htal[q]) fail('Pick the rows above first.'); me.htal[i]=p==='b'?'b':'a'; me.htalU=Math.max(me.htalU||0,open); return {}; },()=>{ snd('quest'); toast('🌟 Talent learned!'); talDialog(); }); };
+talReset=function(){ act([],me=>{ if(!(me.htal||[]).filter(Boolean).length) fail('Nothing to re-pick.'); if((me.gems||0)<TAL_RESET) fail('Not enough gems.'); me.htalU=Math.max(me.htalU||0,talOpen(me)); me.gems-=TAL_RESET; me.htal=[]; return {}; },()=>{ toast('♻️ Pick your talents again!'); talDialog(); }); };
+function talBuy(){ act([],me=>{ const open=talOpen(me); if(open>=TALENTS.length) fail('All rows are unlocked.'); settle(me); pay(me,{gold:talCost(open)}); me.htalU=open+1; return {n:open+1}; },r=>{ snd('build'); confetti(); toast(`🔓 Talent row ${r.n} unlocked! Pick a talent.`); talDialog(); }); }
+
+/* =============== 6. invite rewards =============== */
+var REF_MAX=20;
+try{ const q=new URLSearchParams(location.search).get('ref'); if(q&&/^[\w-]{6,64}$/.test(q)) localStorage.setItem('cf-ref',q); }catch(e){}
+shareUrl=(o=>function(){ const u=o.apply(this,arguments); return u&&ME?u+'?ref='+encodeURIComponent(ME):u; })(shareUrl);
+setInterval(()=>{ try{ const m=P(ME); if(!m||m.dead||m.ref||m.refT) return; let r=null; try{ r=localStorage.getItem('cf-ref'); }catch(e){} if(!r||r===ME||!P(r)) return; if(m.created&&now()-m.created>3*864e5) return; pmSave(me=>{ if(!me.ref&&!me.refT){ me.ref=r; me.refT=now(); } }).catch(()=>{}); }catch(e){} },6000);
+function refKids(){ return Object.entries(G.players||{}).filter(([u,p])=>p&&p.ref===ME&&u!==ME).map(([u,p])=>({u,p,th:th151(u)})); }
+function refDialog(){ const m=P(ME)||{}, kids=refKids(), got=m.refGot||[], url=shareUrl();
+  o151('🎟️ Invite friends',`<p class="desc">Send your <b>own invite link</b> to a friend. When they reach <b>Town Hall 5</b>, you get <b>30 gems + a Royal Crate</b>, and they get <b>20 gems + a Royal Crate</b> too!</p>
+    ${url?`<input id="refL" readonly value="${esc(url)}" style="width:100%" onclick="this.select()"><div class="row">${btn('📋 Copy my link',null,'v151:refcopy','prime')}${btn('📣 Share',null,'v127:share','soft')}</div>`:'<p class="desc">Your invite link works on the real website.</p>'}
+    ${m.ref&&P(m.ref)?`<p class="desc">👋 You were invited by <b>${n151(m.ref)}</b>. ${th151(ME)>=5?(m.refC?'✅ Gift collected.':''):`Reach Town Hall 5 to get your gift (you are TH ${th151(ME)}).`}</p>${th151(ME)>=5&&!m.refC?`<div class="row">${btn('🎁 Collect your welcome gift',null,'v151:refme','gemb')}</div>`:''}`:''}
+    <div class="label">👥 Friends you invited (${kids.length})</div>${kids.length?kids.map(k=>`<div class="jgRow"><div class="jgTop"><span class="jgName">${esc(cleanText(k.p.name||'?'))}</span><small>TH ${k.th}/5</small>${got.includes(k.u)?'<small>✅ collected</small>':k.th>=5&&got.length<REF_MAX?btn('🎁 Collect',null,'v151:refget:'+k.u,'gemb mini'):''}</div><div class="lvBar"><i style="width:${Math.min(100,k.th/5*100)}%"></i></div></div>`).join(''):'<p class="desc">Nobody yet. Send your link!</p>'}
+    <p class="desc"><small>Up to ${REF_MAX} friends give rewards. Invites only count for brand new players.</small></p>`); }
+function refGet(u){ act([],me=>{ const p=P(u); if(!p||p.ref!==ME) fail('That player was not invited by you.'); if(th151(u)<5) fail('They need Town Hall 5 first.'); me.refGot=me.refGot||[]; if(me.refGot.includes(u)) fail('Already collected.'); if(me.refGot.length>=REF_MAX) fail('You already got the most invite rewards.'); me.refGot=[...me.refGot,u]; gemsAdd(me,30); me.stash=me.stash||{}; me.stash.royal=(me.stash.royal||0)+1; return {}; },()=>{ snd('quest'); confetti(); toast('🎟️ Invite reward: 30 gems and a Royal Crate!'); refDialog(); }); }
+function refMe(){ act([],me=>{ if(!me.ref) fail('You were not invited.'); if(me.refC) fail('Already collected.'); if(th151(ME)<5) fail('Reach Town Hall 5 first.'); me.refC=1; gemsAdd(me,20); me.stash=me.stash||{}; me.stash.royal=(me.stash.royal||0)+1; return {}; },()=>{ snd('quest'); confetti(); toast('🎁 Welcome gift: 20 gems and a Royal Crate!'); refDialog(); }); }
+
+/* =============== 3. weekly pet show =============== */
+var PS_CELL=cid(-1220,-260), psSt=null;
+function psFresh(b){ const wk=weekId(); if(b&&b.wk===wk) return {...b,e:{...(b.e||{})},v:{...(b.v||{})}}; const nb={o:'npc',b:'petshow',wk,e:{},v:{}}; if(b&&b.wk&&b.e){ const cnt={}; for(const t of Object.values(b.v||{})) cnt[t]=(cnt[t]||0)+1; nb.prev={wk:b.wk,top:Object.entries(b.e).map(([u,e])=>[u,cnt[u]||0,e.k,e.n,e.lvl]).sort((a,c)=>c[1]-a[1]).slice(0,10),ent:Object.keys(b.e),vot:Object.keys(b.v||{})}; } return nb; }
+function psCount(b){ const c={}; for(const t of Object.values((b&&b.v)||{})) c[t]=(c[t]||0)+1; return c; }
+async function psDialog(){ psSt=await cellRead(PS_CELL); const b=psFresh(psSt), m=P(ME)||{}, mine=b.e[ME], myVote=b.v[ME], cnt=psCount(b), E=Object.entries(b.e).sort((a,c)=>(cnt[c[0]]||0)-(cnt[a[0]]||0)), pets=m.pets||[], pr=b.prev, res=pr&&m.psC!==pr.wk&&(pr.ent.includes(ME)||pr.vot.includes(ME));
+  const d=new Date(), left=(7-((d.getDay()+6)%7))*864e5-(d.getHours()*36e5+d.getMinutes()*6e4);
+  o151('🐾 Weekly pet show',`<p class="desc">Show off your best pet! Everyone can enter <b>one</b> pet and give <b>one</b> vote to someone else's pet. When the week ends, the top 3 pets win gems and a Royal Crate, and everyone who took part gets a prize. Ends in ${fmtT(Math.max(0,left)/1000)}.</p>
+    ${res?`<div class="row">${btn('🎁 Collect last week\'s prize',null,'v151:psclaim','gemb')}</div>`:''}
+    ${pr&&pr.top.length?`<div class="label">🏆 Last week's winners</div><div class="board">${pr.top.slice(0,3).map((x,i)=>`<div><span>${['🥇','🥈','🥉'][i]} ${esc(cleanText(x[3]||'?'))} (${n151(x[0])})</span><span>${x[1]} votes</span></div>`).join('')}</div>`:''}
+    ${mine?`<p class="desc opLive">✅ Your pet <b>${esc(cleanText(mine.n||''))}</b> is in the show with ${cnt[ME]||0} vote${(cnt[ME]||0)===1?'':'s'}.</p>`:pets.length?`<div class="label">🎀 Enter a pet</div><div class="psPick">${pets.map(p=>`<button class="soft" data-act="v151:psin:${p.id}"><canvas data-pet="${p.k}" data-lvl="${p.lvl||1}" data-id="${p.id}" class="petcv" style="width:70px;height:56px"></canvas><small>${esc(cleanText(p.name||''))}</small></button>`).join('')}</div>`:'<p class="desc">Get a pet from a Pet Crate to enter!</p>'}
+    <div class="label">🗳️ The show (${E.length} pets)${myVote?' · you voted ✅':''}</div><div class="psGrid">${E.length?E.map(([u,e])=>`<div class="psCard${myVote===u?' on':''}"><canvas data-pet="${e.k}" data-lvl="${e.lvl||1}" class="petcv" style="width:100%;height:80px"></canvas><b>${esc(cleanText(e.n||'?'))}</b><small>by ${n151(u)} · ${cnt[u]||0} 🗳️</small>${u!==ME&&!myVote?btn('Vote',null,'v151:psvote:'+u,'prime mini'):''}</div>`).join(''):'<p class="desc">No pets yet. Be the first!</p>'}</div>`);
+  try{ startPetLoop(); }catch(e){} }
+function psEnter(pid){ const p=((P(ME)||{}).pets||[]).find(x=>x.id===pid); if(!p) return;
+  act([PS_CELL],(me,pl)=>{ const b=psFresh(pl[PS_CELL]); if(b.e[ME]) fail('You already entered a pet this week.'); if(Object.keys(b.e).length>=80) fail('The show is full this week!'); const q=(me.pets||[]).find(x=>x.id===pid); if(!q) fail('That pet is gone.'); b.e[ME]={k:q.k,lvl:q.lvl||1,n:cleanText(q.name||'').slice(0,20),pid}; pl[PS_CELL]=b; return {}; },()=>{ snd('quest'); toast('🎀 Your pet is in the show! Ask friends to vote.'); psDialog(); }); }
+function psVote(u){ act([PS_CELL],(me,pl)=>{ const b=psFresh(pl[PS_CELL]); if(u===ME) fail('You cannot vote for yourself.'); if(!b.e[u]) fail('That pet left the show.'); if(b.v[ME]) fail('You already voted this week.'); b.v[ME]=u; trimMap(b.v,600); pl[PS_CELL]=b; return {}; },()=>{ snd('click'); toast('🗳️ Vote counted!'); psDialog(); }); }
+function psClaim(){ act([PS_CELL],(me,pl)=>{ const b=psFresh(pl[PS_CELL]), pr=b.prev; if(!pr) fail('Nothing to collect.'); if(me.psC===pr.wk) fail('Already collected.'); const ent=pr.ent.includes(ME), vot=pr.vot.includes(ME); if(!ent&&!vot) fail('You did not take part last week.'); me.psC=pr.wk; settle(me);
+    const rank=pr.top.findIndex(x=>x[0]===ME)+1; let t=''; if(ent&&rank>=1&&rank<=3&&pr.top[rank-1][1]>0){ gemsAdd(me,[50,30,20][rank-1]); me.stash=me.stash||{}; me.stash.royal=(me.stash.royal||0)+1; me.psW=(me.psW||0)+(rank===1?1:0); t=`${['🥇','🥈','🥉'][rank-1]} Your pet placed #${rank}! Gems and a Royal Crate!`; }
+    else { const g=sc133(ent?2000:1000); me.gold+=g; t=`🐾 Thanks for taking part! +${f(g)} gold.`; } pl[PS_CELL]=b; return {t}; },r=>{ snd('quest'); confetti(); toast(r.t); psDialog(); }); }
+
+/* =============== 4. live board games (tic-tac-toe, connect four, checkers) =============== */
+var BG={ttt:['❌⭕','Tic-tac-toe'],c4:['🔴🟡','Connect four'],ck:['⚫⚪','Checkers']}, BG_BETS=[0,500,2000,5000], BG_TO=120000, bgSeen={}, bgSel=null, bgPath=[], bgSig='';
+function bgMine(){ const m=P(ME); return m&&m.bg&&m.bg.id?m.bg:null; }
+function bgPair(){ const a=bgMine(); if(!a) return null; const o=P(a.vs), b=o&&o.bg&&o.bg.id===a.id?o.bg:null; return {a,b,host:a.host===ME}; }
+function bgMoves(pr){ const H=pr.host?pr.a.m||[]:(pr.b&&pr.b.m)||[], G2=pr.host?(pr.b&&pr.b.m)||[]:pr.a.m||[]; const L=[]; for(let i=0;i<Math.max(H.length,G2.length);i++){ if(i<H.length) L.push([0,H[i]]); else break; if(i<G2.length) L.push([1,G2[i]]); else break; } return L; }
+function bgInit(g){ if(g==='ttt') return Array(9).fill(-1); if(g==='c4') return Array(42).fill(-1); const B=Array(64).fill(null); for(let r=0;r<8;r++) for(let c=0;c<8;c++) if((r+c)%2===1){ if(r<3) B[r*8+c]={p:1,k:0}; else if(r>4) B[r*8+c]={p:0,k:0}; } return B; }
+function bgLine(B,W,H,n,p){ const at=(r,c)=>r>=0&&r<H&&c>=0&&c<W?B[r*W+c]:-2; for(let r=0;r<H;r++) for(let c=0;c<W;c++) for(const [dr,dc] of [[0,1],[1,0],[1,1],[1,-1]]){ let k=0; while(k<n&&at(r+dr*k,c+dc*k)===p) k++; if(k===n) return true; } return false; }
+function ckSteps(B,p,s){ const r=s>>3, c=s&7, pc=B[s]; if(!pc||pc.p!==p) return {mv:[],jp:[]}; const dirs=pc.k?[[1,1],[1,-1],[-1,1],[-1,-1]]:p===0?[[-1,1],[-1,-1]]:[[1,1],[1,-1]], mv=[], jp=[]; for(const [dr,dc] of dirs){ const r1=r+dr, c1=c+dc, r2=r+2*dr, c2=c+2*dc; if(r1>=0&&r1<8&&c1>=0&&c1<8){ if(!B[r1*8+c1]) mv.push(r1*8+c1); else if(B[r1*8+c1].p!==p&&r2>=0&&r2<8&&c2>=0&&c2<8&&!B[r2*8+c2]) jp.push(r2*8+c2); } } return {mv,jp}; }
+function ckApply(B,p,path){ if(!Array.isArray(path)||path.length<2) return null; B=B.map(x=>x&&{...x}); let s=path[0]; if(!B[s]||B[s].p!==p) return null; for(let i=1;i<path.length;i++){ const t=path[i], st=ckSteps(B,p,s); if(path.length===2&&st.mv.includes(t)){ B[t]=B[s]; B[s]=null; s=t; break; } if(!st.jp.includes(t)) return null; const mid=((s>>3)+(t>>3))/2*8+((s&7)+(t&7))/2; B[mid]=null; B[t]=B[s]; B[s]=null; s=t; } if((p===0&&(s>>3)===0)||(p===1&&(s>>3)===7)) B[s].k=1; return B; }
+function ckAny(B,p){ for(let s=0;s<64;s++) if(B[s]&&B[s].p===p){ const st=ckSteps(B,p,s); if(st.mv.length||st.jp.length) return true; } return false; }
+function bgApply(g,B,p,mv){ if(g==='ttt'){ if(!(mv>=0&&mv<9)||B[mv]!==-1) return null; B=[...B]; B[mv]=p; return B; } if(g==='c4'){ if(!(mv>=0&&mv<7)) return null; for(let r=5;r>=0;r--) if(B[r*7+mv]===-1){ B=[...B]; B[r*7+mv]=p; return B; } return null; } return ckApply(B,p,mv); }
+function bgState(pr){ const g=pr.a.g; let B=bgInit(g), win=null, n=0; for(const [p,mv] of bgMoves(pr)){ const nb=bgApply(g,B,p,mv); if(!nb) break; B=nb; n++; if(g==='ttt'&&bgLine(B,3,3,3,p)) { win=p; break; } if(g==='c4'&&bgLine(B,7,6,4,p)) { win=p; break; } if(g==='ck'&&(!B.some(x=>x&&x.p===1-p)||!ckAny(B,1-p))) { win=p; break; } }
+  const full=g==='ttt'?B.every(x=>x!==-1):g==='c4'?B.every(x=>x!==-1):n>=120; const turn=n%2; const me=pr.host?0:1; const last=Math.max(pr.a.lt||pr.a.t,(pr.b&&(pr.b.lt||pr.b.t))||0), stale=win==null&&!full&&turn!==me&&now()-last>BG_TO;
+  return {B,win,draw:win==null&&full,turn,me,myTurn:win==null&&!full&&turn===me,stale,n}; }
+function bgChallenge(uid,g,bet){ const v=P(uid); if(!v||uid===ME||!BG[g]) return; if(blkAny(uid)) return toast(blkMsg(uid),true); if(!online(v)) return toast(`${cleanText(v.name)} is not online right now.`,true); const cur=bgPair(); if(cur&&cur.a.st!=='end') return toast('Finish your game first.',true); bet=BG_BETS.includes(+bet)?+bet:0;
+  act([],me=>{ if(me.bg&&me.bg.st!=='end'&&me.bgC!==me.bg.id) fail('Finish or collect your last game first.'); settle(me); if(bet) pay(me,{gold:bet}); me.bg={id:'bg'+now().toString(36)+Math.random().toString(36).slice(2,5),vs:uid,g,bet,host:ME,st:'ask',m:[],t:now(),paid:bet?1:0}; return {}; },()=>{ toast(`${BG[g][0]} Challenge sent to ${cleanText(v.name)}!`); bgOpen(); }); }
+function bgAccept(uid){ const o=P(uid), d=o&&o.bg; if(!d||d.vs!==ME||d.st!=='ask'||now()-d.t>BG_TO) return toast('That challenge is gone.',true); const x=$('bgAsk'); if(x) x.remove();
+  act([],me=>{ if(me.bg&&me.bg.st!=='end'&&me.bg.id!==d.id&&me.bgC!==me.bg.id) fail('Finish or collect your own game first.'); settle(me); if(d.bet) pay(me,{gold:d.bet}); me.bg={id:d.id,vs:uid,g:d.g,bet:d.bet,host:uid,st:'on',m:[],t:now(),paid:d.bet?1:0}; return {}; },()=>bgOpen()); }
+function bgDecline(uid){ const x=$('bgAsk'); if(x) x.remove(); const d=(P(uid)||{}).bg; if(d) pmSave(me=>{ me.bgDec=d.id; }).catch(()=>{}); }
+function bgMove(mv){ const pr=bgPair(); if(!pr||!pr.b) return; if(pr.b.st==='end') return toast('The other player left the game.',true); const s=bgState(pr); if(!s.myTurn) return; if(!bgApply(pr.a.g,s.B,s.me,mv)) return toast('You cannot move there.',true); bgSel=null; bgPath=[];
+  pmSave(me=>{ if(!me.bg||me.bg.id!==pr.a.id) fail('That game is over.'); me.bg={...me.bg,m:[...(me.bg.m||[]),mv],lt:now(),st:'on'}; }).then(()=>bgRender()).catch(explain); }
+function bgClaim(){ const pr=bgPair(); if(!pr) return; const a=pr.a; let res; if(a.st==='ask'){ const o=P(a.vs); if(!(now()-a.t>BG_TO||(o&&o.bgDec===a.id))) return toast('Still waiting for them.',true); res='refund'; } else { if(!pr.b) res='refund'; else { const s=bgState(pr); res=s.win!=null?(s.win===s.me?'win':'lose'):s.draw?'draw':s.stale?'win':pr.b.st==='end'?'lose':null; } } if(!res) return toast('The game is not over yet.',true); const oppPaid=!!(pr.b&&pr.b.paid&&pr.b.id===a.id);
+  act([],me=>{ if(!me.bg||me.bg.id!==a.id) fail('That game is over.'); if(me.bgC===a.id) fail('Already done.'); me.bgC=a.id; const bet=me.bg.paid?me.bg.bet:0; let g=0; settle(me);
+    if(res==='refund'||res==='draw') g=bet; else if(res==='win'){ g=bet+(oppPaid?a.bet:0); const d=dayNum(); if(!me.bgD||me.bgD.d!==d) me.bgD={d,n:0}; if(me.bgD.n<5){ me.bgD.n++; g+=sc133(500); } me.bgW=(me.bgW||0)+1; } me.gold+=g; me.bg={...me.bg,st:'end'}; return {g,res}; },
+    r=>{ snd(r.res==='win'?'quest':'click'); if(r.res==='win') confetti(); toast(r.res==='win'?`🏆 You won! +${f(r.g)} gold`:r.res==='lose'?'You lost this one. Good game!':r.res==='draw'?`🤝 Draw! Your ${f(r.g)} gold came back.`:`↩️ Game cancelled.${r.g?' Your '+f(r.g)+' gold came back.':''}`); const o=$('bgOv'); if(o) o.remove(); }); }
+function bgOpen(){ let o=$('bgOv'); if(!o){ o=document.createElement('div'); o.id='bgOv'; o.className='overlay'; o.style.zIndex=70; document.body.appendChild(o); } bgRender(); }
+function bgRender(){ const o=$('bgOv'); if(!o) return; const pr=bgPair(); if(!pr){ o.remove(); return; } const a=pr.a, g=a.g, name=n151(a.vs); let h='';
+  if(a.st==='end'){ o.remove(); return; }
+  if(!pr.b){ const dec=(P(a.vs)||{}).bgDec===a.id, old=now()-a.t>BG_TO; h=`<p class="desc" style="text-align:center">${dec?'😕 They said no thanks.':old?'⌛ Nobody answered.':`⏳ Waiting for <b>${name}</b> to accept...`}</p>${dec||old?`<div class="row" style="justify-content:center">${btn('↩️ Get my gold back',null,'v151:bgclaim','prime')}</div>`:''}`; }
+  else { const s=bgState(pr), mine=s.me; const over=s.win!=null||s.draw||s.stale;
+    h=`<p class="desc" style="text-align:center">${a.bet?`💰 Bet: ${f(a.bet)} gold each · `:''}You are ${g==='ttt'?(mine===0?'❌':'⭕'):g==='c4'?(mine===0?'🔴':'🟡'):(mine===0?'⚫ (bottom)':'⚪ (top)')}</p>`+bgBoard(g,s,pr)+
+      `${pr.b.st==='end'&&!over?`<p class="desc" style="text-align:center"><b>The other player ended the game.</b></p><div class="row" style="justify-content:center">${btn('Close',null,'v151:bgclaim','soft')}</div>`:''}<p class="desc" style="text-align:center"><b>${over?(s.win!=null?(s.win===mine?'🏆 You win!':'💔 You lost'):s.draw?'🤝 Draw!':'⌛ They left. You win!'):s.myTurn?'Your turn!':`⏳ ${name}'s turn...`}</b></p>${over?`<div class="row" style="justify-content:center">${btn('Collect & close',null,'v151:bgclaim','gemb')}</div>`:''}${g==='ck'&&bgPath.length>1&&s.myTurn?`<div class="row" style="justify-content:center">${btn('✅ End turn',null,'v151:bgend','prime')}${btn('↩️ Undo',null,'v151:bgundo','soft')}</div>`:''}`; }
+  o.innerHTML=`<div class="dialog"><h2>${BG[g][0]} ${BG[g][1]} vs ${name}</h2>${h}<div class="row"><button class="soft" data-act="v151:bgclose">Hide</button></div></div>`; }
+function bgBoard(g,s,pr){ const sym=p=>g==='ttt'?(p===0?'❌':p===1?'⭕':''):(p===0?'🔴':p===1?'🟡':'');
+  if(g==='ttt') return `<div class="bgT">${s.B.map((x,i)=>`<button class="bgC" data-act="v151:bgm:${i}" ${s.myTurn&&x===-1?'':'disabled'}>${sym(x)}</button>`).join('')}</div>`;
+  if(g==='c4') return `<div class="bgF">${[0,1,2,3,4,5].map(r=>[0,1,2,3,4,5,6].map(c=>`<button class="bgD" data-act="v151:bgm:${c}" ${s.myTurn?'':'disabled'}>${sym(s.B[r*7+c])}</button>`).join('')).join('')}</div>`;
+  let B=s.B; const cur=bgPath.length?bgPath[bgPath.length-1]:null; if(bgPath.length>1) B=ckApply(B,s.me,bgPath)||B; const hl=new Set(); if(s.myTurn&&cur!=null){ const st=ckSteps(B,s.me,cur); (bgPath.length>1?st.jp:st.mv.concat(st.jp)).forEach(x=>hl.add(x)); }
+  const flip=s.me===1; const order=[...Array(64).keys()]; if(flip) order.reverse();
+  return `<div class="bgK">${order.map(i=>{ const dark=((i>>3)+(i&7))%2===1, pc=B[i]; return `<button class="bgS${dark?' d':''}${hl.has(i)?' hl':''}${cur===i?' sel':''}" data-act="v151:bgk:${i}" ${s.myTurn&&dark?'':'disabled'}>${pc?(pc.p===0?(pc.k?'⚫👑':'⚫'):(pc.k?'⚪👑':'⚪')):''}</button>`; }).join('')}</div>`; }
+function bgCk(i){ i=+i; const pr=bgPair(); if(!pr||!pr.b) return; const s=bgState(pr); if(!s.myTurn) return; let B=s.B; if(bgPath.length>1) B=ckApply(B,s.me,bgPath)||B;
+  if(!bgPath.length||(bgPath.length===1&&B[i]&&B[i].p===s.me)){ if(B[i]&&B[i].p===s.me){ bgPath=[i]; } bgRender(); return; }
+  const cur=bgPath[bgPath.length-1], st=ckSteps(B,s.me,cur);
+  if(bgPath.length===1&&st.mv.includes(i)){ bgMove([cur,i]); return; }
+  if(st.jp.includes(i)){ bgPath.push(i); const nb=ckApply(s.B,s.me,bgPath), more=nb&&ckSteps(nb,s.me,i).jp.length&&!(nb[i].k&&!B[cur].k); if(!more){ const p=bgPath; bgPath=[]; bgMove(p); return; } bgRender(); return; }
+  bgPath=[]; bgRender(); }
+setInterval(()=>{ try{ const m=P(ME); if(!m) return;
+  for(const [uid,p] of Object.entries(G.players||{})){ const d=p&&p.bg; if(!d||d.vs!==ME||d.st!=='ask'||now()-d.t>BG_TO||bgSeen[d.id]||isBlocked(uid)) continue; const mine=bgMine(); if(mine&&mine.id===d.id) continue; bgSeen[d.id]=1;
+    const x=document.createElement('div'); x.id='bgAsk'; x.className='duAsk2'; x.innerHTML=`<span>${BG[d.g][0]} <b>${n151(uid)}</b> wants to play ${BG[d.g][1]}${d.bet?' for '+f(d.bet)+' gold':''}!</span><button class="prime mini" data-act="v151:bgok:${uid}">Play</button><button class="soft mini" data-act="v151:bgno:${uid}">No</button>`; const old=$('bgAsk'); if(old) old.remove(); document.body.appendChild(x); setTimeout(()=>{ if(x.parentNode) x.remove(); },BG_TO); }
+  const pr=bgPair(); const sig=pr?JSON.stringify([pr.a.st,pr.a.m,pr.b&&pr.b.m,pr.b&&pr.b.st,(P(pr.a.vs)||{}).bgDec]):''; if(sig!==bgSig){ bgSig=sig; if(pr&&pr.b&&pr.a.st!=='end'&&!$('bgOv')) bgOpen(); else bgRender(); } }catch(e){} },1500);
+function bgDialog(uid){ const fr=new Set([...(P(ME).friends||[])]); const L=uid?[[uid,P(uid)]]:Object.entries(G.players||{}).filter(([u,p])=>p&&u!==ME&&!p.dead&&online(p)&&!blkAny(u)).sort((a,b)=>fr.has(b[0])-fr.has(a[0])).slice(0,20);
+  const pr=bgPair(); o151('♟️ Board games',`${pr&&pr.a.st!=='end'?`<div class="row">${btn('▶️ Back to my game',null,'v151:bgshow','gemb')}</div>`:''}<p class="desc">Play a live game against someone who is online. You can bet gold: the winner takes both bets. Winning also gives a bonus (5 bonuses a day).</p>
+    <div class="row"><select id="bgG">${Object.entries(BG).map(([k,[ic,n]])=>`<option value="${k}">${ic} ${n}</option>`).join('')}</select><select id="bgB">${BG_BETS.map(b=>`<option value="${b}">${b?'Bet '+f(b)+' gold':'No bet'}</option>`).join('')}</select></div>
+    ${L.length?L.map(([u,p])=>`<div class="jgRow"><div class="jgTop"><span class="jgName">${online(p)?'🟢':'⚪'} ${esc(cleanText(p.name||'?'))}${fr.has(u)?' ⭐':''}</span>${btn('♟️ Challenge',null,'v151:bgch:'+u,'prime mini')}</div></div>`).join(''):'<p class="desc">Nobody else is online right now.</p>'}`); }
+
+/* =============== 1. sea battles =============== */
+var SHIPS={sl:{n:'Sloop',ic:'⛵',cost:{gold:400,stone:200},atk:10,hp:30,th:2},fr:{n:'Frigate',ic:'🚤',cost:{gold:1500,stone:800},atk:30,hp:90,th:4},gl:{n:'Galleon',ic:'🚢',cost:{gold:5000,stone:3000},atk:90,hp:260,th:7}};
+var SEA_FOES=[['pir','🏴‍☠️','Pirate raiders',l=>80+l*60,'Pirates get stronger every time you beat them.'],['ser','🐍','Sea Serpent',()=>2500,'A huge sea snake. Once a day.'],['kra','🐙','The Kraken',()=>9000,'The king of the sea. Once a week. Bring a big fleet!']], SEA_DAY=6;
+function seaDocks(id){ try{ return stats(id).dock||0; }catch(e){ return 0; } }
+function seaMax(id){ return Math.min(80,10*Math.max(1,seaDocks(id))+10); }
+function seaCount(p){ const F=(p&&p.fleet)||{}; return Object.keys(SHIPS).reduce((a,k)=>a+(F[k]||0),0); }
+function seaPow(p){ const F=(p&&p.fleet)||{}; let a=0,h=0; for(const k in SHIPS){ a+=(F[k]||0)*SHIPS[k].atk; h+=(F[k]||0)*SHIPS[k].hp; } return {a,h,p:a+h*.35}; }
+function navyDialog(){ const m=P(ME)||{}, dk=seaDocks(ME), F=m.fleet||{}, pw=seaPow(m), th=th151(ME), lv=m.seaLv||1, d=dayNum(), used=(m.seaD&&m.seaD.d===d)?m.seaD.n:0;
+  if(!dk) return o151('⚔️ Sea battles',`<p class="desc">Build a <b>⚓ Dock</b> on your land next to a lake to start a navy! Docks unlock at Town Hall 2.</p>`);
+  const tg=Object.entries(G.players||{}).filter(([u,p])=>p&&u!==ME&&!p.dead&&seaCount(p)>0&&!blkAny(u)).sort((a,b)=>Math.abs(seaPow(a[1]).p-pw.p)-Math.abs(seaPow(b[1]).p-pw.p)).slice(0,8);
+  o151('⚔️ Sea battles',`<div class="row">${btn('🧭 Sea expeditions',null,'v108:sea','soft mini')}</div><p class="desc">Build warships at your Dock and battle pirates, sea monsters and other players' fleets! You have ${dk} dock${dk>1?'s':''}, so your fleet can have up to <b>${seaMax(ME)}</b> ships.</p>
+    <div class="seaFleet">${Object.entries(SHIPS).map(([k,S])=>`<div><span>${S.ic}</span><b>${f(F[k]||0)}</b><small>${S.n}s</small></div>`).join('')}<div><span>⚔️</span><b>${f(pw.a)}</b><small>fleet attack</small></div></div>
+    <div class="label">🔨 Build ships</div><div class="setList">${Object.entries(SHIPS).map(([k,S])=>`<div class="setItem${th>=S.th?'':' lock'}"><div><b>${S.ic} ${S.n}</b><small>⚔️ ${S.atk} attack · ❤️ ${S.hp} health${th>=S.th?'':' · needs Town Hall '+S.th}</small></div>${th>=S.th?`<input id="seaN_${k}" type="number" min="1" value="1" style="width:56px">${btn('Build',S.cost,'v151:seab:'+k,'prime mini')}`:''}</div>`).join('')}</div>
+    <div class="label">🌊 Battles (${SEA_DAY-used} left today)</div><div class="setList">${SEA_FOES.map(([k,ic,n,pf,dsc])=>{ const once=k==='ser'?m.seaS===d:k==='kra'?m.seaK===weekId():false; return `<div class="setItem"><div><b>${ic} ${n}${k==='pir'?' (level '+lv+')':''}</b><small>${dsc} · 💪 ${f(pf(lv))}</small></div>${once?'<small>✅ done</small>':btn('⚔️ Sail',null,'v151:seaf:'+k,'war mini')}</div>`; }).join('')}</div>
+    ${tg.length?`<div class="label">🏴 Other players' fleets</div><div class="setList">${tg.map(([u,p])=>`<div class="setItem"><div><b>${esc(cleanText(p.name||'?'))}</b><small>${seaCount(p)} ships · 💪 ${f(Math.round(seaPow(p).p))}</small></div>${btn('⚔️ Attack',null,'v151:seap:'+u,'war mini')}</div>`).join('')}</div><p class="desc"><small>Beat another fleet to take 3% of their gold. Each player once every 6 hours.</small></p>`:''}`); }
+function seaBuild(k){ const S=SHIPS[k]; if(!S) return; const n=Math.max(1,Math.min(50,Math.floor(+($('seaN_'+k)||{}).value||1)));
+  act([],me=>{ if(!seaDocks(ME)) fail('Build a Dock first.'); if(th151(ME)<S.th) fail(`${S.n}s need Town Hall ${S.th}.`); const room=seaMax(ME)-seaCount(me); if(room<=0) fail('Your fleet is full. Build another Dock for more ships.'); const k2=Math.min(n,room); settle(me); pay(me,{gold:S.cost.gold*k2,stone:S.cost.stone*k2}); me.fleet=Object.assign({},me.fleet); me.fleet[k]=(me.fleet[k]||0)+k2; return {k2}; },r=>{ snd('build'); toast(`${S.ic} ${r.k2} ${S.n}${r.k2>1?'s':''} ready to sail!`); navyDialog(); }); }
+function seaSim(myF,foeA,foeH){ let A=0,H=0; for(const k in SHIPS){ A+=(myF[k]||0)*SHIPS[k].atk; H+=(myF[k]||0)*SHIPS[k].hp; } let fh=foeH, mh=H; const R=[]; for(let i=0;i<4&&fh>0&&mh>0;i++){ const d1=A*(.8+Math.random()*.4)*(mh/H), d2=foeA*(.8+Math.random()*.4)*(fh/foeH); fh=Math.max(0,fh-d1); mh=Math.max(0,mh-d2); R.push([Math.round(d1),Math.round(d2),fh/foeH,mh/H]); } return {win:fh<=0||(mh>0&&fh/foeH<mh/H),R,lossFrac:H?Math.min(.9,(H-mh)/H*.6):0}; }
+function seaLose(me,frac){ const F=Object.assign({},me.fleet), lost={}; for(const k in SHIPS){ const n=F[k]||0, l=Math.min(n,Math.round(n*frac)); if(l){ F[k]=n-l; lost[k]=l; } } me.fleet=F; return lost; }
+function seaFight(k){ const foe=SEA_FOES.find(x=>x[0]===k); if(!foe) return; let res;
+  act([],me=>{ if(!seaCount(me)) fail('Build some ships first.'); const d=dayNum(); if(!me.seaD||me.seaD.d!==d) me.seaD={d,n:0}; if(me.seaD.n>=SEA_DAY) fail('Your sailors are tired. Come back tomorrow!'); if(k==='ser'&&me.seaS===d) fail('You already fought the Sea Serpent today.'); if(k==='kra'&&me.seaK===weekId()) fail('You already fought the Kraken this week.');
+    const lv=me.seaLv||1, pw=foe[3](lv), sim=seaSim(me.fleet||{},pw*.35,pw); me.seaD.n++; if(k==='ser') me.seaS=d; if(k==='kra') me.seaK=weekId(); const lost=seaLose(me,sim.win?sim.lossFrac*.4:sim.lossFrac); let rw={};
+    if(sim.win){ settle(me); const mul=k==='pir'?1+lv*.15:k==='ser'?6:18, g=sc133(Math.round(700*mul)), s=sc133(Math.round(400*mul)); me.gold+=g; me.stone+=s; rw={g,s}; if(k==='pir') me.seaLv=lv+1; if(Math.random()<(k==='pir'?.08:k==='ser'?.4:1)){ const gm=k==='kra'?25:3+Math.floor(Math.random()*6); gemsAdd(me,gm); rw.gm=gm; } if(k==='kra'||Math.random()<.05){ me.stash=me.stash||{}; const cr=k==='kra'?'royal':'iron'; me.stash[cr]=(me.stash[cr]||0)+1; rw.cr=cr; } me.seaW=(me.seaW||0)+1; }
+    res={sim,lost,rw,foe:[foe[1],foe[2]]}; return res; },r=>seaShow(r)); }
+function seaAttack(uid){ const v0=P(uid); if(!v0) return; if(blkAny(uid)) return toast(blkMsg(uid),true); try{ const st=dlState(ME,P(ME),uid,v0); if(st&&st.on&&st.ty==='peace') return toast('🕊️ You have a peace promise with them.',true); }catch(e){}
+  mkTx(async(t,me)=>{ const v=await t.getPlayer(uid); if(!v||v.dead) fail('That kingdom is gone.'); if((v.shield||0)>now()) fail('They have a shield up.'); if(!seaCount(me)) fail('Build some ships first.'); if(!seaCount(v)) fail('They have no fleet.'); me.seaPv=Object.assign({},me.seaPv); for(const q in me.seaPv) if(now()-me.seaPv[q]>6*3600000) delete me.seaPv[q]; if(me.seaPv[uid]) fail('You attacked this fleet recently. Try again later.'); const d=dayNum(); if(!me.seaD||me.seaD.d!==d) me.seaD={d,n:0}; if(me.seaD.n>=SEA_DAY) fail('Your sailors are tired. Come back tomorrow!');
+    const vp=seaPow(v), sim=seaSim(me.fleet||{},vp.a,Math.max(1,vp.h)); me.seaD.n++; me.seaPv[uid]=now(); const lost=seaLose(me,sim.win?sim.lossFrac*.4:sim.lossFrac); let rw={}; settle(me);
+    if(sim.win){ settle(v); const take=Math.min(Math.floor((v.gold||0)*.03),sc133(5000)); v.gold=(v.gold||0)-take; me.gold+=take; rw={g:take}; t.setPlayer(uid,v); }
+    t.setPlayer(ME,me); return {sim,lost,rw,foe:['⚓',cleanText(v.name||'?')+"'s fleet"],pv:uid}; },
+    r=>{ try{ report(uid,r.sim.win?`⚓ ${cleanText(P(ME).name)} beat your fleet and took ${f(r.rw.g||0)} gold! Build more ships.`:`⚓ Your fleet beat ${cleanText(P(ME).name)}'s attack!`,r.sim.win?'bad':'good'); }catch(e){} seaShow(r); }); }
+function seaShow(r){ const o=document.createElement('div'); o.className='overlay'; o.id='seaOv'; o.style.zIndex=72; const R=r.sim.R;
+  o.innerHTML=`<div class="dialog"><h2>⛵ Sea battle</h2><div class="seaBat"><div class="side me"><span>⛵⛵🚢</span><div class="lvBar"><i id="seaMe" style="width:100%"></i></div><small>Your fleet</small></div><b class="vs">💥</b><div class="side foe"><span>${r.foe[0]}</span><div class="lvBar"><i id="seaFoe" style="width:100%"></i></div><small>${esc(r.foe[1])}</small></div></div><div id="seaRes" class="desc" style="text-align:center;min-height:3em">🌊 The battle begins...</div><div class="row" style="justify-content:center"><button class="prime" data-act="v151:seaok">OK</button></div></div>`; document.body.appendChild(o);
+  let i=0; const step=()=>{ if(!document.body.contains(o)) return; if(i<R.length){ const x=R[i]; const a=$('seaMe'), b=$('seaFoe'); if(b) b.style.width=(x[2]*100)+'%'; if(a) a.style.width=(x[3]*100)+'%'; $('seaRes').textContent=`💥 Round ${i+1}: you hit for ${f(x[0])}, they hit for ${f(x[1])}`; snd('click'); i++; setTimeout(step,RM?50:700); return; }
+    const lostT=Object.entries(r.lost).map(([k,n])=>n+' '+SHIPS[k].n+(n>1?'s':'')).join(', '); $('seaRes').innerHTML=(r.sim.win?`<b>🏆 Victory!</b> ${r.rw.g?'+'+f(r.rw.g)+' gold ':''}${r.rw.s?'+'+f(r.rw.s)+' stone ':''}${r.rw.gm?'+'+r.rw.gm+' gems ':''}${r.rw.cr?'+ a '+CRATES[r.rw.cr].name:''}`:'<b>🌊 Your fleet had to retreat.</b>')+(lostT?`<br><small>Ships lost: ${lostT}</small>`:''); if(r.sim.win){ snd('quest'); confetti(); } };
+  setTimeout(step,400); }
+
+/* the Sea Expeditions screen and Sea battles live together */
+seaDialog=(o=>function(){ const r=o.apply(this,arguments); try{ const d=document.querySelector('#fkOv .dialog, #ov .dialog'); const h=d&&d.querySelector('h2'); if(h&&!d.querySelector('.navyBtn')){ const w=document.createElement('div'); w.className='row navyBtn'; w.innerHTML=btn('⚔️ Sea battles: warships, pirates and the Kraken',null,'v151:sea','war'); h.after(w); } }catch(e){} return r; })(seaDialog);
+/* =============== menus, profile, ready list, router =============== */
+setTimeout(()=>{ try{ const add=(sec,item)=>{ const S=PLAY_SECTIONS.find(x=>x[0]===sec); if(S&&!S[1].some(x=>x[2]===item[2])) S[1].push(item); };
+  add('⚔️ Fight',['⛵','Sea (expeditions & battles)','v108:sea']); add('🤝 Together',['♟️','Board games','v151:bg']); add('🐾 Pets',['🎀','Pet show','v151:ps']); add('🎒 Collect',['🗺️','Riddle treasure hunt','v108:tr']); add('ℹ️ Help',['🎟️','Invite friends','v151:ref']);
+  const H=PLAY_SECTIONS.find(x=>x[0]==='ℹ️ Help'); if(H) H[1]=H[1].filter(x=>x[2]!=='v127:share'); }catch(e){} },120);
+profileDialog=(o=>function(uid){ const r=o.apply(this,arguments); try{ const p=P(uid), d=document.querySelector('#profOv .v132prof'), row=d&&d.querySelector('.row'); if(p&&row&&uid!==ME){ if(online(p)&&!row.querySelector('.bgBtn')){ const b=document.createElement('button'); b.className='soft mini bgBtn'; b.dataset.act='v151:bgto:'+uid; b.textContent='♟️ Board game'; row.appendChild(b); } if(seaCount(p)&&!row.querySelector('.seaBtn')){ const b=document.createElement('button'); b.className='war mini seaBtn'; b.dataset.act='v151:seap:'+uid; b.textContent='⛵ Attack fleet'; row.appendChild(b); } }
+  if(p&&d&&p.psW&&!d.querySelector('.psTag')){ const t=document.createElement('p'); t.className='desc psTag'; t.textContent=`🏆 Pet show champion ×${p.psW}`; d.prepend(t); } }catch(e){} return r; })(profileDialog);
+readyList=(f0=>function(){ const L=f0.apply(this,arguments).filter(x=>x&&x.act!=='v133:we'); try{ const m=P(ME); if(m&&!m.dead){ const got=m.refGot||[]; if(refKids().some(k=>k.th>=5&&!got.includes(k.u))&&got.length<REF_MAX) L.push({ic:'🎟️',t:'Collect your invite reward',act:'v151:ref'}); if(m.ref&&!m.refC&&th151(ME)>=5) L.push({ic:'🎁',t:'Collect your welcome gift',act:'v151:ref'});
+  const pr=psSt&&psSt.wk!==weekId()?psFresh(psSt).prev:null; if(pr&&m.psC!==pr.wk&&(pr.ent.includes(ME)||pr.vot.includes(ME))) L.push({ic:'🐾',t:'Collect your pet show prize',act:'v151:ps'}); } }catch(e){} return L; })(readyList);
+setTimeout(()=>cellRead(PS_CELL).then(v=>psSt=v),9000);
+(function(){ const va=v82Act; v82Act=function(a,b){ if(!a.startsWith('v151:')) return va(a,b); const r=a.split(':'), k=r[1];
+  if(k==='talbuy') talBuy();
+  else if(k==='ref') refDialog(); else if(k==='refget') refGet(r[2]); else if(k==='refme') refMe(); else if(k==='refcopy'){ const i=$('refL'); try{ navigator.clipboard.writeText(i.value).then(()=>toast('📋 Link copied!')).catch(()=>{ i.select(); toast('Select the link and copy it.'); }); }catch(e){ i&&i.select(); } }
+  else if(k==='ps') psDialog(); else if(k==='psin') psEnter(r[2]); else if(k==='psvote') psVote(r[2]); else if(k==='psclaim') psClaim();
+  else if(k==='bg') bgDialog(); else if(k==='bgto') bgDialog(r[2]); else if(k==='bgch') bgChallenge(r[2],($('bgG')||{}).value||'ttt',($('bgB')||{}).value||0); else if(k==='bgok') bgAccept(r[2]); else if(k==='bgno') bgDecline(r[2]);
+  else if(k==='bgm') bgMove(+r[2]); else if(k==='bgk') bgCk(r[2]); else if(k==='bgend'){ const p=bgPath; bgPath=[]; if(p.length>1) bgMove(p); } else if(k==='bgundo'){ bgPath=bgPath.slice(0,1); bgRender(); } else if(k==='bgclaim') bgClaim(); else if(k==='bgclose'){ const o=$('bgOv'); if(o) o.remove(); } else if(k==='bgshow') bgOpen();
+  else if(k==='sea') navyDialog(); else if(k==='seab') seaBuild(r[2]); else if(k==='seaf') seaFight(r[2]); else if(k==='seap') seaAttack(r[2]); else if(k==='seaok'){ const o=$('seaOv'); if(o) o.remove(); if(document.querySelector('#fkOv h2')&&document.querySelector('#fkOv h2').textContent.includes('Sea battles')) navyDialog(); }
+  return true; }; })();
+
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
 var SITES={vein:{name:'Gold Vein',ic:'⛏️',desc:'+25% gold from your Town Hall and Gold Mines.'},well:{name:'Magic Well',ic:'🔮',desc:'+25% food from your Town Hall and Farms.'},ruins:{name:'Ancient Ruins',ic:'🏛️',desc:'Search them once a day for 10 gems.'},grove:{name:'Crystal Grove',ic:'💎',desc:'+10% attack for your whole army.'}};
@@ -11574,6 +11753,7 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  151:['⛵ Sea battles: build warships and fight pirates, the Sea Serpent, the Kraken and other fleets (in the Sea harbor)','🎀 A weekly pet show: enter your pet and vote','♟️ Live board games: tic-tac-toe, connect four and checkers','🎟️ Invite rewards for you and your friends','👑 The Royal Council now meets twice a day','🌟 Hero talent rows are now unlocked with gold','🌍 World events were removed'],
   150:['🧹 A tidier Play menu: every feature shows up once, in clear groups','👑 All royal choices are now in one place: the Royal Council','🏹 New names: Arrow Queen, Barbarian Overlord, Wall Smasher and Builder Lodge'],
   149:['📚 New game guides on the website: jobs, heroes, troops, crates, gear, relics and pets','🧭 Strategy tips and a list of all updates','📦 The Recruit Crate and Army Crate now say "Troops" in their odds'],
   148:['🌅 A cleaner home screen','👑 A cleaner owner panel'],
