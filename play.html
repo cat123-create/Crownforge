@@ -595,6 +595,7 @@ button:active{transform:scale(.96)}.jgChips{display:flex;flex-wrap:wrap;gap:4px;
 .clLv{text-align:center;background:#fff6dc;border:2px solid #c9a24a;border-radius:12px;padding:8px;margin:6px 0;color:#2b1a0c}.clLv b{font-size:22px;display:block}
 .seaFleet{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}.seaFleet>div{background:#e3f1ff;border:2px solid #4fb6ff;border-radius:12px;padding:6px;text-align:center;color:#12324a}.seaFleet span{font-size:24px;display:block}.seaFleet b{display:block;font-size:18px}.seaFleet small{font-size:11px}
 .seaBat{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#8fd0ff,#2f6bd1);border-radius:14px;padding:14px 10px;margin:8px 0;color:#fff}.seaBat .side{flex:1;text-align:center}.seaBat .side span{font-size:32px;display:block}.seaBat .vs{font-size:26px}.seaBat .lvBar i{transition:width .5s}
+.bgC:disabled,.bgD:disabled,.bgS:disabled{filter:none!important;opacity:1!important;cursor:default}
 </style>
 </head>
 <body>
@@ -715,7 +716,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 151;
+const GAME_VERSION = 152;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -11753,6 +11754,7 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  152:['♟️ Board game pieces now keep their colors while you wait for your turn'],
   151:['⛵ Sea battles: build warships and fight pirates, the Sea Serpent, the Kraken and other fleets (in the Sea harbor)','🎀 A weekly pet show: enter your pet and vote','♟️ Live board games: tic-tac-toe, connect four and checkers','🎟️ Invite rewards for you and your friends','👑 The Royal Council now meets twice a day','🌟 Hero talent rows are now unlocked with gold','🌍 World events were removed'],
   150:['🧹 A tidier Play menu: every feature shows up once, in clear groups','👑 All royal choices are now in one place: the Royal Council','🏹 New names: Arrow Queen, Barbarian Overlord, Wall Smasher and Builder Lodge'],
   149:['📚 New game guides on the website: jobs, heroes, troops, crates, gear, relics and pets','🧭 Strategy tips and a list of all updates','📦 The Recruit Crate and Army Crate now say "Troops" in their odds'],
