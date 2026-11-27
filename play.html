@@ -596,6 +596,8 @@ button:active{transform:scale(.96)}.jgChips{display:flex;flex-wrap:wrap;gap:4px;
 .seaFleet{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}.seaFleet>div{background:#e3f1ff;border:2px solid #4fb6ff;border-radius:12px;padding:6px;text-align:center;color:#12324a}.seaFleet span{font-size:24px;display:block}.seaFleet b{display:block;font-size:18px}.seaFleet small{font-size:11px}
 .seaBat{display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#8fd0ff,#2f6bd1);border-radius:14px;padding:14px 10px;margin:8px 0;color:#fff}.seaBat .side{flex:1;text-align:center}.seaBat .side span{font-size:32px;display:block}.seaBat .vs{font-size:26px}.seaBat .lvBar i{transition:width .5s}
 .bgC:disabled,.bgD:disabled,.bgS:disabled{filter:none!important;opacity:1!important;cursor:default}
+@keyframes tap153{0%{transform:scale(1)}40%{transform:scale(.93)}100%{transform:scale(1)}}.tap153{animation:tap153 .18s ease-out}
+#savingPill{position:fixed;right:12px;bottom:12px;z-index:200;background:#2b1a0c;color:#ffe9a8;font-weight:800;font-size:13px;padding:6px 12px;border-radius:999px;box-shadow:0 3px 0 rgba(0,0,0,.3);pointer-events:none}
 </style>
 </head>
 <body>
@@ -716,7 +718,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 152;
+const GAME_VERSION = 153;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -3602,7 +3604,7 @@ function renderQuest(){
   el.dataset.done=done?'1':'';
 }
 function refreshButtons(){ const m=P(ME); if(!m) return; const c=cur(m), fb=freeBuilder();
-  document.querySelectorAll('[data-act]').forEach(b=>{ b.disabled=busy||b.dataset.lock==='1'||c.gold<+(b.dataset.g||0)||c.stone<+(b.dataset.s||0)||(m.gems||0)<+(b.dataset.m||0)||(b.dataset.b==='1'&&!fb); }); }
+  document.querySelectorAll('[data-act]').forEach(b=>{ b.disabled=b.dataset.lock==='1'||c.gold<+(b.dataset.g||0)||c.stone<+(b.dataset.s||0)||(m.gems||0)<+(b.dataset.m||0)||(b.dataset.b==='1'&&!fb); }); }
 let boardTab='kingdoms';
 function renderBoard(){
   const sid=seasonId(), alive=Object.values(G.players).filter(p=>!p.dead&&(p.season===sid||p.id===ME)).sort((a,b)=>(b.tr||0)-(a.tr||0));
@@ -11562,6 +11564,18 @@ setTimeout(()=>cellRead(PS_CELL).then(v=>psSt=v),9000);
   else if(k==='sea') navyDialog(); else if(k==='seab') seaBuild(r[2]); else if(k==='seaf') seaFight(r[2]); else if(k==='seap') seaAttack(r[2]); else if(k==='seaok'){ const o=$('seaOv'); if(o) o.remove(); if(document.querySelector('#fkOv h2')&&document.querySelector('#fkOv h2').textContent.includes('Sea battles')) navyDialog(); }
   return true; }; })();
 
+/* ===== v153: buttons feel instant. Taps are never thrown away while the game waits for the server:
+   they wait in a short line and run right after. Buttons stay clickable, a double tap only counts once,
+   and a small "Saving..." note shows while the server answers. ===== */
+var actQ=[], tap153={a:'',t:0}, busyT0=0;
+window.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-act]'); if(!b) return; const a=b.dataset.act, t=Date.now();
+  if(a===tap153.a&&t-tap153.t<450){ e.stopImmediatePropagation(); e.preventDefault(); return; } tap153={a,t}; b.classList.remove('tap153'); void b.offsetWidth; b.classList.add('tap153'); },true);
+function q153(o,self,args){ if(actQ.length>=2) return toast('⏳ One moment, still saving...'); actQ.push([o,self,args,Date.now()]); }
+act=(o=>function(){ if(busy){ q153(o,this,arguments); return; } return o.apply(this,arguments); })(act);
+mkTx=(o=>function(){ if(busy){ q153(o,this,arguments); return; } return o.apply(this,arguments); })(mkTx);
+setInterval(()=>{ if(busy||!actQ.length) return; const [o,self,args,t]=actQ.shift(); if(Date.now()-t>8000) return; try{ o.apply(self,args); }catch(e){} },40);
+setInterval(()=>{ let el=$('savingPill'); if(busy){ if(!busyT0) busyT0=Date.now(); if(Date.now()-busyT0>300){ if(!el){ el=document.createElement('div'); el.id='savingPill'; el.textContent='⏳ Saving...'; document.body.appendChild(el); } } } else { busyT0=0; if(el) el.remove(); } },100);
+
 /* ===== v63 ===== */
 /* ===== v66: special places on the map ===== */
 var SITES={vein:{name:'Gold Vein',ic:'⛏️',desc:'+25% gold from your Town Hall and Gold Mines.'},well:{name:'Magic Well',ic:'🔮',desc:'+25% food from your Town Hall and Farms.'},ruins:{name:'Ancient Ruins',ic:'🏛️',desc:'Search them once a day for 10 gems.'},grove:{name:'Crystal Grove',ic:'💎',desc:'+10% attack for your whole army.'}};
@@ -11754,6 +11768,7 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  153:['⚡ Buttons feel faster: taps are never lost while the game is saving, and a double tap only counts once'],
   152:['♟️ Board game pieces now keep their colors while you wait for your turn'],
   151:['⛵ Sea battles: build warships and fight pirates, the Sea Serpent, the Kraken and other fleets (in the Sea harbor)','🎀 A weekly pet show: enter your pet and vote','♟️ Live board games: tic-tac-toe, connect four and checkers','🎟️ Invite rewards for you and your friends','👑 The Royal Council now meets twice a day','🌟 Hero talent rows are now unlocked with gold','🌍 World events were removed'],
   150:['🧹 A tidier Play menu: every feature shows up once, in clear groups','👑 All royal choices are now in one place: the Royal Council','🏹 New names: Arrow Queen, Barbarian Overlord, Wall Smasher and Builder Lodge'],
