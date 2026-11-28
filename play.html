@@ -718,7 +718,7 @@ const FIREBASE_CONFIG = {
   appId: "1:969723909410:web:cd151423ec6cb19378417b"
 };
 const WORLD = { id: "main", size: 20000, seed: 20261023 };
-const GAME_VERSION = 153;
+const GAME_VERSION = 154;
 /* Player settings (saved on this device) */
 var PREF=(()=>{ try{ return JSON.parse(localStorage.getItem('cf-prefs'))||{}; }catch(e){ return {}; } })();
 function pref(k,d){ return PREF[k]===undefined?d:PREF[k]; }
@@ -2941,7 +2941,7 @@ const TUT=[
   {t:'Troops need food! Tap your empty land and build a Farm. Tap it to collect food.',done:m=>Object.values(G.plots).some(q=>q.o===ME&&q.b==='farm'),hl:'[data-act="b:farm"]'},
   {t:'Build a Barracks, then train soldiers in the Army panel. Each soldier costs a little food.',done:m=>((m.stats||{}).sol||0)>0,hl:'#army'},
   {t:'Tap a barbarian camp (red tents) and press Raid. Place your troops and watch the fight!',done:m=>((m.stats||{}).raids||0)>0,hl:'[data-act=attack]'},
-  {t:'You are ready! Upgrade your Town Hall to unlock the Shop, Gear, Clans and Market. The fog hides land more than 50 tiles away: send troops to camp to explore. Check 🎉 Fun for the Story and games, and follow the Next tip on the map.',done:()=>false,hl:'#gFun',last:true}
+  {t:'You are ready! Upgrade your Town Hall to unlock the Shop, Gear, Clans and Market. Check 🎉 Fun for the Story and games, and follow the Next tip on the map.',done:()=>false,hl:'#gFun',last:true}
 ];
 const TUT_KEY=()=>'iron-acre-tut-'+WORLD.id+'-'+ME;
 function tutStep(){ try{ const v=localStorage.getItem(TUT_KEY()); return v===null?0:+v; }catch(e){ return 99; } }
@@ -2978,7 +2978,7 @@ const DAY_MIN=24;
 function darkness(){ const p=(Date.now()/(DAY_MIN*60000))%1; return p<.55?0:p<.65?(p-.55)/.1:p<.9?1:p<1?1-(p-.9)/.1:0; }
 /* ================= weather and seasons ================= */
 function seasonNow(){ const d=new Date(), m=d.getMonth(), day=d.getDate(); return (m===9&&day>=10)||(m===10&&day<=2)?'halloween':(m===11||m<=1)?'winter':'none'; }
-function weatherNow(){ const blk=Math.floor(Date.now()/(20*60000)), h=hash2(blk,77,5); if(seasonNow()==='winter') return h<.4?'snow':h<.5?'fog':'clear'; return h<.2?'rain':h<.26?'storm':h<.33?'fog':'clear'; }
+function weatherNow(){ const blk=Math.floor(Date.now()/(20*60000)), h=hash2(blk,77,5); if(seasonNow()==='winter') return h<.4?'snow':'clear'; return h<.2?'rain':h<.26?'storm':'clear'; }
 const WEATHER_NAME={clear:'',rain:'Rain',storm:'Thunderstorm',fog:'Fog',snow:'Snow'};
 let flashT=0;
 function drawWeather(){ if(RM) return; const w=weatherNow(), T=NOWT||performance.now();
@@ -6268,9 +6268,9 @@ async function exLoad(){ try{ await DB.tx(async t=>{ const r=await t.getRegion(r
 setTimeout(()=>{ exLoad(); },10000); setInterval(()=>{ exLoad(); },5*60000);
 var exFound=m=>!!(m&&m.expl&&m.expl.d===exDay());
 function exDialog(){ const m=P(ME); if(!m) return; const cl=exClue(), done=exFound(m), n=exState&&exState.d===exDay()?(exState.f||[]).length:0;
-  $('ov').innerHTML=`<div class="overlay"><div class="dialog"><h2>🧭 Daily explorer</h2><p class="desc">A secret place is hidden somewhere on the map today. When you can see it (not in the fog), it twinkles. Tap it to claim it! The first ${EXPL_MAX} explorers win gems.</p>
+  $('ov').innerHTML=`<div class="overlay"><div class="dialog"><h2>🧭 Daily explorer</h2><p class="desc">A secret place is hidden somewhere on the map today. It twinkles on the map. Tap it to claim it! The first ${EXPL_MAX} explorers win gems.</p>
     ${cl?`<div class="v82box">📜 <b>Today's clue:</b> look about <b>${cl.d} tiles ${cl.dir}</b> of <b>${esc(cl.who)}</b>'s kingdom.</div>`:'<p class="desc">The map is still loading. Try again in a moment.</p>'}
-    <p class="desc">${done?'✅ <b>You already found today\'s place!</b> A new one appears tomorrow.':`${n} of ${EXPL_MAX} prizes claimed so far. Tip: send troops to camp nearby to clear the fog.`}</p>
+    <p class="desc">${done?'✅ <b>You already found today\'s place!</b> A new one appears tomorrow.':`${n} of ${EXPL_MAX} prizes claimed so far. Tip: look around the map for the twinkle.`}</p>
     ${exState&&(exState.f||[]).length?`<div class="label">Explorers today</div><div class="desc">${exState.f.slice(0,EXPL_MAX).map((x,i)=>`${i+1}. ${esc(cleanText(x.n||'?'))}`).join(' · ')}</div>`:''}
     <button class="soft" data-act="ov:close">Close</button></div></div>`; }
 function exClaim(){ const c=exCell(); if(!c||sel!==c) return; act([EXPL_CELL],(me,pl)=>{ const b=pl[EXPL_CELL], d=exDay(); if(!b||b.d!==d) fail('The explorer map is still loading. Try again in a moment.'); if(me.expl&&me.expl.d===d) fail('You already found today\'s place!'); const [x,y]=xy(c); if(!seenTile(x,y)) fail('You need to see the place first.');
@@ -6779,7 +6779,7 @@ try{ FAQ.push(
  ['What are mini-games?','mini game games archery jousting horse race goblin defense','Open 🎉 Fun ▾ → Games for archery, jousting, horse races and goblin defense. They give small rewards.'],
  ['What is the World Boss reward?','world boss reward royal legendary chest top hitter','Everyone who hits the World Boss gets a Royal Crate. The top hitter gets a Legendary Chest.'],
  ['What happens at night?','night dark day time','Day and night change as you play. At night kingdoms light up, and on full moons werewolves raid more often.'],
- ['What do the weather and seasons do?','weather rain snow fog season seasons','The weather and seasons change how the map looks. Weather spells change your own kingdom\'s weather for bonuses.'],
+ ['What do the weather and seasons do?','weather rain snow season seasons','The weather and seasons change how the map looks. Weather spells change your own kingdom\'s weather for bonuses.'],
  ['What is a full moon?','full moon werewolf werewolves','On a full moon, barbarian raids come twice as often and are called werewolf packs. Keep your defenses ready!'],
  ['Why am I being raided by barbarians?','raid raided barbarians camp attacking me','Barbarian camps near your borders sometimes raid you. Build towers, keep troops home and use your pet\'s power to fight back.'],
  ['What is the food bar?','food starve starving hungry run out','Food goes down as troops and pets eat. If it reaches 0 your kingdom starves and slowly loses gold, stone and troops. Build and collect Farms!'],
@@ -6792,8 +6792,7 @@ try{ FAQ.push(
  ['How do I report a bug?','bug glitch broken error problem','Tell the game owner what happened and what you were doing. A screenshot helps a lot!'],
  ['What do the buttons at the top do?','buttons top menu battles fun kingdom more','Shop, Gear, Rewards, Pets and Kingdom open those windows. ⚔️ Battles, 🎉 Fun, 🏰 My kingdom and ☰ More open menus with everything else.'],
  ['How do I zoom and move the map?','zoom move map drag pinch scroll home','Drag to move, pinch or scroll to zoom, or use the + and − buttons. Press Home to go back to your kingdom and tap the minimap to jump anywhere.'],
- ['What does the fog mean?','fog unexplored hidden grey','You can only see land near your kingdom, camp and armies. Send troops to camp somewhere to explore it.'],
- ['What is camping?','camp camping troops outpost explore','Send troops to camp on a faraway tile. They clear the fog around them and let you attack from there.'],
+ ['What is camping?','camp camping troops outpost explore','Send troops to camp on a faraway tile. They let you attack from there.'],
  ['How far can my army march?','march range far distance tiles','15 tiles at first. Upgrade March range in ⚔️ Battles ▾ to reach up to 36 tiles.'],
  ['What are special sites?','site sites vein well grove ruins special','Some tiles are special sites, like gold veins, wells, groves and ruins. Own them for bonuses.'],
  ['What are ancient ruins?','ruins ancient explore hero','Find an Ancient Ruins tile and send your hero to explore it for treasure.'],
@@ -6938,7 +6937,7 @@ function gdSections(){ const S=[]; const add=(id,ic,name,html)=>S.push({id,ic,na
     <li>Your <b>Town Hall</b> is your capital. Lose it and you lose everything.</li><li>New kingdoms start with <b>1,000 gold</b> and must build a <b>Gold Mine</b>, then a <b>Quarry</b>, before anything else.</li>
     <li>Buy <b>glowing gold tiles</b> next to your land to grow. Each new tile costs a bit more.</li><li>Your kingdom only makes resources while the game is open.</li>
     <li>New kingdoms get a <b>2-hour peace shield</b> and newcomer protection. After being attacked you get a <b>15-minute shield</b>.</li><li>The Town Hall goes up to <b>level 100</b>. At 100 you can <b>prestige</b> for a permanent star.</li>
-    <li>Day and night change as you play. Weather (rain, storms, fog, snow) is just for looks unless you cast a weather spell.</li><li>Tap 🔔 to see everything ready for you, and use the ❓ question bar at the top for quick answers.</li></ul>`);
+    <li>Day and night change as you play. Weather (rain, storms, snow) is just for looks unless you cast a weather spell.</li><li>Tap 🔔 to see everything ready for you, and use the ❓ question bar at the top for quick answers.</li></ul>`);
   add('res','💰','Resources',gdT([['🪙 Gold','Gold Mines (20 per minute per level), raids, quests. Used for almost everything.'],['🪨 Stone','Quarries (12/min/level) and Stone Mines (8/min/level, sometimes give gems). Used for buildings.'],['🍖 Food','Farms (15/min/level). Troops and pets eat food. At 0 food your kingdom starves and slowly loses gold, stone and troops.'],['💎 Gems','Rare! From daily rewards, quests, achievements, events, the maze, arena, Pet Cup and more. Every gem reward is about 35% smaller than shown in older windows.'],['🏆 Trophies','Win player battles to earn them and climb leagues.'],['⭐ XP','From almost everything. Each kingdom level gives a skill point.']],['Resource','How to get it / what it does'])+`<p>Storage limits rise with your Town Hall. Golden hour (a few times a week, 10 minutes) doubles everything you make.</p>`);
   add('build','🏗️','Buildings',gdT(Object.entries(B).filter(([k,b])=>b&&b.name&&k!=='hallx'&&k!=='deco').map(([k,b])=>[`<b>${esc(b.name)}</b>`,gdC(b.cost),b.th?'TH '+b.th:'TH 1',esc(b.desc||'')]),['Building','Cost','Needs','What it does'])+`<p>Buildings go up to level 12 (your Town Hall level +1). Each builder works on one thing at a time.</p>`);
   add('troops','⚔️','Troops',gdT(Object.entries(UNITS).map(([k,u])=>[`<b>${esc(u.name)}</b>`,gdC(u.cost),u.atk,u.def,u.sp,'TH '+(u.th||1),esc(u.desc||'')]),['Troop','Cost','Attack','Defense','Space','Needs','About']));
@@ -8036,12 +8035,12 @@ var DR_CD=30*60000, DR_MAX=60, DR_VIEW=10*60000;
 var drFx=null;
 function drOk(m){ return !!(m&&(m.mounts||{}).dragon); }
 function drDialog(){ const m=P(ME), cd=Math.max(0,DR_CD-(now()-((m.dfly||{}).t||0)));
-  adOpen('🐉 Dragon Riding',`<p class="desc">Hop on your <b>Hero Dragon</b> and fly over lakes and forests to anywhere within <b>${DR_MAX} tiles</b> of your kingdom! The dragon clears the fog around where it lands (and you keep that land explored forever), and sometimes finds treasure. You can fly every 30 minutes.</p>
+  adOpen('🐉 Dragon Riding',`<p class="desc">Hop on your <b>Hero Dragon</b> and fly over lakes and forests to anywhere within <b>${DR_MAX} tiles</b> of your kingdom! Sometimes your dragon finds treasure where it lands. You can fly every 30 minutes.</p>
     ${drOk(m)?(cd>0?`<p class="desc">Your dragon is resting. Fly again in ${fmtT(cd/1000)}.</p>`:'<p class="desc">💡 Close this, <b>tap any tile on the map</b>, then press <b>🐉 Fly here</b>.</p>'):`<p class="desc">🔒 You need the <b>🐉 Hero Dragon</b> mount (Town Hall 10). Get it in My kingdom → Mounts.</p>${btn('🐴 Mounts',null,'v84:mount:open','prime')}`}
     ${(m.dflyN||0)?`<div class="stat"><span>Flights</span><span>${m.dflyN}</span></div>`:''}`); }
 function drFly(cell){ const m=P(ME); if(!drOk(m)) return toast('You need the Hero Dragon mount.',true); const h=stats(ME).hall; if(!h||!cell) return; const [x,y]=xy(cell), [hx,hy]=xy(h), d=Math.round(Math.hypot(x-hx,y-hy)); if(d>DR_MAX) return toast(`That's too far! Your dragon can fly ${DR_MAX} tiles.`,true);
   act([],me=>{ if(now()-((me.dfly||{}).t||0)<DR_CD) fail('Your dragon is still resting.'); const out={}; if(Math.random()<.25){ const hl=Math.max(1,stats(ME).hallLvl||1); if(Math.random()<.6){ out.g=800*hl; me.gold+=out.g; } else { out.gems=2+Math.floor(Math.random()*3); gemsAdd(me,out.gems); } } me.dfly={t:now(),x,y}; me.dflyN=(me.dflyN||0)+1; return out; },
-    r=>{ drFx={t:performance.now(),from:[hx,hy],to:[x,y]}; snd('march'); setTimeout(()=>{ try{ fogC=null; }catch(e){} try{ expMark(); }catch(e){} toast(`🐉 Your dragon landed and cleared the fog!${r.g?` It found ${f(r.g)} gold!`:r.gems?` It found ${r.gems} gems!`:''}`); },2600); renderPanel(true); }); }
+    r=>{ drFx={t:performance.now(),from:[hx,hy],to:[x,y]}; snd('march'); setTimeout(()=>{ try{ fogC=null; }catch(e){} try{ expMark(); }catch(e){} toast(`🐉 Your dragon landed!${r.g?` It found ${f(r.g)} gold!`:r.gems?` It found ${r.gems} gems!`:''}`); },2600); renderPanel(true); }); }
 (function(){ const fc=fogCenters; fogCenters=function(){ const l=fc(); try{ const m=P(ME), d=m&&m.dfly; if(d&&now()-d.t<DR_VIEW&&!l.some(q=>q[0]===d.x&&q[1]===d.y)) l.push([d.x,d.y]); }catch(e){} return l; }; })();
 function drawDragonFly(v){ const F=drFx; if(!F) return; const q=Math.min(1,(performance.now()-F.t)/2600); if(q>=1&&performance.now()-F.t>3200){ drFx=null; return; } const e=q<.5?2*q*q:1-Math.pow(-2*q+2,2)/2, x=F.from[0]+(F.to[0]-F.from[0])*e, y=F.from[1]+(F.to[1]-F.from[1])*e, [cx,cy]=ctr(x,y), u=TW, lift=Math.sin(Math.min(1,q)*Math.PI)*u*1.6+u*.4;
   ctx.save(); ctx.fillStyle='rgba(0,0,0,.25)'; ctx.beginPath(); ctx.ellipse(cx,cy,u*.4,u*.15,0,0,7); ctx.fill(); ctx.restore(); try{ drawFpet(ctx,'dragon','none',cx,cy-lift,u*1.1,F.to[0]>=F.from[0]?1:-1,NOWT||0,8); }catch(e){} }
@@ -8155,7 +8154,7 @@ try{ FAQ.push(
   ['What are hero journeys?','hero journey heroes away mission offline','Send your heroes on a 1 to 10 hour journey (Adventures → Hero Journeys). They bring back gold, gems, gear, Star Shards and a story. They can\'t fight while they are away.'],
   ['What is clan research?','clan research tree upgrade treasury drills','Clan members donate gold to research upgrades for the whole clan: Treasury (+gold and stone), War Drills (+attack and defense), Beast Lore (+pet power) and Master Builders (faster building).'],
   ['How do friend missions work?','friend mission together team up','Pick a friend and a mission (Adventures → Friend Missions). Everything you and your friend do counts for 3 days. Finish it for 40 gems, 5 Star Shards and 50,000 gold.'],
-  ['How do I ride my dragon?','dragon ride fly flying','With the Hero Dragon mount, tap any tile within 60 tiles and press 🐉 Fly here. Your dragon clears the fog there forever and sometimes finds treasure. You can fly every 30 minutes.'],
+  ['How do I ride my dragon?','dragon ride fly flying','With the Hero Dragon mount, tap any tile within 60 tiles and press 🐉 Fly here. Your dragon sometimes finds treasure there. You can fly every 30 minutes.'],
   ['How does the treasure hunt work?','treasure hunt riddle pirate dig clue','Every week a pirate hides treasure and leaves riddle clues (Adventures → Treasure Hunt). Tap a tile and press ⛏️ Dig for treasure. You get 6 digs a day, and the first player to find it wins a big prize.'],
   ['How do I send gifts?','gift gifts mailbox send friend','In Adventures → Gift Mailbox you can send a free gift to each friend once a day (5 a day). Gifts you get wait in your mailbox.'],
   ['How do I get new castle skins?','castle skin skins look pirate candy crystal','Adventures → Castle Skins has 7 new looks like the Pirate Fort, Candy Castle and Crystal Palace. Buy one with gems and switch any time.']); }catch(e){}
@@ -9679,7 +9678,7 @@ function cwxDialog(){ const c=myClan(); if(!c) return nkOpen('⚔️ Clan Wars',
 /* ---------- 2. Weekly Tournament: the game already has one (tnDialog); it is now in 🎮 Play → 🆕 New and counts for levels, outfits and the museum ---------- */
 /* ---------- 3. Weather effects + forecast ---------- */
 var WX_FX={clear:['☀️','Clear','No effect.'],rain:['🌧️','Rain','Armies march 10% slower.'],storm:['⛈️','Thunderstorm','Armies march 20% slower.'],fog:['🌫️','Fog','Hard to see. No other effect.'],snow:['❄️','Snow','Armies march 15% slower and troops cost 20% more food.']};
-function wxAt(t){ const blk=Math.floor(t/(20*60000)), h=hash2(blk,77,5); if(seasonNow()==='winter') return h<.4?'snow':h<.5?'fog':'clear'; return h<.2?'rain':h<.26?'storm':h<.33?'fog':'clear'; }
+function wxAt(t){ const blk=Math.floor(t/(20*60000)), h=hash2(blk,77,5); if(seasonNow()==='winter') return h<.4?'snow':'clear'; return h<.2?'rain':h<.26?'storm':'clear'; }
 function wxMarch(){ const w=weatherNow(); return w==='storm'?1.2:w==='snow'?1.15:w==='rain'?1.1:1; }
 function wxFood(){ return weatherNow()==='snow'?1.2:1; }
 mountSpd=(o=>function(){ return o.apply(this,arguments)*wxMarch(); })(mountSpd);
@@ -11768,6 +11767,7 @@ setInterval(()=>{ try{ renderNext(); }catch(e){} },2000);
 
 /* ===== v65: what's new ===== */
 const WHATS_NEW={
+  154:['🌤️ The fog is gone: you can see the whole map, and foggy weather is gone too'],
   153:['⚡ Buttons feel faster: taps are never lost while the game is saving, and a double tap only counts once'],
   152:['♟️ Board game pieces now keep their colors while you wait for your turn'],
   151:['⛵ Sea battles: build warships and fight pirates, the Sea Serpent, the Kraken and other fleets (in the Sea harbor)','🎀 A weekly pet show: enter your pet and vote','♟️ Live board games: tic-tac-toe, connect four and checkers','🎟️ Invite rewards for you and your friends','👑 The Royal Council now meets twice a day','🌟 Hero talent rows are now unlocked with gold','🌍 World events were removed'],
@@ -11896,14 +11896,14 @@ setTimeout(()=>{ try{ holidayBtn(); const h=holidayToday(); if(h&&P(ME)&&P(ME).h
 setInterval(()=>{ try{ holidayBtn(); }catch(e){} },20000);
 
 /* ===== fog of war: you only see 50 tiles around your kingdom, your camp and your marching army ===== */
-var FOG_R=50;
+var FOG_R=0;
 var fogC=null, fogT=0, fogCv=null;
 function fogCenters(){ const tn=Date.now(); if(fogC&&tn-fogT<500) return fogC; const m=P(ME), l=[];
   if(m&&!m.dead){ const h=stats(ME).hall; if(h) l.push(xy(h)); const mm=m.march; if(mm&&mm.from&&mm.to){ const q=Math.max(0,Math.min(1,(now()-mm.start)/Math.max(1,mm.arr-mm.start))), [ax,ay]=xy(mm.from), [bx,by]=xy(mm.to); l.push([ax+(bx-ax)*q,ay+(by-ay)*q]); } }
   fogC=l; fogT=tn; return l; }
 function seenTile(x,y){ if(!FOG_R) return true; const cs=fogCenters(); if(!cs.length) return true; for(const [cx,cy] of cs){ const dx=x-cx, dy=y-cy; if(dx*dx+dy*dy<=FOG_R*FOG_R) return true; } return false; }
 const seenCell=k=>{ const [x,y]=xy(k); return seenTile(x,y); };
-function drawFog(dpr){ const cs=fogCenters(); if(!cs.length) return; const W=Math.ceil(VW*dpr), H=Math.ceil(VH*dpr);
+function drawFog(dpr){ if(!FOG_R) return; const cs=fogCenters(); if(!cs.length) return; const W=Math.ceil(VW*dpr), H=Math.ceil(VH*dpr);
   // skip the work when every corner of the view is inside the vision
   const v=view(), corners=[[v.x0,v.y0],[v.x1,v.y0],[v.x0,v.y1],[v.x1,v.y1]].map(([wx,wy])=>{ const a=(wx-OX)/(TW/2), b=(wy-OY)/(TH/2); return [(a+b)/2,(b-a)/2]; });
   if(corners.every(([x,y])=>seenTile(x,y))) return;
@@ -12041,7 +12041,7 @@ const STORY=[
   {who:'Mirabel',ic:'🧙',role:'the wizard',text:'I sense barbarians lurking near your borders. Show them what you are made of: <b>defeat a barbarian camp</b>.',goal:'Win against a barbarian camp',chk:(m)=>(m.stats?.raids||0)>=1,r:{gold:800,gems:15}},
   {who:'Tobin',ic:'💰',role:'the merchant',text:'Ah, a customer! Trade moves faster on good roads. Build a <b>Road</b> and your armies will march twice as fast.',goal:'Build a Road',chk:()=>Object.values(G.plots).some(q=>q.o===ME&&q.b==='road'),r:{gold:500,stone:500,gems:10}},
   {who:'Mirabel',ic:'🧙',role:'the wizard',text:'Your power grows. Raise your <b>Town Hall to level 4</b> and I will teach you a secret.',goal:'Town Hall level 4',chk:(m,s)=>s.hallLvl>=4,r:{gold:1500,gems:20}},
-  {who:'Sir Aldric',ic:'🛡️',role:'the old knight',text:'Beyond the fog lie lands no one has mapped. <b>Send troops to camp on wild land</b> and see what is out there.',goal:'Camp troops on wild land',chk:(m)=>!!(m.march&&m.march.stay)||!!(m.sf&&m.sf.camp),r:{gold:1200,stone:800,gems:15}},
+  {who:'Sir Aldric',ic:'🛡️',role:'the old knight',text:'Far away lie lands no one has visited. <b>Send troops to camp on wild land</b> and see what is out there.',goal:'Camp troops on wild land',chk:(m)=>!!(m.march&&m.march.stay)||!!(m.sf&&m.sf.camp),r:{gold:1200,stone:800,gems:15}},
   {who:'Tobin',ic:'💰',role:'the merchant',text:'Every hero needs a hobby! Try your luck at the <b>archery range or the jousting field</b>.',goal:'Play a mini-game',chk:(m)=>!!((m.arch&&m.arch.best)||(m.joust&&m.joust.best)),r:{gold:1000,gems:20}},
   {who:'Grom',ic:'👹',role:'the Barbarian Overlord',text:'HAH! So you are the little king everyone talks about. My monsters will crush you! Prove me wrong: <b>hit the World Boss</b> on a weekend.',goal:'Attack the World Boss',chk:(m)=>(m.wbHits||0)>=1,r:{gold:3000,gems:30}},
   {who:'Mirabel',ic:'🧙',role:'the wizard',text:'The old magic of the beasts... Build a <b>Pet Breeder</b> and raise a new pet.',goal:'Breed a pet',chk:(m)=>(m.stats?.bred||0)>=1,r:{gold:4000,gems:40}},
